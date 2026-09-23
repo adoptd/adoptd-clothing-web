@@ -7,7 +7,7 @@ import { sql } from '@vercel/postgres';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, honeypot, formRenderTime } = body;
+    const { email, name, honeypot, formRenderTime } = body;
 
     // Extract client IP for rate-limiting
     const forwardedFor = req.headers.get('x-forwarded-for');
@@ -43,16 +43,17 @@ export async function POST(req: NextRequest) {
     }
 
     const cleanEmail = email.trim().toLowerCase();
+    const cleanName = name ? name.trim() : '';
 
     // 3. Save to Airtable
-    await recordNewsletterSubscriber(cleanEmail);
+    await recordNewsletterSubscriber(cleanEmail, cleanName);
 
     // 4. Also store in Vercel Postgres if connected
     if (process.env.POSTGRES_URL) {
       try {
         await sql`
-          INSERT INTO newsletter_subscribers (email)
-          VALUES (${cleanEmail})
+          INSERT INTO newsletter_subscribers (email, name)
+          VALUES (${cleanEmail}, ${cleanName})
           ON CONFLICT (email) DO NOTHING;
         `;
       } catch (pgErr) {

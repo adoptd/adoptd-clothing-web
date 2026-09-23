@@ -190,22 +190,24 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 }
 
 // Record Newsletter Subscriber in Airtable
-export async function recordNewsletterSubscriber(email: string) {
+export async function recordNewsletterSubscriber(email: string, name?: string) {
   if (!base) {
-    console.log('[Mock] Recorded newsletter subscriber in local state:', email);
+    console.log('[Mock] Recorded newsletter subscriber in local state:', email, name);
     return { success: true };
   }
 
   try {
-    await base('Newsletter Subscribers').create([
-      {
-        fields: {
-          Email: email,
-          'Consent Given': true,
-          Status: 'Active',
-        },
-      },
-    ]);
+    const fields: any = {
+      Email: email,
+      'Consent Given': true,
+      Status: 'Active',
+    };
+    if (name) {
+      fields['First Name'] = name;
+      fields['Name'] = name;
+    }
+
+    await base('Newsletter Subscribers').create([{ fields }]);
     return { success: true };
   } catch (error) {
     console.error('Error recording newsletter subscriber in Airtable:', error);

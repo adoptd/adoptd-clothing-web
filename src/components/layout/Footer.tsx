@@ -10,6 +10,7 @@ interface FooterProps {
 }
 
 export function Footer({ settings }: FooterProps) {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [formRenderTime, setFormRenderTime] = useState<number>(0);
@@ -35,7 +36,7 @@ export function Footer({ settings }: FooterProps) {
       const res = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, honeypot, formRenderTime }),
+        body: JSON.stringify({ email, name, honeypot, formRenderTime }),
       });
 
       const data = await res.json();
@@ -43,6 +44,7 @@ export function Footer({ settings }: FooterProps) {
 
       setSubscribed(true);
       setEmail('');
+      setName('');
     } catch (err: any) {
       setErrorMsg(err.message || 'Error subscribing.');
     } finally {
@@ -87,14 +89,24 @@ export function Footer({ settings }: FooterProps) {
                     />
                   </div>
 
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email"
-                    required
-                    className="w-full px-4 py-2.5 bg-transparent border border-white/80 text-white placeholder-white/80 rounded-sm focus:outline-none focus:ring-1 focus:ring-white text-sm"
-                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="First Name (optional)"
+                      className="w-full px-4 py-2.5 bg-transparent border border-white/80 text-white placeholder-white/80 rounded-sm focus:outline-none focus:ring-1 focus:ring-white text-sm"
+                    />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Email Address"
+                      required
+                      className="w-full px-4 py-2.5 bg-transparent border border-white/80 text-white placeholder-white/80 rounded-sm focus:outline-none focus:ring-1 focus:ring-white text-sm"
+                    />
+                  </div>
+
                   <button
                     type="submit"
                     disabled={loading}
