@@ -32,13 +32,13 @@ export function Navbar({ settings }: NavbarProps) {
       {/* Main Black Header Bar */}
       <div className="bg-[#030303] text-white border-b border-stone-800">
         <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
-          <div className="flex items-center justify-between h-28 sm:h-36 lg:h-40 py-2 sm:py-3">
+          <div className="flex items-center justify-between h-32 sm:h-40 lg:h-44 py-2 sm:py-3">
             
             {/* Brand Logo - Maximized & Proportionate */}
             <div className="flex-shrink-0 flex items-center">
               <Link
                 href="/"
-                className="block relative h-24 sm:h-30 lg:h-34 w-48 sm:w-72 lg:w-96 focus:outline-none transition-transform hover:opacity-95"
+                className="block relative h-28 sm:h-36 lg:h-40 w-60 sm:w-80 lg:w-[460px] focus:outline-none transition-transform hover:opacity-95"
                 aria-label="Adoptd Christian Clothing Home"
               >
                 <Image
@@ -47,28 +47,28 @@ export function Navbar({ settings }: NavbarProps) {
                   fill
                   priority
                   className="object-contain object-left"
-                  sizes="(max-width: 640px) 220px, (max-width: 1024px) 320px, 420px"
+                  sizes="(max-width: 640px) 260px, (max-width: 1024px) 380px, 480px"
                 />
               </Link>
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-8 xl:space-x-10">
+            <nav className="hidden lg:flex items-center space-x-8 xl:space-x-12">
               <Link
                 href="/"
-                className="text-sm xl:text-base font-semibold tracking-wide text-white hover:text-[#00736a] transition"
+                className="text-base xl:text-lg font-bold tracking-wide text-white hover:text-[#00736a] transition"
               >
                 Home
               </Link>
               <Link
                 href="/church-print-services"
-                className="text-sm xl:text-base font-semibold tracking-wide text-stone-200 hover:text-[#00736a] transition"
+                className="text-base xl:text-lg font-bold tracking-wide text-stone-200 hover:text-[#00736a] transition"
               >
                 Church & Ministry Print Services
               </Link>
               <Link
                 href="/shop"
-                className="text-sm xl:text-base font-semibold tracking-wide text-stone-200 hover:text-[#00736a] transition"
+                className="text-base xl:text-lg font-bold tracking-wide text-stone-200 hover:text-[#00736a] transition"
               >
                 Blaze city Merch
               </Link>
