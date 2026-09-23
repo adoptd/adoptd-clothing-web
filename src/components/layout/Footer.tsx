@@ -112,8 +112,8 @@ export function Footer({ settings }: FooterProps) {
       </div>
 
       {/* 2. Main Dark Charcoal Footer (#424242) */}
-      <div className="bg-[#424242] text-white pt-10 pb-16">
-        <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 space-y-8">
+      <div className="bg-[#424242] text-white pt-12 pb-16">
+        <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 space-y-10">
           
           {/* Top Row: Social Icons */}
           <div className="flex items-center space-x-4 text-white">
@@ -124,7 +124,7 @@ export function Footer({ settings }: FooterProps) {
               className="hover:opacity-80 transition"
               aria-label="Facebook"
             >
-              <Facebook className="w-4 h-4 fill-current" />
+              <Facebook className="w-5 h-5 fill-current" />
             </a>
             <a
               href="https://www.instagram.com/adoptdchristian"
@@ -133,77 +133,77 @@ export function Footer({ settings }: FooterProps) {
               className="hover:opacity-80 transition"
               aria-label="Instagram"
             >
-              <Instagram className="w-4 h-4" />
+              <Instagram className="w-5 h-5" />
             </a>
           </div>
 
           {/* Large Brand Heading */}
           <div>
-            <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white">
+            <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">
               @ADOPTD-CLOTHING
             </h3>
           </div>
 
-          {/* 4 Footer Columns */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-xs">
+          {/* 4 Footer Columns (Tighter Column Spacing & Larger Typography) */}
+          <div className="max-w-4xl lg:max-w-5xl grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 lg:gap-10 text-sm sm:text-[15px]">
             
             {/* SHOP Column */}
-            <div className="space-y-3">
-              <h4 className="font-black uppercase tracking-wider text-white">SHOP</h4>
-              <ul className="space-y-2 text-stone-300 font-normal">
+            <div className="space-y-3.5">
+              <h4 className="font-black uppercase tracking-wider text-white text-sm sm:text-base">SHOP</h4>
+              <ul className="space-y-2 text-stone-200 font-medium">
                 <li className="flex flex-wrap gap-x-3">
-                  <Link href="/shop" className="hover:text-white">Christmas</Link>
-                  <Link href="/shop/tee-shirts" className="hover:text-white">T-Shirts</Link>
-                  <Link href="/shop/christian-hoodies-uk" className="hover:text-white">Hoodies</Link>
+                  <Link href="/shop" className="hover:text-white transition">Christmas</Link>
+                  <Link href="/shop/tee-shirts" className="hover:text-white transition">T-Shirts</Link>
+                  <Link href="/shop/christian-hoodies-uk" className="hover:text-white transition">Hoodies</Link>
                 </li>
                 <li className="flex flex-wrap gap-x-3">
-                  <Link href="/shop/sweaters" className="hover:text-white">Sweaters</Link>
-                  <Link href="/shop/christian-bags" className="hover:text-white">Tote Bags</Link>
+                  <Link href="/shop/sweaters" className="hover:text-white transition">Sweaters</Link>
+                  <Link href="/shop/christian-bags" className="hover:text-white transition">Tote Bags</Link>
                 </li>
-                <li><Link href="/church-print-services" className="hover:text-white">Church & Ministry Print Services</Link></li>
-                <li><Link href="/shop" className="hover:text-white">Blaze city Merch</Link></li>
+                <li><Link href="/church-print-services" className="hover:text-white transition">Church & Ministry Print Services</Link></li>
+                <li><Link href="/shop" className="hover:text-white transition">Blaze city Merch</Link></li>
               </ul>
             </div>
 
             {/* COMPANY Column */}
-            <div className="space-y-3">
-              <h4 className="font-black uppercase tracking-wider text-white">COMPANY</h4>
-              <ul className="space-y-2 text-stone-300 font-normal">
-                <li><Link href="/" className="hover:text-white">Home</Link></li>
-                <li><Link href="/church-print-services" className="hover:text-white">Church & Ministry Print Services</Link></li>
-                <li><Link href="/shop" className="hover:text-white">Blaze city Merch</Link></li>
+            <div className="space-y-3.5">
+              <h4 className="font-black uppercase tracking-wider text-white text-sm sm:text-base">COMPANY</h4>
+              <ul className="space-y-2 text-stone-200 font-medium">
+                <li><Link href="/" className="hover:text-white transition">Home</Link></li>
+                <li><Link href="/church-print-services" className="hover:text-white transition">Church & Ministry Print Services</Link></li>
+                <li><Link href="/shop" className="hover:text-white transition">Blaze city Merch</Link></li>
               </ul>
             </div>
 
             {/* INFO Column */}
-            <div className="space-y-3">
-              <h4 className="font-black uppercase tracking-wider text-white">INFO</h4>
-              <ul className="space-y-2 text-stone-300 font-normal">
+            <div className="space-y-3.5">
+              <h4 className="font-black uppercase tracking-wider text-white text-sm sm:text-base">INFO</h4>
+              <ul className="space-y-2 text-stone-200 font-medium">
                 <li className="flex flex-wrap gap-x-3">
-                  <Link href="/church-print-services" className="hover:text-white">Support</Link>
-                  <Link href="/church-print-services" className="hover:text-white">Contact</Link>
-                  <Link href="/shop" className="hover:text-white">My account</Link>
+                  <Link href="/church-print-services" className="hover:text-white transition">Support</Link>
+                  <Link href="/church-print-services" className="hover:text-white transition">Contact</Link>
+                  <Link href="/shop" className="hover:text-white transition">My account</Link>
                 </li>
               </ul>
             </div>
 
             {/* FOLLOW Column */}
-            <div className="space-y-3">
-              <h4 className="font-black uppercase tracking-wider text-white">FOLLOW</h4>
-              <ul className="space-y-2 text-stone-300 font-normal">
+            <div className="space-y-3.5">
+              <h4 className="font-black uppercase tracking-wider text-white text-sm sm:text-base">FOLLOW</h4>
+              <ul className="space-y-2 text-stone-200 font-medium">
                 <li className="flex flex-wrap gap-x-3">
-                  <Link href="/shop/christian-bags" className="hover:text-white">Tote Bags</Link>
-                  <Link href="/shop" className="hover:text-white">Christmas</Link>
-                  <Link href="/shop/sweaters" className="hover:text-white">Sweaters</Link>
+                  <Link href="/shop/christian-bags" className="hover:text-white transition">Tote Bags</Link>
+                  <Link href="/shop" className="hover:text-white transition">Christmas</Link>
+                  <Link href="/shop/sweaters" className="hover:text-white transition">Sweaters</Link>
                 </li>
                 <li className="flex flex-wrap gap-x-3">
-                  <Link href="/shop/christian-hoodies-uk" className="hover:text-white">Hoodies</Link>
-                  <Link href="/shop/tee-shirts" className="hover:text-white">T-Shirts</Link>
-                  <Link href="/church-print-services" className="hover:text-white">Contact</Link>
+                  <Link href="/shop/christian-hoodies-uk" className="hover:text-white transition">Hoodies</Link>
+                  <Link href="/shop/tee-shirts" className="hover:text-white transition">T-Shirts</Link>
+                  <Link href="/church-print-services" className="hover:text-white transition">Contact</Link>
                 </li>
                 <li className="flex flex-wrap gap-x-3">
-                  <Link href="/shop" className="hover:text-white">My account</Link>
-                  <Link href="/church-print-services" className="hover:text-white">Support</Link>
+                  <Link href="/shop" className="hover:text-white transition">My account</Link>
+                  <Link href="/church-print-services" className="hover:text-white transition">Support</Link>
                 </li>
               </ul>
             </div>
@@ -211,7 +211,7 @@ export function Footer({ settings }: FooterProps) {
           </div>
 
           {/* Copyright */}
-          <div className="pt-8 text-xs text-stone-400">
+          <div className="pt-8 text-xs sm:text-sm text-stone-300">
             <p>Copyright 2026 AdoptdClothing. All rights reserved.</p>
           </div>
 
