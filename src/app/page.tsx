@@ -222,7 +222,7 @@ export default async function HomePage() {
       <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 text-center">
         <div className="bg-[#808080] text-white rounded-[28px] p-8 sm:p-14 max-w-5xl mx-auto space-y-6 shadow-sm">
           {/* Teal Quote Circle */}
-          <div className="w-14 h-14 bg-[#5ebbb0] rounded-full flex items-center justify-center mx-auto shadow-sm">
+          <div className="w-14 h-14 bg-[#00736a] rounded-full flex items-center justify-center mx-auto shadow-sm">
             <Quote className="w-7 h-7 text-white fill-white" />
           </div>
 

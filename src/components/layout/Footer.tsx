@@ -52,8 +52,8 @@ export function Footer({ settings }: FooterProps) {
 
   return (
     <footer className="bg-white text-stone-900">
-      {/* 1. Teal Green Newsletter Block (#54a69b) - Full Width 2-Column */}
-      <div className="w-full bg-[#54a69b] text-white py-12 sm:py-16">
+      {/* 1. Teal Green Newsletter Block (#00736a) - Full Width 2-Column */}
+      <div className="w-full bg-[#00736a] text-white py-12 sm:py-16">
         <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             
@@ -62,7 +62,7 @@ export function Footer({ settings }: FooterProps) {
               <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tight text-white">
                 JOIN OUR NEWSLETTER
               </h3>
-              <p className="text-teal-50 text-sm sm:text-base lg:text-lg font-normal leading-relaxed max-w-xl">
+              <p className="text-white/90 text-sm sm:text-base lg:text-lg font-normal leading-relaxed max-w-xl">
                 Be part of something brighter. It’s not about sales — it’s about community, connection, and sharing how we spread God’s light.
               </p>
             </div>
@@ -98,7 +98,7 @@ export function Footer({ settings }: FooterProps) {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-2.5 bg-white text-[#54a69b] hover:bg-stone-100 font-bold text-xs uppercase tracking-widest rounded-full transition shadow-sm disabled:opacity-50 text-center"
+                    className="w-full py-2.5 bg-white text-[#00736a] hover:bg-stone-100 font-bold text-xs uppercase tracking-widest rounded-full transition shadow-sm disabled:opacity-50 text-center"
                   >
                     {loading ? '...' : 'SUBSCRIBE'}
                   </button>

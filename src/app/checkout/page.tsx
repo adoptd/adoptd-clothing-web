@@ -98,7 +98,7 @@ export default function CheckoutPage() {
               {/* Security Badges */}
               <div className="bg-stone-50 p-4 rounded-xl border border-stone-200 text-stone-600 text-xs space-y-2">
                 <div className="flex items-center space-x-2">
-                  <Lock className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                  <Lock className="w-4 h-4 text-[#00736a] flex-shrink-0" />
                   <span>Stripe 256-bit SSL encrypted checkout</span>
                 </div>
                 <div className="flex items-center space-x-2">

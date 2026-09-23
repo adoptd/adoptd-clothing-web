@@ -74,7 +74,7 @@ function CheckoutForm({ clientSecret }: { clientSecret: string }) {
             2. Payment Details
           </h3>
           <span className="flex items-center text-xs text-stone-500 space-x-1">
-            <Lock className="w-3.5 h-3.5 text-emerald-600" />
+            <Lock className="w-3.5 h-3.5 text-[#00736a]" />
             <span>256-bit Encrypted</span>
           </span>
         </div>
@@ -186,7 +186,7 @@ export function StripeEmbeddedCheckout() {
     appearance: {
       theme: 'stripe',
       variables: {
-        colorPrimary: '#1a1a1a',
+        colorPrimary: '#00736a',
         colorBackground: '#ffffff',
         colorText: '#1c1917',
         colorDanger: '#dc2626',

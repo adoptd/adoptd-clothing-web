@@ -51,7 +51,7 @@ export function CartDrawer() {
               <Truck className="w-4 h-4 text-stone-900" />
               <span>
                 {remainingForFreeShipping === 0 ? (
-                  <strong className="text-emerald-700 font-semibold">🎉 You have unlocked Free UK Delivery!</strong>
+                  <strong className="text-[#00736a] font-semibold">🎉 You have unlocked Free UK Delivery!</strong>
                 ) : (
                   <>
                     Add <strong>£{remainingForFreeShipping.toFixed(2)}</strong> more for <strong>Free UK Delivery</strong>
