@@ -151,27 +151,27 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 3. MISSION SECTION (Full-Width White on Black 2-Column Layout) */}
+      {/* 3. MISSION SECTION (Full-Width White on Black 2-Column Layout - Perfectly Aligned Top & Bottom) */}
       <section className="w-full bg-[#030303] text-white py-16 sm:py-24 border-y border-stone-800">
         <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-stretch">
             
-            {/* Left Column: Large Headline */}
-            <div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1] text-left">
+            {/* Left Column: Large Headline (Matches Right Column Depth) */}
+            <div className="flex flex-col justify-between h-full">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-[62px] font-black tracking-tight text-white leading-[1.12] text-left">
                 Christian Clothing That Shares Your Faith
               </h2>
             </div>
 
-            {/* Right Column: Left-Justified Copy with Specific Bold Phrases */}
-            <div className="space-y-5 text-left">
+            {/* Right Column: Copy Proportioned to Match Left Column Height */}
+            <div className="flex flex-col justify-between h-full space-y-4 lg:space-y-0 text-left">
               <p className="text-stone-300 text-base sm:text-lg leading-relaxed font-normal">
                 ADOPTED was created from a simple desire — <strong className="text-white font-bold">to share Jesus with the world.</strong> I believe clothing can start conversations, provoke questions and offer encouragement in everyday life.
               </p>
               <p className="text-stone-300 text-base sm:text-lg leading-relaxed font-normal">
                 Every design has a purpose: <strong className="text-white font-bold">to get people thinking, talking and, above all, to point people towards Jesus.</strong>
               </p>
-              <div className="pt-2">
+              <div>
                 <p className="font-bold text-white text-base sm:text-lg tracking-wider uppercase">
                   Small brand. Big message. Jesus at the centre.
                 </p>
