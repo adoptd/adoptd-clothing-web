@@ -13,15 +13,15 @@ export default function ChurchPrintServicesPage() {
   return (
     <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 py-16 space-y-16">
       {/* Header */}
-      <div className="text-center max-w-3xl mx-auto space-y-4">
+      <div className="text-center max-w-5xl lg:max-w-6xl mx-auto space-y-4">
         <div className="inline-flex items-center space-x-2 bg-stone-100 text-stone-800 px-4 py-1.5 rounded-full text-xs font-semibold">
           <Church className="w-4 h-4 text-stone-900" />
           <span>Custom Ministry Solutions</span>
         </div>
-        <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-black text-stone-950">
+        <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-stone-950 whitespace-normal sm:whitespace-nowrap">
           Church & Ministry Print Services
         </h1>
-        <p className="text-stone-700 text-base sm:text-lg leading-relaxed font-normal">
+        <p className="text-stone-700 text-base sm:text-lg leading-relaxed font-normal max-w-3xl mx-auto">
           Premium, ethically sourced custom t-shirts, hoodies, and tote bags for your church staff, youth camps, worship ministries, and outreach events.
         </p>
       </div>
