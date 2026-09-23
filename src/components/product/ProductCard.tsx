@@ -15,7 +15,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const displayImage = activeVariant?.images[0] || product.featuredImage;
 
   return (
-    <div className="group flex flex-col bg-white rounded-xl overflow-hidden border border-stone-200/80 hover:border-stone-400/80 transition-all duration-300 hover:shadow-md">
+    <div className="group flex flex-col bg-[#00736a] rounded-xl overflow-hidden border border-[#00736a]/30 hover:border-[#00736a] transition-all duration-300 hover:shadow-md">
       {/* Product Image Container */}
       <Link href={`/product/${product.slug}`} className="relative aspect-square w-full bg-stone-100 overflow-hidden block">
         <Image
@@ -32,15 +32,18 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
       </Link>
 
-      {/* Product Info */}
-      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
+      {/* Product Info (Brand Green #00736a with White Typography) */}
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3 bg-[#00736a] text-white">
         <div>
-          <span className="text-xs uppercase tracking-wider text-stone-500 font-bold">
+          <Link
+            href={`/shop/${product.category}`}
+            className="inline-block text-xs uppercase tracking-wider text-white/80 hover:text-white font-bold transition-colors"
+          >
             {product.categoryName}
-          </span>
+          </Link>
           <Link
             href={`/product/${product.slug}`}
-            className="block font-semibold text-base sm:text-lg text-stone-900 group-hover:text-stone-700 transition line-clamp-2 mt-1"
+            className="block font-semibold text-base sm:text-lg text-white hover:text-white/90 transition line-clamp-2 mt-1"
           >
             {product.name}
           </Link>
@@ -58,27 +61,27 @@ export function ProductCard({ product }: ProductCardProps) {
                 }}
                 className={`w-4 h-4 rounded-full border transition-all ${
                   idx === activeColorIndex
-                    ? 'ring-2 ring-stone-900 ring-offset-1 scale-110'
-                    : 'border-stone-300 opacity-80 hover:opacity-100'
+                    ? 'ring-2 ring-white ring-offset-1 ring-offset-[#00736a] scale-110'
+                    : 'border-white/50 opacity-80 hover:opacity-100'
                 }`}
                 style={{ backgroundColor: color.hex }}
                 title={color.name}
                 aria-label={`View ${color.name} variant`}
               />
             ))}
-            <span className="text-xs text-stone-500 pl-1.5 font-medium">
+            <span className="text-xs text-white/80 pl-1.5 font-medium">
               {product.colors.length} colors
             </span>
           </div>
         )}
 
         {/* Price Row */}
-        <div className="flex items-baseline space-x-2 pt-2 border-t border-stone-100">
-          <span className="font-black text-stone-950 text-lg sm:text-xl">
+        <div className="flex items-baseline space-x-2 pt-2 border-t border-white/20">
+          <span className="font-black text-white text-lg sm:text-xl">
             £{product.price.toFixed(2)}
           </span>
           {product.compareAtPrice && product.compareAtPrice > product.price && (
-            <span className="text-sm text-stone-400 line-through">
+            <span className="text-sm text-white/70 line-through">
               £{product.compareAtPrice.toFixed(2)}
             </span>
           )}
