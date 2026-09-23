@@ -54,7 +54,7 @@ export function Footer({ settings }: FooterProps) {
     <footer className="bg-white text-stone-900">
       {/* 1. Teal Green Newsletter Block (#54a69b) - Full Width 2-Column */}
       <div className="w-full bg-[#54a69b] text-white py-12 sm:py-16">
-        <div className="max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-12">
+        <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             
             {/* Left Column: Heading & Subtitle */}
@@ -67,15 +67,15 @@ export function Footer({ settings }: FooterProps) {
               </p>
             </div>
 
-            {/* Right Column: Form (Input + Pill Button Below It) */}
-            <div className="w-full max-w-md lg:ml-auto">
+            {/* Right Column: Form (Stretched Full Width Across Column) */}
+            <div className="w-full">
               {subscribed ? (
                 <div className="bg-white/20 border border-white text-white p-3.5 rounded-lg text-sm font-semibold text-center flex items-center justify-center space-x-2">
                   <CheckCircle2 className="w-5 h-5 text-white" />
                   <span>Success! Thank you for subscribing.</span>
                 </div>
               ) : (
-                <form onSubmit={handleNewsletterSubmit} className="space-y-3">
+                <form onSubmit={handleNewsletterSubmit} className="space-y-3 w-full">
                   <div aria-hidden="true" style={{ display: 'none', position: 'absolute', left: '-9999px' }}>
                     <input
                       type="text"
@@ -113,7 +113,7 @@ export function Footer({ settings }: FooterProps) {
 
       {/* 2. Main Dark Charcoal Footer (#424242) */}
       <div className="bg-[#424242] text-white pt-10 pb-16">
-        <div className="max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-12 space-y-8">
+        <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 space-y-8">
           
           {/* Top Row: Social Icons */}
           <div className="flex items-center space-x-4 text-white">
