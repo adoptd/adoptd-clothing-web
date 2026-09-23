@@ -38,7 +38,7 @@ export default async function HomePage() {
     <div className="bg-white text-stone-900 space-y-16 sm:space-y-24 pb-16">
       
       {/* 1. HERO SECTION (2 Main Columns Layout Matching Original) */}
-      <section className="max-w-[1440px] mx-auto px-2 sm:px-3 lg:px-4 pt-6 sm:pt-10">
+      <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 pt-6 sm:pt-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
           
           {/* COLUMN 1 (LEFT MAIN COLUMN) */}
@@ -140,7 +140,7 @@ export default async function HomePage() {
       </section>
 
       {/* 2. FEATURED PRODUCTS GRID (Exact Live Products) */}
-      <section className="max-w-[1440px] mx-auto px-2 sm:px-3 lg:px-4">
+      <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {featuredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
@@ -150,7 +150,7 @@ export default async function HomePage() {
 
       {/* 3. MISSION SECTION (Full-Width White on Black 2-Column Layout) */}
       <section className="w-full bg-[#030303] text-white py-16 sm:py-24 border-y border-stone-800">
-        <div className="max-w-[1440px] mx-auto px-2 sm:px-3 lg:px-4">
+        <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             
             {/* Left Column: Large Headline */}
@@ -180,7 +180,7 @@ export default async function HomePage() {
       </section>
 
       {/* 4. SHOP BY CATEGORY (1:1 Exact Match with Block Cards) */}
-      <section className="max-w-[1440px] mx-auto px-2 sm:px-3 lg:px-4">
+      <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
         <div className="text-center mb-10">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
             Shop By Category
@@ -219,7 +219,7 @@ export default async function HomePage() {
       </section>
 
       {/* 5. CUSTOMER TESTIMONIAL / REVIEW (Exact Live Review with #efefef Block) */}
-      <section className="max-w-[1440px] mx-auto px-2 sm:px-3 lg:px-4 text-center">
+      <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 text-center">
         <div className="bg-[#efefef] rounded-[24px] p-8 sm:p-12 max-w-4xl mx-auto space-y-4 shadow-sm">
           <Quote className="w-8 h-8 text-stone-400 mx-auto" />
           <blockquote className="text-stone-700 text-sm sm:text-base leading-relaxed italic">

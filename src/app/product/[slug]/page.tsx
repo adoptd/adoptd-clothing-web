@@ -52,7 +52,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const jsonLd = generateProductJsonLd(product);
 
   return (
-    <div className="max-w-[1440px] mx-auto px-2 sm:px-3 lg:px-4 py-12">
+    <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 py-12">
       {/* Inject Google Structured Data */}
       <script
         type="application/ld+json"

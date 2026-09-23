@@ -53,7 +53,7 @@ export function Footer({ settings }: FooterProps) {
   return (
     <footer className="bg-white text-stone-900">
       {/* 1. Teal Green Newsletter Block (#00736a) */}
-      <div className="max-w-[1440px] mx-auto px-2 sm:px-3 lg:px-4 pb-16">
+      <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 pb-16">
         <div className="bg-[#00736a] text-white rounded-[24px] p-8 sm:p-14 text-center space-y-6 shadow-lg">
           <div className="max-w-2xl mx-auto space-y-3">
             <h3 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
@@ -135,7 +135,7 @@ export function Footer({ settings }: FooterProps) {
 
       {/* 2. Main Dark Footer (#030303) */}
       <div className="bg-[#030303] text-white pt-16 pb-12 border-t border-stone-800">
-        <div className="max-w-[1440px] mx-auto px-2 sm:px-3 lg:px-4 space-y-12">
+        <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 space-y-12">
           
           {/* 4 Footer Columns */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-xs">
