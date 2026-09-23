@@ -58,32 +58,32 @@ export function TestimonialsCarousel() {
 
   return (
     <div
-      className="relative max-w-5xl mx-auto px-4 sm:px-8 py-4 sm:py-6"
+      className="relative max-w-6xl xl:max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-6 sm:py-10"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Teal Quote Circle */}
-      <div className="w-14 h-14 bg-[#00736a] rounded-full flex items-center justify-center mx-auto shadow-sm mb-6">
-        <Quote className="w-7 h-7 text-white fill-white" />
+      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#00736a] rounded-full flex items-center justify-center mx-auto shadow-md mb-8">
+        <Quote className="w-8 h-8 sm:w-10 sm:h-10 text-white fill-white" />
       </div>
 
       {/* Main Carousel View Area with Left/Right Navigation */}
-      <div className="relative flex items-center justify-between gap-3 sm:gap-6">
+      <div className="relative flex items-center justify-between gap-4 sm:gap-8 lg:gap-12">
         {/* Left Arrow Button */}
         <button
           onClick={prevSlide}
           aria-label="Previous testimony"
-          className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-white/80"
+          className="shrink-0 w-11 h-11 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full bg-white/10 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-white shadow-sm"
         >
-          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+          <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
         </button>
 
         {/* Testimonial Quote Content */}
-        <div className="flex-1 text-center min-h-[160px] sm:min-h-[140px] flex flex-col justify-center px-2 sm:px-6">
-          <blockquote className="text-white text-xs sm:text-sm md:text-base font-extrabold leading-relaxed uppercase tracking-wide transition-opacity duration-300">
+        <div className="flex-1 text-center min-h-[180px] sm:min-h-[160px] lg:min-h-[180px] flex flex-col justify-center px-2 sm:px-6">
+          <blockquote className="text-white text-base sm:text-xl md:text-2xl lg:text-[28px] font-extrabold leading-relaxed uppercase tracking-wide transition-opacity duration-300">
             {current.quote}
           </blockquote>
-          <p className="mt-3 text-white/90 text-xs sm:text-sm font-black tracking-widest uppercase">
+          <p className="mt-5 text-white/95 text-sm sm:text-base md:text-lg lg:text-xl font-black tracking-widest uppercase">
             — {current.author}
           </p>
         </div>
@@ -92,14 +92,14 @@ export function TestimonialsCarousel() {
         <button
           onClick={nextSlide}
           aria-label="Next testimony"
-          className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-white/80"
+          className="shrink-0 w-11 h-11 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full bg-white/10 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-white shadow-sm"
         >
-          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+          <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
         </button>
       </div>
 
       {/* Pagination Indicators / Dots */}
-      <div className="flex items-center justify-center space-x-2.5 pt-6">
+      <div className="flex items-center justify-center space-x-3 pt-8 sm:pt-10">
         {testimonials.map((item, idx) => (
           <button
             key={item.id}
@@ -107,8 +107,8 @@ export function TestimonialsCarousel() {
             aria-label={`Go to testimony ${idx + 1}`}
             className={`transition-all duration-300 rounded-full focus:outline-none ${
               idx === currentIndex
-                ? 'w-7 h-2.5 bg-white'
-                : 'w-2.5 h-2.5 bg-white/40 hover:bg-white/70'
+                ? 'w-8 sm:w-10 h-3 bg-white'
+                : 'w-3 h-3 bg-white/40 hover:bg-white/70'
             }`}
           />
         ))}
