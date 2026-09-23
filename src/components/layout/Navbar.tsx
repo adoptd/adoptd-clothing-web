@@ -32,13 +32,13 @@ export function Navbar({ settings }: NavbarProps) {
       {/* Main Black Header Bar */}
       <div className="bg-[#030303] text-white border-b border-stone-800">
         <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
-          <div className="flex items-center justify-between h-32 sm:h-40 lg:h-44 py-2 sm:py-3">
+          <div className="flex items-center justify-between py-4 sm:py-5 lg:py-6">
             
-            {/* Brand Logo - Maximized & Proportionate */}
+            {/* Brand Logo - Maximized & Proportionate with 15% Vertical Breathing Room */}
             <div className="flex-shrink-0 flex items-center">
               <Link
                 href="/"
-                className="block relative h-28 sm:h-36 lg:h-40 w-60 sm:w-80 lg:w-[460px] focus:outline-none transition-transform hover:opacity-95"
+                className="block relative h-16 sm:h-20 lg:h-24 w-44 sm:w-60 lg:w-72 focus:outline-none transition-transform hover:opacity-95"
                 aria-label="Adoptd Christian Clothing Home"
               >
                 <Image
@@ -47,7 +47,7 @@ export function Navbar({ settings }: NavbarProps) {
                   fill
                   priority
                   className="object-contain object-left"
-                  sizes="(max-width: 640px) 260px, (max-width: 1024px) 380px, 480px"
+                  sizes="(max-width: 640px) 180px, (max-width: 1024px) 260px, 320px"
                 />
               </Link>
             </div>
