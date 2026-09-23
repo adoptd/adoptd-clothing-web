@@ -1,9 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Quote } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { getProducts } from '@/lib/airtable';
 import { ProductCard } from '@/components/product/ProductCard';
+import { TestimonialsCarousel } from '@/components/home/TestimonialsCarousel';
 
 export const revalidate = 60;
 
@@ -221,25 +222,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 5. CUSTOMER TESTIMONIAL / REVIEW (Exact Match with Screenshot) */}
-      <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 text-center">
-        <div className="bg-[#808080] text-white rounded-[28px] p-8 sm:p-14 max-w-5xl mx-auto space-y-6 shadow-sm">
-          {/* Teal Quote Circle */}
-          <div className="w-14 h-14 bg-[#00736a] rounded-full flex items-center justify-center mx-auto shadow-sm">
-            <Quote className="w-7 h-7 text-white fill-white" />
-          </div>
-
-          {/* Testimonial Quote */}
-          <blockquote className="text-white text-sm sm:text-base md:text-lg font-extrabold leading-relaxed max-w-3xl mx-auto uppercase tracking-wide">
-            I’M REALLY GLAD I FOUND ADOPTD CHRISTIAN CLOTHING. THE T-SHIRT I BOUGHT IS MORE THAN JUST SOMETHING TO WEAR — IT’S A SIMPLE, MEANINGFUL WAY TO SHARE MY FAITH. I LOVE THAT THE MESSAGE ON IT SERVES AS A GENTLE REMINDER FOR ANYONE WHO SEES IT TO THINK ABOUT GOD AND JESUS. IT’S SUBTLE, POSITIVE, AND EXACTLY THE KIND OF WAY I WANT TO SPREAD HOPE AND FAITH IN EVERYDAY LIFE. - PAUL KERSHAW
-          </blockquote>
-
-          {/* Carousel Pagination Dots */}
-          <div className="flex items-center justify-center space-x-2 pt-4">
-            <span className="w-2.5 h-2.5 rounded-full bg-white"></span>
-            <span className="w-2.5 h-2.5 rounded-full bg-white/40"></span>
-            <span className="w-2.5 h-2.5 rounded-full bg-white/40"></span>
-          </div>
+      {/* 5. CUSTOMER TESTIMONIALS (Full-Width Unrounded Section with Interactive Carousel) */}
+      <section className="w-full bg-[#808080] text-white py-14 sm:py-20">
+        <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
+          <TestimonialsCarousel />
         </div>
       </section>
 
