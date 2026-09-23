@@ -52,142 +52,166 @@ export function Footer({ settings }: FooterProps) {
 
   return (
     <footer className="bg-white text-stone-900">
-      {/* 1. Teal Green Newsletter Block (#00736a) - Full Width Rectangular Box */}
-      <div className="w-full bg-[#00736a] text-white py-16 sm:py-24 rounded-none border-y border-[#005c55]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <div className="space-y-3">
-            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
-              Join Our Newsletter
-            </h3>
-            <p className="text-teal-50 text-base sm:text-lg leading-relaxed">
-              Be part of something brighter. It’s not about sales — it’s about community, connection, and sharing how we spread God’s light.
-            </p>
-          </div>
-
-          {subscribed ? (
-            <div className="flex items-center justify-center space-x-2 text-white bg-teal-800/60 border border-teal-400/40 p-4 rounded-xl max-w-md mx-auto">
-              <CheckCircle2 className="w-5 h-5 text-teal-200" />
-              <span className="text-sm font-semibold">Success! Thank you for subscribing.</span>
+      {/* 1. Teal Green Newsletter Block (#54a69b) - Full Width 2-Column */}
+      <div className="w-full bg-[#54a69b] text-white py-12 sm:py-16">
+        <div className="max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+            
+            {/* Left Column: Heading & Subtitle */}
+            <div className="space-y-2 text-left">
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tight text-white">
+                JOIN OUR NEWSLETTER
+              </h3>
+              <p className="text-teal-50 text-xs sm:text-sm font-normal leading-relaxed max-w-xl">
+                Be part of something brighter. It’s not about sales — it’s about community, connection, and sharing how we spread God’s light.
+              </p>
             </div>
-          ) : (
-            <form onSubmit={handleNewsletterSubmit} className="space-y-3 pt-2">
-              <div aria-hidden="true" style={{ display: 'none', position: 'absolute', left: '-9999px' }}>
-                <input
-                  type="text"
-                  name="website_hp"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  value={honeypot}
-                  onChange={(e) => setHoneypot(e.target.value)}
-                />
-              </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  required
-                  className="flex-grow px-4 py-3.5 bg-white text-stone-900 placeholder-stone-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm shadow-sm font-medium"
-                />
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-8 py-3.5 bg-[#030303] text-white hover:bg-stone-800 font-bold text-xs uppercase tracking-wider rounded-lg transition shadow-md disabled:opacity-50"
-                >
-                  {loading ? '...' : 'Subscribe'}
-                </button>
-              </div>
-              {errorMsg && <p className="text-xs text-rose-200">{errorMsg}</p>}
-            </form>
-          )}
+            {/* Right Column: Form (Input + Pill Button Below It) */}
+            <div className="w-full max-w-md lg:ml-auto">
+              {subscribed ? (
+                <div className="bg-white/20 border border-white text-white p-3.5 rounded-lg text-sm font-semibold text-center flex items-center justify-center space-x-2">
+                  <CheckCircle2 className="w-5 h-5 text-white" />
+                  <span>Success! Thank you for subscribing.</span>
+                </div>
+              ) : (
+                <form onSubmit={handleNewsletterSubmit} className="space-y-3">
+                  <div aria-hidden="true" style={{ display: 'none', position: 'absolute', left: '-9999px' }}>
+                    <input
+                      type="text"
+                      name="website_hp"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                    />
+                  </div>
 
-          {/* Social Follow Links */}
-          <div className="flex items-center justify-center space-x-8 pt-4 text-xs font-bold uppercase tracking-wider text-teal-100">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email"
+                    required
+                    className="w-full px-4 py-2.5 bg-transparent border border-white/80 text-white placeholder-white/80 rounded-sm focus:outline-none focus:ring-1 focus:ring-white text-sm"
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-2.5 bg-white text-[#54a69b] hover:bg-stone-100 font-bold text-xs uppercase tracking-widest rounded-full transition shadow-sm disabled:opacity-50 text-center"
+                  >
+                    {loading ? '...' : 'SUBSCRIBE'}
+                  </button>
+                  {errorMsg && <p className="text-xs text-rose-100">{errorMsg}</p>}
+                </form>
+              )}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Main Dark Charcoal Footer (#424242) */}
+      <div className="bg-[#424242] text-white pt-10 pb-16">
+        <div className="max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-12 space-y-8">
+          
+          {/* Top Row: Social Icons */}
+          <div className="flex items-center space-x-4 text-white">
             <a
               href="https://facebook.com/adoptdclothing25/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center space-x-2 hover:text-white transition"
+              className="hover:opacity-80 transition"
+              aria-label="Facebook"
             >
-              <Facebook className="w-4 h-4" />
-              <span>Follow</span>
+              <Facebook className="w-4 h-4 fill-current" />
             </a>
             <a
               href="https://www.instagram.com/adoptdchristian"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center space-x-2 hover:text-white transition"
+              className="hover:opacity-80 transition"
+              aria-label="Instagram"
             >
               <Instagram className="w-4 h-4" />
-              <span>Follow</span>
             </a>
           </div>
 
-          <div className="pt-2">
-            <span className="font-extrabold text-xs sm:text-sm tracking-[0.25em] text-teal-200 uppercase">
-              @adoptd-CLOTHING
-            </span>
+          {/* Large Brand Heading */}
+          <div>
+            <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white">
+              @ADOPTD-CLOTHING
+            </h3>
           </div>
-        </div>
-      </div>
 
-      {/* 2. Main Dark Footer (#030303) */}
-      <div className="bg-[#030303] text-white pt-16 pb-12 border-t border-stone-800">
-        <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 space-y-12">
-          
           {/* 4 Footer Columns */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-xs">
             
             {/* SHOP Column */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <h4 className="font-black uppercase tracking-wider text-white">SHOP</h4>
-              <ul className="space-y-2.5 text-stone-400 font-medium">
-                <li><Link href="/shop" className="hover:text-[#00736a] transition">Christmas</Link></li>
-                <li><Link href="/shop/tee-shirts" className="hover:text-[#00736a] transition">T-Shirts</Link></li>
-                <li><Link href="/shop/christian-hoodies-uk" className="hover:text-[#00736a] transition">Hoodies</Link></li>
-                <li><Link href="/shop/sweaters" className="hover:text-[#00736a] transition">Sweaters</Link></li>
-                <li><Link href="/shop/christian-bags" className="hover:text-[#00736a] transition">Tote Bags</Link></li>
-                <li><Link href="/church-print-services" className="hover:text-[#00736a] transition">Church & Ministry Print Services</Link></li>
-                <li><Link href="/shop" className="hover:text-[#00736a] transition">Blaze city Merch</Link></li>
+              <ul className="space-y-2 text-stone-300 font-normal">
+                <li className="flex flex-wrap gap-x-3">
+                  <Link href="/shop" className="hover:text-white">Christmas</Link>
+                  <Link href="/shop/tee-shirts" className="hover:text-white">T-Shirts</Link>
+                  <Link href="/shop/christian-hoodies-uk" className="hover:text-white">Hoodies</Link>
+                </li>
+                <li className="flex flex-wrap gap-x-3">
+                  <Link href="/shop/sweaters" className="hover:text-white">Sweaters</Link>
+                  <Link href="/shop/christian-bags" className="hover:text-white">Tote Bags</Link>
+                </li>
+                <li><Link href="/church-print-services" className="hover:text-white">Church & Ministry Print Services</Link></li>
+                <li><Link href="/shop" className="hover:text-white">Blaze city Merch</Link></li>
               </ul>
             </div>
 
             {/* COMPANY Column */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <h4 className="font-black uppercase tracking-wider text-white">COMPANY</h4>
-              <ul className="space-y-2.5 text-stone-400 font-medium">
-                <li><Link href="/" className="hover:text-[#00736a] transition">Home</Link></li>
-                <li><Link href="/church-print-services" className="hover:text-[#00736a] transition">Church & Ministry Print Services</Link></li>
-                <li><Link href="/shop" className="hover:text-[#00736a] transition">Blaze city Merch</Link></li>
+              <ul className="space-y-2 text-stone-300 font-normal">
+                <li><Link href="/" className="hover:text-white">Home</Link></li>
+                <li><Link href="/church-print-services" className="hover:text-white">Church & Ministry Print Services</Link></li>
+                <li><Link href="/shop" className="hover:text-white">Blaze city Merch</Link></li>
               </ul>
             </div>
 
             {/* INFO Column */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <h4 className="font-black uppercase tracking-wider text-white">INFO</h4>
-              <ul className="space-y-2.5 text-stone-400 font-medium">
-                <li><Link href="/church-print-services" className="hover:text-[#00736a] transition">Support</Link></li>
-                <li><Link href="/church-print-services" className="hover:text-[#00736a] transition">Contact</Link></li>
-                <li><Link href="/privacy-policy" className="hover:text-[#00736a] transition">Privacy Policy & GDPR</Link></li>
+              <ul className="space-y-2 text-stone-300 font-normal">
+                <li className="flex flex-wrap gap-x-3">
+                  <Link href="/church-print-services" className="hover:text-white">Support</Link>
+                  <Link href="/church-print-services" className="hover:text-white">Contact</Link>
+                  <Link href="/shop" className="hover:text-white">My account</Link>
+                </li>
               </ul>
             </div>
 
             {/* FOLLOW Column */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <h4 className="font-black uppercase tracking-wider text-white">FOLLOW</h4>
-              <ul className="space-y-2.5 text-stone-400 font-medium">
-                <li><a href="https://facebook.com/adoptdclothing25/" target="_blank" rel="noopener noreferrer" className="hover:text-[#00736a] transition">Facebook</a></li>
-                <li><a href="https://www.instagram.com/adoptdchristian" target="_blank" rel="noopener noreferrer" className="hover:text-[#00736a] transition">Instagram</a></li>
-                <li><Link href="/blog" className="hover:text-[#00736a] transition">Blog & Journal</Link></li>
+              <ul className="space-y-2 text-stone-300 font-normal">
+                <li className="flex flex-wrap gap-x-3">
+                  <Link href="/shop/christian-bags" className="hover:text-white">Tote Bags</Link>
+                  <Link href="/shop" className="hover:text-white">Christmas</Link>
+                  <Link href="/shop/sweaters" className="hover:text-white">Sweaters</Link>
+                </li>
+                <li className="flex flex-wrap gap-x-3">
+                  <Link href="/shop/christian-hoodies-uk" className="hover:text-white">Hoodies</Link>
+                  <Link href="/shop/tee-shirts" className="hover:text-white">T-Shirts</Link>
+                  <Link href="/church-print-services" className="hover:text-white">Contact</Link>
+                </li>
+                <li className="flex flex-wrap gap-x-3">
+                  <Link href="/shop" className="hover:text-white">My account</Link>
+                  <Link href="/church-print-services" className="hover:text-white">Support</Link>
+                </li>
               </ul>
             </div>
 
           </div>
 
           {/* Copyright */}
-          <div className="pt-8 border-t border-stone-800 text-center text-xs text-stone-500">
+          <div className="pt-8 text-xs text-stone-400">
             <p>Copyright 2026 AdoptdClothing. All rights reserved.</p>
           </div>
 

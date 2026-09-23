@@ -218,16 +218,25 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 5. CUSTOMER TESTIMONIAL / REVIEW (Exact Live Review with #efefef Block) */}
+      {/* 5. CUSTOMER TESTIMONIAL / REVIEW (Exact Match with Screenshot) */}
       <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 text-center">
-        <div className="bg-[#efefef] rounded-[24px] p-8 sm:p-12 max-w-4xl mx-auto space-y-4 shadow-sm">
-          <Quote className="w-8 h-8 text-stone-400 mx-auto" />
-          <blockquote className="text-stone-700 text-sm sm:text-base leading-relaxed italic">
-            "I’m really glad I found Adoptd Christian Clothing. The T-shirt I bought is more than just something to wear — it’s a simple, meaningful way to share my faith. I love that the message is clear without being overpowering, and the quality is genuinely great. It’s comfortable, fits well, and feels like it was made with care. Knowing that it’s from an independent Christian brand makes it even better. I’ll definitely be ordering again and recommending it to others!"
+        <div className="bg-[#808080] text-white rounded-[28px] p-8 sm:p-14 max-w-5xl mx-auto space-y-6 shadow-sm">
+          {/* Teal Quote Circle */}
+          <div className="w-14 h-14 bg-[#5ebbb0] rounded-full flex items-center justify-center mx-auto shadow-sm">
+            <Quote className="w-7 h-7 text-white fill-white" />
+          </div>
+
+          {/* Testimonial Quote */}
+          <blockquote className="text-white text-sm sm:text-base md:text-lg font-extrabold leading-relaxed max-w-3xl mx-auto uppercase tracking-wide">
+            I’M REALLY GLAD I FOUND ADOPTD CHRISTIAN CLOTHING. THE T-SHIRT I BOUGHT IS MORE THAN JUST SOMETHING TO WEAR — IT’S A SIMPLE, MEANINGFUL WAY TO SHARE MY FAITH. I LOVE THAT THE MESSAGE ON IT SERVES AS A GENTLE REMINDER FOR ANYONE WHO SEES IT TO THINK ABOUT GOD AND JESUS. IT’S SUBTLE, POSITIVE, AND EXACTLY THE KIND OF WAY I WANT TO SPREAD HOPE AND FAITH IN EVERYDAY LIFE. - PAUL KERSHAW
           </blockquote>
-          <p className="text-xs font-bold uppercase tracking-wider text-stone-900 pt-2">
-            Verified Customer
-          </p>
+
+          {/* Carousel Pagination Dots */}
+          <div className="flex items-center justify-center space-x-2 pt-4">
+            <span className="w-2.5 h-2.5 rounded-full bg-white"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-white/40"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-white/40"></span>
+          </div>
         </div>
       </section>
 
