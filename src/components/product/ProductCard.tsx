@@ -33,14 +33,14 @@ export function ProductCard({ product }: ProductCardProps) {
       </Link>
 
       {/* Product Info */}
-      <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
         <div>
-          <span className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">
+          <span className="text-xs uppercase tracking-wider text-stone-500 font-bold">
             {product.categoryName}
           </span>
           <Link
             href={`/product/${product.slug}`}
-            className="block font-medium text-sm text-stone-900 group-hover:text-stone-700 transition line-clamp-2 mt-0.5"
+            className="block font-semibold text-base sm:text-lg text-stone-900 group-hover:text-stone-700 transition line-clamp-2 mt-1"
           >
             {product.name}
           </Link>
@@ -56,7 +56,7 @@ export function ProductCard({ product }: ProductCardProps) {
                   e.preventDefault();
                   setActiveColorIndex(idx);
                 }}
-                className={`w-3.5 h-3.5 rounded-full border transition-all ${
+                className={`w-4 h-4 rounded-full border transition-all ${
                   idx === activeColorIndex
                     ? 'ring-2 ring-stone-900 ring-offset-1 scale-110'
                     : 'border-stone-300 opacity-80 hover:opacity-100'
@@ -66,19 +66,19 @@ export function ProductCard({ product }: ProductCardProps) {
                 aria-label={`View ${color.name} variant`}
               />
             ))}
-            <span className="text-[10px] text-stone-400 pl-1">
+            <span className="text-xs text-stone-500 pl-1.5 font-medium">
               {product.colors.length} colors
             </span>
           </div>
         )}
 
         {/* Price Row */}
-        <div className="flex items-baseline space-x-2 pt-1 border-t border-stone-100">
-          <span className="font-bold text-stone-950 text-base">
+        <div className="flex items-baseline space-x-2 pt-2 border-t border-stone-100">
+          <span className="font-black text-stone-950 text-lg sm:text-xl">
             £{product.price.toFixed(2)}
           </span>
           {product.compareAtPrice && product.compareAtPrice > product.price && (
-            <span className="text-xs text-stone-400 line-through">
+            <span className="text-sm text-stone-400 line-through">
               £{product.compareAtPrice.toFixed(2)}
             </span>
           )}

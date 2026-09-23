@@ -11,49 +11,49 @@ export const metadata = constructMetadata({
 
 export default function ChurchPrintServicesPage() {
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+    <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 py-16 space-y-16">
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-4">
         <div className="inline-flex items-center space-x-2 bg-stone-100 text-stone-800 px-4 py-1.5 rounded-full text-xs font-semibold">
           <Church className="w-4 h-4 text-stone-900" />
           <span>Custom Ministry Solutions</span>
         </div>
-        <h1 className="font-serif text-3xl sm:text-5xl font-bold text-stone-950">
+        <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-black text-stone-950">
           Church & Ministry Print Services
         </h1>
-        <p className="text-stone-600 text-sm sm:text-base leading-relaxed">
+        <p className="text-stone-700 text-base sm:text-lg leading-relaxed font-normal">
           Premium, ethically sourced custom t-shirts, hoodies, and tote bags for your church staff, youth camps, worship ministries, and outreach events.
         </p>
       </div>
 
       {/* Benefits Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="bg-stone-50 border border-stone-200 rounded-2xl p-6 space-y-3">
-          <div className="w-10 h-10 bg-stone-900 text-white rounded-xl flex items-center justify-center font-bold">
+        <div className="bg-stone-50 border border-stone-200 rounded-2xl p-8 space-y-4">
+          <div className="w-12 h-12 bg-stone-900 text-white rounded-xl flex items-center justify-center font-black text-lg">
             1
           </div>
-          <h3 className="font-serif text-lg font-bold text-stone-900">Heavyweight Quality</h3>
-          <p className="text-xs text-stone-600 leading-relaxed">
+          <h3 className="font-serif text-xl font-bold text-stone-900">Heavyweight Quality</h3>
+          <p className="text-sm text-stone-600 leading-relaxed font-normal">
             We supply high-grade organic ringspun cotton and cozy heavyweight fleece that your congregation will genuinely love wearing weekly.
           </p>
         </div>
 
-        <div className="bg-stone-50 border border-stone-200 rounded-2xl p-6 space-y-3">
-          <div className="w-10 h-10 bg-stone-900 text-white rounded-xl flex items-center justify-center font-bold">
+        <div className="bg-stone-50 border border-stone-200 rounded-2xl p-8 space-y-4">
+          <div className="w-12 h-12 bg-stone-900 text-white rounded-xl flex items-center justify-center font-black text-lg">
             2
           </div>
-          <h3 className="font-serif text-lg font-bold text-stone-900">Bulk Ministry Pricing</h3>
-          <p className="text-xs text-stone-600 leading-relaxed">
+          <h3 className="font-serif text-xl font-bold text-stone-900">Bulk Ministry Pricing</h3>
+          <p className="text-sm text-stone-600 leading-relaxed font-normal">
             Tiered volume discounts designed for church budgets, youth groups, and conference merchandise without compromising quality.
           </p>
         </div>
 
-        <div className="bg-stone-50 border border-stone-200 rounded-2xl p-6 space-y-3">
-          <div className="w-10 h-10 bg-stone-900 text-white rounded-xl flex items-center justify-center font-bold">
+        <div className="bg-stone-50 border border-stone-200 rounded-2xl p-8 space-y-4">
+          <div className="w-12 h-12 bg-stone-900 text-white rounded-xl flex items-center justify-center font-black text-lg">
             3
           </div>
-          <h3 className="font-serif text-lg font-bold text-stone-900">Custom Design Support</h3>
-          <p className="text-xs text-stone-600 leading-relaxed">
+          <h3 className="font-serif text-xl font-bold text-stone-900">Custom Design Support</h3>
+          <p className="text-sm text-stone-600 leading-relaxed font-normal">
             Need help polishing your church logo, event theme typography, or choosing color combinations? We help guide you from concept to delivery.
           </p>
         </div>

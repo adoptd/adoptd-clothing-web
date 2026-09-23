@@ -119,21 +119,21 @@ export function ProductDetailClient({
             <span className="text-xs uppercase tracking-[0.25em] text-stone-500 font-bold block mb-1">
               {product.categoryName}
             </span>
-            <h1 className="font-serif text-3xl sm:text-4xl font-bold text-stone-950 leading-tight">
+            <h1 className="font-serif text-3xl sm:text-5xl font-black text-stone-950 leading-tight">
               {product.name}
             </h1>
 
             {/* Price Row */}
-            <div className="flex items-baseline space-x-3 mt-3">
-              <span className="font-bold text-2xl text-stone-950">
+            <div className="flex items-baseline space-x-3 mt-4">
+              <span className="font-black text-3xl sm:text-4xl text-stone-950">
                 £{product.price.toFixed(2)}
               </span>
               {product.compareAtPrice && product.compareAtPrice > product.price && (
-                <span className="text-sm text-stone-400 line-through">
+                <span className="text-lg text-stone-400 line-through">
                   £{product.compareAtPrice.toFixed(2)}
                 </span>
               )}
-              <span className="text-xs text-stone-500 font-medium pl-2 border-l border-stone-200">
+              <span className="text-xs sm:text-sm text-stone-500 font-medium pl-3 border-l border-stone-200">
                 Taxes included • Free UK shipping over £40
               </span>
             </div>
@@ -141,8 +141,8 @@ export function ProductDetailClient({
 
           {/* Scripture Verse Inspiration */}
           {product.scriptureReference && (
-            <div className="p-4 bg-stone-50 border-l-4 border-stone-800 rounded-r-xl text-xs sm:text-sm text-stone-800 italic flex items-start space-x-2">
-              <BookOpen className="w-4 h-4 text-stone-600 flex-shrink-0 mt-0.5" />
+            <div className="p-5 bg-stone-50 border-l-4 border-stone-800 rounded-r-xl text-sm sm:text-base text-stone-800 italic flex items-start space-x-3">
+              <BookOpen className="w-5 h-5 text-stone-600 flex-shrink-0 mt-0.5" />
               <span>{product.scriptureReference}</span>
             </div>
           )}
@@ -171,16 +171,16 @@ export function ProductDetailClient({
             <button
               onClick={handleAddToCart}
               disabled={!product.inStock}
-              className="w-full py-4 px-8 bg-stone-950 text-white rounded-xl font-bold text-sm tracking-wider uppercase hover:bg-stone-800 transition-all flex items-center justify-center space-x-2 shadow-xl disabled:opacity-50"
+              className="w-full py-5 px-8 bg-stone-950 text-white rounded-xl font-black text-base tracking-wider uppercase hover:bg-stone-800 transition-all flex items-center justify-center space-x-2 shadow-xl disabled:opacity-50"
             >
               {isAddedAnimation ? (
                 <>
-                  <Check className="w-5 h-5 text-emerald-400" />
+                  <Check className="w-6 h-6 text-emerald-400" />
                   <span>Added to Your Bag!</span>
                 </>
               ) : (
                 <>
-                  <ShoppingBag className="w-5 h-5" />
+                  <ShoppingBag className="w-6 h-6" />
                   <span>Add to Bag • £{product.price.toFixed(2)}</span>
                 </>
               )}
@@ -188,22 +188,22 @@ export function ProductDetailClient({
           </div>
 
           {/* Shipping & Quality Badges */}
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-stone-200 text-xs text-stone-600">
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-stone-200 text-sm text-stone-600">
             <div className="flex items-center space-x-2">
-              <Truck className="w-4 h-4 text-stone-900" />
+              <Truck className="w-5 h-5 text-stone-900" />
               <span>Fast & Tracked UK Shipping</span>
             </div>
             <div className="flex items-center space-x-2">
-              <ShieldCheck className="w-4 h-4 text-stone-900" />
+              <ShieldCheck className="w-5 h-5 text-stone-900" />
               <span>Ethical Apparel Sourcing</span>
             </div>
           </div>
 
           {/* Description & Care Accordion */}
-          <div className="space-y-4 pt-4 border-t border-stone-200 text-sm text-stone-700">
+          <div className="space-y-4 pt-4 border-t border-stone-200 text-base text-stone-700">
             <div>
-              <h3 className="font-serif font-bold text-stone-900 text-base mb-2">Description</h3>
-              <p className="leading-relaxed text-stone-600 text-xs sm:text-sm">
+              <h3 className="font-serif font-bold text-stone-900 text-lg mb-2">Description</h3>
+              <p className="leading-relaxed text-stone-600 text-sm sm:text-base">
                 {product.description}
               </p>
             </div>
@@ -213,7 +213,7 @@ export function ProductDetailClient({
                 <h4 className="font-semibold text-stone-900 text-xs uppercase tracking-wider mb-1">
                   Care Guidelines
                 </h4>
-                <p className="text-xs text-stone-500 leading-relaxed">
+                <p className="text-xs sm:text-sm text-stone-500 leading-relaxed">
                   {product.careInstructions}
                 </p>
               </div>
