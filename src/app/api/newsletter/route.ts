@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { recordNewsletterSubscriber } from '@/lib/airtable';
 import { validateSubmissionSpam } from '@/lib/spam-protection';
+import { checkRateLimitKV } from '@/lib/vercel-kv';
+import { sql } from '@vercel/postgres';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,7 +14,16 @@ export async function POST(req: NextRequest) {
     const realIp = req.headers.get('x-real-ip');
     const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : realIp || 'unknown';
 
-    // Run multi-layer spam & bot validation
+    // 1. Edge Distributed Rate Limiting via Vercel KV
+    const kvRateLimit = await checkRateLimitKV(`newsletter:${clientIp}`, 3, 600);
+    if (!kvRateLimit.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
+    // 2. Multi-layer spam & bot validation
     const spamCheck = validateSubmissionSpam({
       email: email ? email.trim().toLowerCase() : '',
       honeypot,
@@ -21,7 +32,6 @@ export async function POST(req: NextRequest) {
     });
 
     if (spamCheck.isSpam) {
-      // If honeypot or bot speed trap triggered, silently return 200 OK so bots think they succeeded without saving spam
       if (spamCheck.silentDrop) {
         return NextResponse.json({ success: true, message: 'Subscribed successfully' });
       }
@@ -32,8 +42,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Save cleaned, verified email to Airtable
-    await recordNewsletterSubscriber(email.trim().toLowerCase());
+    const cleanEmail = email.trim().toLowerCase();
+
+    // 3. Save to Airtable
+    await recordNewsletterSubscriber(cleanEmail);
+
+    // 4. Also store in Vercel Postgres if connected
+    if (process.env.POSTGRES_URL) {
+      try {
+        await sql`
+          INSERT INTO newsletter_subscribers (email)
+          VALUES (${cleanEmail})
+          ON CONFLICT (email) DO NOTHING;
+        `;
+      } catch (pgErr) {
+        console.warn('[Vercel Postgres] Failed to mirror subscriber:', pgErr);
+      }
+    }
 
     return NextResponse.json({ success: true, message: 'Subscribed successfully' });
   } catch (error: any) {
