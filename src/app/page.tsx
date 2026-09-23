@@ -35,7 +35,7 @@ export default async function HomePage() {
   ];
 
   return (
-    <div className="bg-white text-stone-900 space-y-16 sm:space-y-24 pb-16">
+    <div className="bg-white text-stone-900 space-y-16 sm:space-y-24 pb-0">
       
       {/* 1. HERO SECTION (2 Main Columns Layout Matching Original) */}
       <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 pt-6 sm:pt-10">

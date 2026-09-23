@@ -52,8 +52,8 @@ export function Footer({ settings }: FooterProps) {
 
   return (
     <footer className="bg-white text-stone-900">
-      {/* 1. Teal Green Newsletter Block (#00736a) - Full Width */}
-      <div className="w-full bg-[#00736a] text-white py-16 sm:py-24">
+      {/* 1. Teal Green Newsletter Block (#00736a) - Full Width Rectangular Box */}
+      <div className="w-full bg-[#00736a] text-white py-16 sm:py-24 rounded-none border-y border-[#005c55]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
           <div className="space-y-3">
             <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
