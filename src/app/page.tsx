@@ -37,50 +37,52 @@ export default async function HomePage() {
   return (
     <div className="bg-white text-stone-900 space-y-16 sm:space-y-24 pb-16">
       
-      {/* 1. HERO SECTION (1:1 Exact Match) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          
-          {/* Left Text Column */}
-          <div className="space-y-6">
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-stone-900 block">
-              SMALL BUSINESS. BIG FAITH.
-            </span>
-            <p className="text-stone-800 text-base sm:text-lg leading-relaxed font-normal">
-              ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity. Every purchase helps a small business keep creating, designing and sharing faith through clothing.
-            </p>
-            <p className="text-stone-600 text-sm italic">
-              Thank you for choosing to support an independent Christian brand.
-            </p>
+      {/* 1. HERO SECTION (1:1 Exact Match with #efefef Block) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10">
+        <div className="bg-[#efefef] rounded-[24px] p-8 sm:p-12 lg:p-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            
+            {/* Left Text Column */}
+            <div className="space-y-6">
+              <span className="text-xs font-black uppercase tracking-[0.25em] text-stone-900 block">
+                SMALL BUSINESS. BIG FAITH.
+              </span>
+              <p className="text-stone-800 text-base sm:text-lg leading-relaxed font-normal">
+                ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity. Every purchase helps a small business keep creating, designing and sharing faith through clothing.
+              </p>
+              <p className="text-stone-600 text-sm italic">
+                Thank you for choosing to support an independent Christian brand.
+              </p>
 
-            <div className="flex flex-wrap gap-4 pt-2">
-              <Link
-                href="/shop/tee-shirts"
-                className="px-6 py-3.5 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-stone-800 transition"
-              >
-                Shop T-Shirts
-              </Link>
-              <Link
-                href="/shop/christian-hoodies-uk"
-                className="px-6 py-3.5 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-stone-800 transition"
-              >
-                Shop Hoodies
-              </Link>
+              <div className="flex flex-wrap gap-4 pt-2">
+                <Link
+                  href="/shop/tee-shirts"
+                  className="px-6 py-3.5 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-stone-800 transition"
+                >
+                  Shop T-Shirts
+                </Link>
+                <Link
+                  href="/shop/christian-hoodies-uk"
+                  className="px-6 py-3.5 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-stone-800 transition"
+                >
+                  Shop Hoodies
+                </Link>
+              </div>
             </div>
-          </div>
 
-          {/* Right Hero Image */}
-          <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-stone-100 shadow-md">
-            <Image
-              src="https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/adoptd-christian-clothing_pNlRVDt8-400x250-1.webp"
-              alt="Adoptd Christian Clothing Collection"
-              fill
-              priority
-              className="object-cover object-center"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-          </div>
+            {/* Right Hero Image */}
+            <div className="relative aspect-[4/3] w-full rounded-[20px] overflow-hidden bg-white shadow-sm">
+              <Image
+                src="/images/hero-hoodie.webp"
+                alt="Adoptd Christian Clothing Collection"
+                fill
+                priority
+                className="object-cover object-center"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
 
+          </div>
         </div>
       </section>
 
@@ -93,9 +95,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 3. MISSION SECTION (1:1 Exact Match) */}
-      <section className="bg-stone-50 py-16 sm:py-24 border-y border-stone-200/80">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+      {/* 3. MISSION SECTION (1:1 Exact Match with #efefef Block) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-[#efefef] rounded-[24px] p-10 sm:p-16 text-center max-w-4xl mx-auto space-y-6">
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900">
             Christian Clothing That Shares Your Faith
           </h2>
@@ -113,7 +115,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 4. SHOP BY CATEGORY (1:1 Exact Match) */}
+      {/* 4. SHOP BY CATEGORY (1:1 Exact Match with Block Cards) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
@@ -125,9 +127,9 @@ export default async function HomePage() {
           {categories.map((cat) => (
             <div
               key={cat.slug}
-              className="bg-stone-50 border border-stone-200 rounded-xl p-8 flex flex-col items-center justify-between text-center space-y-6 hover:shadow-lg transition-all"
+              className="bg-[#efefef] rounded-[20px] p-8 flex flex-col items-center justify-between text-center space-y-6 hover:shadow-md transition-all"
             >
-              <div className="relative aspect-square w-32 rounded-lg overflow-hidden bg-stone-200">
+              <div className="relative aspect-square w-32 rounded-lg overflow-hidden bg-white shadow-sm">
                 <Image
                   src={cat.image}
                   alt={cat.name}
@@ -152,9 +154,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 5. CUSTOMER TESTIMONIAL / REVIEW (Exact Live Review) */}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-10">
-        <div className="bg-stone-50 border border-stone-200 rounded-2xl p-8 sm:p-12 space-y-4 shadow-sm">
+      {/* 5. CUSTOMER TESTIMONIAL / REVIEW (Exact Live Review with #efefef Block) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="bg-[#efefef] rounded-[24px] p-8 sm:p-12 max-w-4xl mx-auto space-y-4 shadow-sm">
           <Quote className="w-8 h-8 text-stone-400 mx-auto" />
           <blockquote className="text-stone-700 text-sm sm:text-base leading-relaxed italic">
             "I’m really glad I found Adoptd Christian Clothing. The T-shirt I bought is more than just something to wear — it’s a simple, meaningful way to share my faith. I love that the message is clear without being overpowering, and the quality is genuinely great. It’s comfortable, fits well, and feels like it was made with care. Knowing that it’s from an independent Christian brand makes it even better. I’ll definitely be ordering again and recommending it to others!"

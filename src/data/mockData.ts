@@ -27,7 +27,7 @@ export const mockProducts: Product[] = [
         name: "Natural Canvas",
         hex: "#EAE0D5",
         images: [
-          "https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/mockup-of-a-man-with-a-loc-hairstyle-carrying-a-tote-bag-on-his-back-in-a-park-m56958-2-300x300.webp"
+          "/images/products/he-makes-all-things-new-tote.webp"
         ]
       }
     ],
@@ -35,7 +35,7 @@ export const mockProducts: Product[] = [
     scriptureReference: "Revelation 21:5 — 'Behold, I am making all things new.'",
     careInstructions: "Wipe clean or gentle cold hand wash.",
     sizeGuideType: "tote-bag",
-    featuredImage: "https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/mockup-of-a-man-with-a-loc-hairstyle-carrying-a-tote-bag-on-his-back-in-a-park-m56958-2-300x300.webp",
+    featuredImage: "/images/products/he-makes-all-things-new-tote.webp",
     relatedProductIds: ["prod_bag_2", "prod_bag_3", "prod_hoodie_5"],
     seoTitle: "He Makes All Things New Tote Bag | Adoptd Clothing",
     seoDescription: "Eco-friendly 100% cotton Christian tote bag for study books and daily errands."
@@ -54,7 +54,7 @@ export const mockProducts: Product[] = [
         name: "Natural Canvas",
         hex: "#EAE0D5",
         images: [
-          "https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/sublimated-canvas-tote-bag-mockup-of-a-woman-texting-a11495-300x300.webp"
+          "/images/products/the-true-vine-tote.webp"
         ]
       }
     ],
@@ -62,7 +62,7 @@ export const mockProducts: Product[] = [
     scriptureReference: "John 15:5 — 'I am the vine; you are the branches.'",
     careInstructions: "Hand wash in cold water.",
     sizeGuideType: "tote-bag",
-    featuredImage: "https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/sublimated-canvas-tote-bag-mockup-of-a-woman-texting-a11495-300x300.webp",
+    featuredImage: "/images/products/the-true-vine-tote.webp",
     relatedProductIds: ["prod_bag_1", "prod_bag_4", "prod_hoodie_2"],
     seoTitle: "The True Vine Tote Bag | Christian Bags UK",
     seoDescription: "Shop The True Vine canvas tote bag inspired by John 15."
@@ -81,7 +81,7 @@ export const mockProducts: Product[] = [
         name: "Natural Canvas",
         hex: "#EAE0D5",
         images: [
-          "https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/mockup-of-a-woman-holding-a-tote-bag-with-both-hands-28863-300x300.webp"
+          "/images/products/more-of-him-tote.webp"
         ]
       }
     ],
@@ -89,7 +89,7 @@ export const mockProducts: Product[] = [
     scriptureReference: "John 3:30 — 'He must increase, but I must decrease.'",
     careInstructions: "Spot clean with a damp cloth.",
     sizeGuideType: "tote-bag",
-    featuredImage: "https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/mockup-of-a-woman-holding-a-tote-bag-with-both-hands-28863-300x300.webp",
+    featuredImage: "/images/products/more-of-him-tote.webp",
     relatedProductIds: ["prod_bag_1", "prod_bag_2", "prod_hoodie_3"],
     seoTitle: "More of Him Less of Me Tote Bag | Adoptd Clothing",
     seoDescription: "John 3:30 inspired canvas tote bag. Simple faith statements for intentional living."
@@ -108,7 +108,7 @@ export const mockProducts: Product[] = [
         name: "Natural Canvas",
         hex: "#EAE0D5",
         images: [
-          "https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/canvas-tote-bag-mockup-over-a-woman-s-shoulder-a11492-300x300.webp"
+          "/images/products/amazing-grace-tote.webp"
         ]
       }
     ],
@@ -116,7 +116,7 @@ export const mockProducts: Product[] = [
     scriptureReference: "Ephesians 2:8 — 'For by grace you have been saved through faith.'",
     careInstructions: "Spot clean or hand wash cold.",
     sizeGuideType: "tote-bag",
-    featuredImage: "https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/canvas-tote-bag-mockup-over-a-woman-s-shoulder-a11492-300x300.webp",
+    featuredImage: "/images/products/amazing-grace-tote.webp",
     relatedProductIds: ["prod_hoodie_5", "prod_bag_1", "prod_tee_7"],
     seoTitle: "Amazing Grace Tote Bag | Adoptd Christian Clothing",
     seoDescription: "Heavy canvas Amazing Grace tote bag made for church, study, and daily shopping."
@@ -135,7 +135,7 @@ export const mockProducts: Product[] = [
         name: "Sand / Natural",
         hex: "#D8C7B5",
         images: [
-          "https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/atwnhqw4tqcd9pvzeylr-300x300.webp"
+          "/images/products/amazing-grace-hoodie.webp"
         ]
       }
     ],
@@ -143,7 +143,7 @@ export const mockProducts: Product[] = [
     scriptureReference: "Ephesians 2:8-9 — 'For by grace you have been saved through faith.'",
     careInstructions: "Machine wash 30°C inside out. Air dry recommended.",
     sizeGuideType: "unisex-hoodie",
-    featuredImage: "https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/atwnhqw4tqcd9pvzeylr-300x300.webp",
+    featuredImage: "/images/products/amazing-grace-hoodie.webp",
     relatedProductIds: ["prod_bag_4", "prod_hoodie_1", "prod_tee_7"],
     seoTitle: "Amazing Grace Christian Hoodie | Adoptd Clothing UK",
     seoDescription: "Wrap yourself in grace. Heavyweight Christian hoodie designed to start conversations."

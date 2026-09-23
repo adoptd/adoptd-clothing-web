@@ -51,21 +51,22 @@ export function Footer({ settings }: FooterProps) {
   };
 
   return (
-    <footer className="bg-white text-stone-900 border-t border-stone-200 pt-16 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-        
-        {/* Newsletter Section (1:1 Exact Match) */}
-        <div className="max-w-2xl mx-auto text-center space-y-4">
-          <h3 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
-            Join Our Newsletter
-          </h3>
-          <p className="text-stone-600 text-sm leading-relaxed">
-            Be part of something brighter. It’s not about sales — it’s about community, connection, and sharing how we spread God’s light.
-          </p>
+    <footer className="bg-white text-stone-900">
+      {/* 1. Teal Green Newsletter Block (#00736a) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="bg-[#00736a] text-white rounded-[24px] p-8 sm:p-14 text-center space-y-6 shadow-lg">
+          <div className="max-w-2xl mx-auto space-y-3">
+            <h3 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
+              Join Our Newsletter
+            </h3>
+            <p className="text-teal-50 text-sm sm:text-base leading-relaxed">
+              Be part of something brighter. It’s not about sales — it’s about community, connection, and sharing how we spread God’s light.
+            </p>
+          </div>
 
           {subscribed ? (
-            <div className="flex items-center justify-center space-x-2 text-emerald-700 bg-emerald-50 border border-emerald-200 p-4 rounded-md">
-              <CheckCircle2 className="w-5 h-5" />
+            <div className="flex items-center justify-center space-x-2 text-white bg-teal-800/60 border border-teal-400/40 p-4 rounded-xl max-w-md mx-auto">
+              <CheckCircle2 className="w-5 h-5 text-teal-200" />
               <span className="text-sm font-semibold">Success! Thank you for subscribing.</span>
             </div>
           ) : (
@@ -81,34 +82,34 @@ export function Footer({ settings }: FooterProps) {
                 />
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
+              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email"
+                  placeholder="Enter your email"
                   required
-                  className="flex-grow px-4 py-3 bg-white border border-stone-300 text-stone-900 placeholder-stone-400 rounded-md focus:outline-none focus:ring-2 focus:ring-black text-sm"
+                  className="flex-grow px-4 py-3.5 bg-white text-stone-900 placeholder-stone-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm shadow-sm font-medium"
                 />
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-6 py-3 bg-black text-white hover:bg-stone-800 font-bold text-xs uppercase tracking-wider rounded-md transition disabled:opacity-50"
+                  className="px-8 py-3.5 bg-[#030303] text-white hover:bg-stone-800 font-bold text-xs uppercase tracking-wider rounded-lg transition shadow-md disabled:opacity-50"
                 >
                   {loading ? '...' : 'Subscribe'}
                 </button>
               </div>
-              {errorMsg && <p className="text-xs text-rose-600">{errorMsg}</p>}
+              {errorMsg && <p className="text-xs text-rose-200">{errorMsg}</p>}
             </form>
           )}
 
           {/* Social Follow Links */}
-          <div className="flex items-center justify-center space-x-6 pt-4 text-xs font-bold uppercase tracking-wider text-stone-900">
+          <div className="flex items-center justify-center space-x-8 pt-4 text-xs font-bold uppercase tracking-wider text-teal-100">
             <a
               href="https://facebook.com/adoptdclothing25/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center space-x-1.5 hover:text-stone-600 transition"
+              className="flex items-center space-x-2 hover:text-white transition"
             >
               <Facebook className="w-4 h-4" />
               <span>Follow</span>
@@ -117,75 +118,80 @@ export function Footer({ settings }: FooterProps) {
               href="https://www.instagram.com/adoptdchristian"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center space-x-1.5 hover:text-stone-600 transition"
+              className="flex items-center space-x-2 hover:text-white transition"
             >
               <Instagram className="w-4 h-4" />
               <span>Follow</span>
             </a>
           </div>
-        </div>
 
-        {/* Social Handle Banner */}
-        <div className="text-center pt-8 border-t border-stone-200">
-          <span className="font-extrabold text-sm sm:text-base tracking-[0.2em] text-stone-900 uppercase">
-            @adoptd-CLOTHING
-          </span>
+          <div className="pt-2">
+            <span className="font-extrabold text-xs sm:text-sm tracking-[0.25em] text-teal-200 uppercase">
+              @adoptd-CLOTHING
+            </span>
+          </div>
         </div>
+      </div>
 
-        {/* 4 Footer Columns (1:1 Exact Match) */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-xs pt-4 border-t border-stone-200">
+      {/* 2. Main Dark Footer (#030303) */}
+      <div className="bg-[#030303] text-white pt-16 pb-12 border-t border-stone-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
-          {/* SHOP Column */}
-          <div className="space-y-3">
-            <h4 className="font-black uppercase tracking-wider text-stone-900">SHOP</h4>
-            <ul className="space-y-2 text-stone-600 font-medium">
-              <li><Link href="/shop" className="hover:text-black">Christmas</Link></li>
-              <li><Link href="/shop/tee-shirts" className="hover:text-black">T-Shirts</Link></li>
-              <li><Link href="/shop/christian-hoodies-uk" className="hover:text-black">Hoodies</Link></li>
-              <li><Link href="/shop/sweaters" className="hover:text-black">Sweaters</Link></li>
-              <li><Link href="/shop/christian-bags" className="hover:text-black">Tote Bags</Link></li>
-              <li><Link href="/church-print-services" className="hover:text-black">Church & Ministry Print Services</Link></li>
-              <li><Link href="/shop" className="hover:text-black">Blaze city Merch</Link></li>
-            </ul>
+          {/* 4 Footer Columns */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-xs">
+            
+            {/* SHOP Column */}
+            <div className="space-y-4">
+              <h4 className="font-black uppercase tracking-wider text-white">SHOP</h4>
+              <ul className="space-y-2.5 text-stone-400 font-medium">
+                <li><Link href="/shop" className="hover:text-[#00736a] transition">Christmas</Link></li>
+                <li><Link href="/shop/tee-shirts" className="hover:text-[#00736a] transition">T-Shirts</Link></li>
+                <li><Link href="/shop/christian-hoodies-uk" className="hover:text-[#00736a] transition">Hoodies</Link></li>
+                <li><Link href="/shop/sweaters" className="hover:text-[#00736a] transition">Sweaters</Link></li>
+                <li><Link href="/shop/christian-bags" className="hover:text-[#00736a] transition">Tote Bags</Link></li>
+                <li><Link href="/church-print-services" className="hover:text-[#00736a] transition">Church & Ministry Print Services</Link></li>
+                <li><Link href="/shop" className="hover:text-[#00736a] transition">Blaze city Merch</Link></li>
+              </ul>
+            </div>
+
+            {/* COMPANY Column */}
+            <div className="space-y-4">
+              <h4 className="font-black uppercase tracking-wider text-white">COMPANY</h4>
+              <ul className="space-y-2.5 text-stone-400 font-medium">
+                <li><Link href="/" className="hover:text-[#00736a] transition">Home</Link></li>
+                <li><Link href="/church-print-services" className="hover:text-[#00736a] transition">Church & Ministry Print Services</Link></li>
+                <li><Link href="/shop" className="hover:text-[#00736a] transition">Blaze city Merch</Link></li>
+              </ul>
+            </div>
+
+            {/* INFO Column */}
+            <div className="space-y-4">
+              <h4 className="font-black uppercase tracking-wider text-white">INFO</h4>
+              <ul className="space-y-2.5 text-stone-400 font-medium">
+                <li><Link href="/church-print-services" className="hover:text-[#00736a] transition">Support</Link></li>
+                <li><Link href="/church-print-services" className="hover:text-[#00736a] transition">Contact</Link></li>
+                <li><Link href="/privacy-policy" className="hover:text-[#00736a] transition">Privacy Policy & GDPR</Link></li>
+              </ul>
+            </div>
+
+            {/* FOLLOW Column */}
+            <div className="space-y-4">
+              <h4 className="font-black uppercase tracking-wider text-white">FOLLOW</h4>
+              <ul className="space-y-2.5 text-stone-400 font-medium">
+                <li><a href="https://facebook.com/adoptdclothing25/" target="_blank" rel="noopener noreferrer" className="hover:text-[#00736a] transition">Facebook</a></li>
+                <li><a href="https://www.instagram.com/adoptdchristian" target="_blank" rel="noopener noreferrer" className="hover:text-[#00736a] transition">Instagram</a></li>
+                <li><Link href="/blog" className="hover:text-[#00736a] transition">Blog & Journal</Link></li>
+              </ul>
+            </div>
+
           </div>
 
-          {/* COMPANY Column */}
-          <div className="space-y-3">
-            <h4 className="font-black uppercase tracking-wider text-stone-900">COMPANY</h4>
-            <ul className="space-y-2 text-stone-600 font-medium">
-              <li><Link href="/" className="hover:text-black">Home</Link></li>
-              <li><Link href="/church-print-services" className="hover:text-black">Church & Ministry Print Services</Link></li>
-              <li><Link href="/shop" className="hover:text-black">Blaze city Merch</Link></li>
-            </ul>
-          </div>
-
-          {/* INFO Column */}
-          <div className="space-y-3">
-            <h4 className="font-black uppercase tracking-wider text-stone-900">INFO</h4>
-            <ul className="space-y-2 text-stone-600 font-medium">
-              <li><Link href="/church-print-services" className="hover:text-black">Support</Link></li>
-              <li><Link href="/church-print-services" className="hover:text-black">Contact</Link></li>
-              <li><Link href="/privacy-policy" className="hover:text-black">Privacy Policy & GDPR</Link></li>
-            </ul>
-          </div>
-
-          {/* FOLLOW Column */}
-          <div className="space-y-3">
-            <h4 className="font-black uppercase tracking-wider text-stone-900">FOLLOW</h4>
-            <ul className="space-y-2 text-stone-600 font-medium">
-              <li><a href="https://facebook.com/adoptdclothing25/" target="_blank" rel="noopener noreferrer" className="hover:text-black">Facebook</a></li>
-              <li><a href="https://www.instagram.com/adoptdchristian" target="_blank" rel="noopener noreferrer" className="hover:text-black">Instagram</a></li>
-              <li><Link href="/blog" className="hover:text-black">Blog & Journal</Link></li>
-            </ul>
+          {/* Copyright */}
+          <div className="pt-8 border-t border-stone-800 text-center text-xs text-stone-500">
+            <p>Copyright 2026 AdoptdClothing. All rights reserved.</p>
           </div>
 
         </div>
-
-        {/* Copyright */}
-        <div className="pt-8 border-t border-stone-200 text-center text-xs text-stone-500">
-          <p>Copyright 2026 AdoptdClothing. All rights reserved.</p>
-        </div>
-
       </div>
     </footer>
   );
