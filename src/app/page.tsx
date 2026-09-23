@@ -148,20 +148,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 3. MISSION SECTION (1:1 Exact Match with #efefef Block) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-[#efefef] rounded-[24px] p-10 sm:p-16 text-center max-w-4xl mx-auto space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900">
+      {/* 3. MISSION SECTION (Full-Width White on Black) */}
+      <section className="w-full bg-[#030303] text-white py-16 sm:py-24 border-y border-stone-800">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
             Christian Clothing That Shares Your Faith
           </h2>
-          <p className="text-stone-700 text-base sm:text-lg leading-relaxed">
+          <p className="text-stone-300 text-base sm:text-lg leading-relaxed font-normal">
             ADOPTED was created from a simple desire — to share Jesus with the world. I believe clothing can start conversations, provoke questions and offer encouragement in everyday life.
           </p>
-          <p className="text-stone-700 text-base sm:text-lg leading-relaxed">
+          <p className="text-stone-300 text-base sm:text-lg leading-relaxed font-normal">
             Every design has a purpose: to get people thinking, talking and, above all, to point people towards Jesus.
           </p>
-          <div className="pt-2">
-            <p className="font-bold text-stone-950 text-base sm:text-lg tracking-wide uppercase">
+          <div className="pt-3">
+            <p className="font-bold text-white text-base sm:text-lg tracking-wider uppercase">
               Small brand. Big message. Jesus at the centre.
             </p>
           </div>
