@@ -62,7 +62,7 @@ export function Footer({ settings }: FooterProps) {
               <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tight text-white">
                 JOIN OUR NEWSLETTER
               </h3>
-              <p className="text-teal-50 text-xs sm:text-sm font-normal leading-relaxed max-w-xl">
+              <p className="text-teal-50 text-sm sm:text-base lg:text-lg font-normal leading-relaxed max-w-xl">
                 Be part of something brighter. It’s not about sales — it’s about community, connection, and sharing how we spread God’s light.
               </p>
             </div>
