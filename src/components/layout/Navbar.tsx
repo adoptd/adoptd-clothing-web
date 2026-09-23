@@ -32,60 +32,64 @@ export function Navbar({ settings }: NavbarProps) {
       {/* Main Black Header Bar */}
       <div className="bg-[#030303] text-white border-b border-stone-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-24">
+          <div className="flex items-center justify-between h-28 sm:h-32 lg:h-36 py-2">
             
-            {/* Brand Logo - Local Static Image */}
+            {/* Brand Logo - Maximized & Proportionate */}
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="block relative w-48 sm:w-60 h-14 sm:h-16">
+              <Link
+                href="/"
+                className="block relative h-20 sm:h-24 lg:h-28 w-36 sm:w-48 lg:w-56 focus:outline-none transition-transform hover:opacity-95"
+                aria-label="Adoptd Christian Clothing Home"
+              >
                 <Image
                   src="/images/logo.png"
                   alt="Adoptd Christian Clothing Logo"
                   fill
                   priority
                   className="object-contain object-left"
-                  sizes="(max-width: 640px) 200px, 240px"
+                  sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 240px"
                 />
               </Link>
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-8">
+            <nav className="hidden lg:flex items-center space-x-8 xl:space-x-10">
               <Link
                 href="/"
-                className="text-sm font-semibold tracking-wide text-white hover:text-[#00736a] transition"
+                className="text-sm xl:text-base font-semibold tracking-wide text-white hover:text-[#00736a] transition"
               >
                 Home
               </Link>
               <Link
                 href="/church-print-services"
-                className="text-sm font-semibold tracking-wide text-stone-200 hover:text-[#00736a] transition"
+                className="text-sm xl:text-base font-semibold tracking-wide text-stone-200 hover:text-[#00736a] transition"
               >
                 Church & Ministry Print Services
               </Link>
               <Link
                 href="/shop"
-                className="text-sm font-semibold tracking-wide text-stone-200 hover:text-[#00736a] transition"
+                className="text-sm xl:text-base font-semibold tracking-wide text-stone-200 hover:text-[#00736a] transition"
               >
                 Blaze city Merch
               </Link>
             </nav>
 
             {/* Right Header: Cart button & Shop Now Button */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3 sm:space-x-5">
               <button
                 onClick={openCart}
-                className="relative p-2 text-white hover:text-[#00736a] transition flex items-center space-x-2"
+                className="relative p-2.5 text-white hover:text-[#00736a] transition flex items-center space-x-2 rounded-lg hover:bg-stone-900/80"
                 aria-label="View shopping cart"
               >
-                <ShoppingBag className="w-5 h-5 text-white" />
-                <span className="text-xs font-bold uppercase tracking-wider text-white">
+                <ShoppingBag className="w-6 h-6 text-white" />
+                <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white">
                   {hasMounted && totalItems > 0 ? `${totalItems} Items` : '0 Items'}
                 </span>
               </button>
 
               <Link
                 href="/shop"
-                className="hidden sm:inline-flex items-center justify-center px-6 py-2.5 bg-[#00736a] text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-[#005c55] transition shadow-md"
+                className="hidden sm:inline-flex items-center justify-center px-6 py-3 bg-[#00736a] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-lg hover:bg-[#005c55] transition shadow-md"
               >
                 Shop Now
               </Link>
@@ -94,10 +98,10 @@ export function Navbar({ settings }: NavbarProps) {
               <div className="flex lg:hidden">
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="p-2 text-white"
+                  className="p-2 text-white hover:text-[#00736a] transition"
                   aria-label="Toggle menu"
                 >
-                  {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                  {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
                 </button>
               </div>
             </div>
