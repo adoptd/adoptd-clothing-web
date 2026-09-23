@@ -24,9 +24,9 @@ export function Navbar({ settings }: NavbarProps) {
 
   return (
     <header className="sticky top-0 z-40 transition-all">
-      {/* Top Teal Green Accent Bar */}
-      <div className="bg-[#00736a] text-white text-xs py-2 px-4 text-center font-medium tracking-wide">
-        <span>{settings?.announcementBanner || "Wear The Word. Share The Light."}</span>
+      {/* Top Teal Green Accent Bar (+35% Size, Uppercase) */}
+      <div className="bg-[#00736a] text-white text-sm sm:text-base py-3 sm:py-3.5 px-4 text-center font-black uppercase tracking-wider">
+        <span>{settings?.announcementBanner || "WEAR THE WORD. SHARE THE LIGHT."}</span>
       </div>
 
       {/* Main Black Header Bar */}
