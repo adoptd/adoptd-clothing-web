@@ -52,14 +52,14 @@ export function Footer({ settings }: FooterProps) {
 
   return (
     <footer className="bg-white text-stone-900">
-      {/* 1. Teal Green Newsletter Block (#00736a) */}
-      <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 pb-16">
-        <div className="bg-[#00736a] text-white rounded-[24px] p-8 sm:p-14 text-center space-y-6 shadow-lg">
-          <div className="max-w-2xl mx-auto space-y-3">
-            <h3 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
+      {/* 1. Teal Green Newsletter Block (#00736a) - Full Width */}
+      <div className="w-full bg-[#00736a] text-white py-16 sm:py-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+          <div className="space-y-3">
+            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
               Join Our Newsletter
             </h3>
-            <p className="text-teal-50 text-sm sm:text-base leading-relaxed">
+            <p className="text-teal-50 text-base sm:text-lg leading-relaxed">
               Be part of something brighter. It’s not about sales — it’s about community, connection, and sharing how we spread God’s light.
             </p>
           </div>
