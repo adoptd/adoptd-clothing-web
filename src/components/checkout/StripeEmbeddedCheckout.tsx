@@ -54,7 +54,17 @@ function CheckoutForm({ clientSecret }: { clientSecret: string }) {
         <h3 className="font-serif text-base font-bold text-stone-900 border-b border-stone-100 pb-3">
           1. Delivery Address
         </h3>
-        <AddressElement options={{ mode: 'shipping', allowedCountries: ['GB', 'US', 'CA', 'IE', 'AU'] }} />
+        <AddressElement
+          options={{
+            mode: 'shipping',
+            allowedCountries: ['GB', 'US', 'CA', 'IE', 'AU', 'NZ', 'FR', 'DE'],
+            defaultValues: {
+              address: {
+                country: 'GB',
+              },
+            },
+          }}
+        />
       </div>
 
       {/* Payment Element */}
