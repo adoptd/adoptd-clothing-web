@@ -139,6 +139,9 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Full-Width Divider Line */}
+      <div className="w-full border-t border-stone-200" />
+
       {/* 2. FEATURED PRODUCTS GRID (Exact Live Products) */}
       <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
