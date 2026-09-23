@@ -28,34 +28,40 @@ export default function ChurchPrintServicesPage() {
 
       {/* Benefits Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="bg-[#00736a] text-white rounded-2xl p-8 space-y-4 shadow-sm">
-          <div className="w-12 h-12 bg-white text-[#00736a] rounded-xl flex items-center justify-center font-black text-lg shadow-sm">
-            1
+        <div className="bg-[#00736a] text-white rounded-2xl p-8 sm:p-10 space-y-5 shadow-sm flex flex-col justify-between">
+          <div className="space-y-4">
+            <div className="w-14 h-14 bg-white text-[#00736a] rounded-xl flex items-center justify-center font-black text-xl shadow-sm">
+              1
+            </div>
+            <h3 className="font-serif text-2xl font-bold text-white">Heavyweight Quality</h3>
+            <p className="text-base sm:text-lg text-white/95 leading-relaxed font-normal">
+              We supply high-grade organic ringspun cotton and cozy heavyweight fleece that your congregation will genuinely love wearing weekly.
+            </p>
           </div>
-          <h3 className="font-serif text-xl font-bold text-white">Heavyweight Quality</h3>
-          <p className="text-sm text-white/90 leading-relaxed font-normal">
-            We supply high-grade organic ringspun cotton and cozy heavyweight fleece that your congregation will genuinely love wearing weekly.
-          </p>
         </div>
 
-        <div className="bg-[#00736a] text-white rounded-2xl p-8 space-y-4 shadow-sm">
-          <div className="w-12 h-12 bg-white text-[#00736a] rounded-xl flex items-center justify-center font-black text-lg shadow-sm">
-            2
+        <div className="bg-[#00736a] text-white rounded-2xl p-8 sm:p-10 space-y-5 shadow-sm flex flex-col justify-between">
+          <div className="space-y-4">
+            <div className="w-14 h-14 bg-white text-[#00736a] rounded-xl flex items-center justify-center font-black text-xl shadow-sm">
+              2
+            </div>
+            <h3 className="font-serif text-2xl font-bold text-white">Bulk Ministry Pricing</h3>
+            <p className="text-base sm:text-lg text-white/95 leading-relaxed font-normal">
+              Tiered volume discounts designed for church budgets, youth groups, and conference merchandise without compromising quality.
+            </p>
           </div>
-          <h3 className="font-serif text-xl font-bold text-white">Bulk Ministry Pricing</h3>
-          <p className="text-sm text-white/90 leading-relaxed font-normal">
-            Tiered volume discounts designed for church budgets, youth groups, and conference merchandise without compromising quality.
-          </p>
         </div>
 
-        <div className="bg-[#00736a] text-white rounded-2xl p-8 space-y-4 shadow-sm">
-          <div className="w-12 h-12 bg-white text-[#00736a] rounded-xl flex items-center justify-center font-black text-lg shadow-sm">
-            3
+        <div className="bg-[#00736a] text-white rounded-2xl p-8 sm:p-10 space-y-5 shadow-sm flex flex-col justify-between">
+          <div className="space-y-4">
+            <div className="w-14 h-14 bg-white text-[#00736a] rounded-xl flex items-center justify-center font-black text-xl shadow-sm">
+              3
+            </div>
+            <h3 className="font-serif text-2xl font-bold text-white">Custom Design Support</h3>
+            <p className="text-base sm:text-lg text-white/95 leading-relaxed font-normal">
+              Need help polishing your church logo, event theme typography, or choosing color combinations? We help guide you from concept to delivery.
+            </p>
           </div>
-          <h3 className="font-serif text-xl font-bold text-white">Custom Design Support</h3>
-          <p className="text-sm text-white/90 leading-relaxed font-normal">
-            Need help polishing your church logo, event theme typography, or choosing color combinations? We help guide you from concept to delivery.
-          </p>
         </div>
       </div>
 
