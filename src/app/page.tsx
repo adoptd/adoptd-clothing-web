@@ -1,268 +1,170 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Sparkles, Heart, Church, ShieldCheck } from 'lucide-react';
-import { getProducts, getSiteSettings, getBlogPosts } from '@/lib/airtable';
+import { ArrowRight, Quote } from 'lucide-react';
+import { getProducts } from '@/lib/airtable';
 import { ProductCard } from '@/components/product/ProductCard';
 
-export const revalidate = 60; // Refresh data every 60 seconds from Airtable
+export const revalidate = 60;
 
 export default async function HomePage() {
-  const [products, settings, blogPosts] = await Promise.all([
-    getProducts(),
-    getSiteSettings(),
-    getBlogPosts(),
-  ]);
+  const products = await getProducts();
+  const featuredProducts = products.slice(0, 5);
 
-  const featuredProducts = products.slice(0, 4);
   const categories = [
     {
-      name: 'T-Shirts',
+      name: 'T-SHIRTS',
       slug: 'tee-shirts',
       image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80',
-      description: 'Clean typography & organic cotton',
     },
     {
-      name: 'Hoodies',
+      name: 'HOODIES',
       slug: 'christian-hoodies-uk',
       image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&auto=format&fit=crop&q=80',
-      description: 'Heavyweight warmth with scripture truth',
     },
     {
-      name: 'Sweaters',
+      name: 'SWEATERS',
       slug: 'sweaters',
       image: 'https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=800&auto=format&fit=crop&q=80',
-      description: 'Cozy fleece-lined streetwear cuts',
     },
     {
-      name: 'Tote Bags',
+      name: 'TOTE BAGS',
       slug: 'christian-bags',
-      image: 'https://images.unsplash.com/photo-1597484661643-2f5fef640dd1?w=800&auto=format&fit=crop&q=80',
-      description: '100% durable canvas faith accessories',
+      image: 'https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/mockup-of-a-man-with-a-loc-hairstyle-carrying-a-tote-bag-on-his-back-in-a-park-m56958-2-300x300.webp',
     },
   ];
 
   return (
-    <div className="space-y-16 sm:space-y-24 pb-16">
-      {/* Hero Section */}
-      <section className="relative bg-stone-900 text-white overflow-hidden py-24 sm:py-32">
-        <div className="absolute inset-0 opacity-25">
-          <Image
-            src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1600&auto=format&fit=crop&q=80"
-            alt="Christian Clothing Background"
-            fill
-            priority
-            className="object-cover object-center"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-900/60 to-transparent" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <div className="inline-flex items-center space-x-2 bg-stone-800/80 border border-stone-700/80 px-4 py-1.5 rounded-full text-xs text-stone-300 font-medium tracking-wide">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Independent UK Christian Apparel Brand</span>
-          </div>
-
-          <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white max-w-4xl mx-auto leading-tight">
-            Wear The Word. <br className="hidden sm:inline" />
-            <span className="text-stone-300">Share The Light.</span>
-          </h1>
-
-          <p className="max-w-2xl mx-auto text-stone-300 text-sm sm:text-lg font-normal leading-relaxed">
-            ADOPTD was created with a simple purpose — to make clothing that carries a message of faith, hope and identity. Every purchase helps a small business share Jesus through everyday design.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Link
-              href="/shop/christian-hoodies-uk"
-              className="w-full sm:w-auto px-8 py-4 bg-white text-stone-950 hover:bg-stone-100 font-bold text-sm tracking-wider uppercase rounded-xl transition-all shadow-xl flex items-center justify-center space-x-2"
-            >
-              <span>Shop Hoodies</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/shop/tee-shirts"
-              className="w-full sm:w-auto px-8 py-4 bg-stone-800/90 text-white hover:bg-stone-700/90 border border-stone-600 font-bold text-sm tracking-wider uppercase rounded-xl transition-all flex items-center justify-center space-x-2"
-            >
-              <span>Shop T-Shirts</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Shop By Category Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-xl mx-auto mb-10">
-          <span className="text-xs uppercase tracking-[0.25em] text-stone-500 font-bold">
-            Collections
-          </span>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-stone-950 mt-1">
-            Shop By Category
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((cat) => (
-            <Link
-              key={cat.slug}
-              href={`/shop/${cat.slug}`}
-              className="group relative h-80 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-stone-200 block"
-            >
-              <Image
-                src={cat.image}
-                alt={cat.name}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/30 to-transparent" />
-              <div className="absolute bottom-0 inset-x-0 p-6 text-white">
-                <h3 className="font-serif text-xl font-bold uppercase tracking-wider mb-1">
-                  {cat.name}
-                </h3>
-                <p className="text-xs text-stone-300 opacity-90">{cat.description}</p>
-                <div className="mt-3 inline-flex items-center space-x-1.5 text-xs font-semibold text-white group-hover:text-amber-300 transition">
-                  <span>Explore</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Featured Products / Bestsellers */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 pb-4 border-b border-stone-200">
-          <div>
-            <span className="text-xs uppercase tracking-[0.25em] text-stone-500 font-bold">
-              Faith-Centred Apparel
+    <div className="bg-white text-stone-900 space-y-16 sm:space-y-24 pb-16">
+      
+      {/* 1. HERO SECTION (1:1 Exact Match) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          
+          {/* Left Text Column */}
+          <div className="space-y-6">
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-stone-900 block">
+              SMALL BUSINESS. BIG FAITH.
             </span>
-            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-stone-950 mt-1">
-              Featured Pieces
-            </h2>
-          </div>
-          <Link
-            href="/shop/christian-hoodies-uk"
-            className="text-xs font-semibold uppercase tracking-wider text-stone-800 hover:text-stone-950 mt-3 sm:mt-0 flex items-center space-x-1"
-          >
-            <span>View All Products</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
+            <p className="text-stone-800 text-base sm:text-lg leading-relaxed font-normal">
+              ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity. Every purchase helps a small business keep creating, designing and sharing faith through clothing.
+            </p>
+            <p className="text-stone-600 text-sm italic">
+              Thank you for choosing to support an independent Christian brand.
+            </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="flex flex-wrap gap-4 pt-2">
+              <Link
+                href="/shop/tee-shirts"
+                className="px-6 py-3.5 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-stone-800 transition"
+              >
+                Shop T-Shirts
+              </Link>
+              <Link
+                href="/shop/christian-hoodies-uk"
+                className="px-6 py-3.5 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-stone-800 transition"
+              >
+                Shop Hoodies
+              </Link>
+            </div>
+          </div>
+
+          {/* Right Hero Image */}
+          <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-stone-100 shadow-md">
+            <Image
+              src="https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/adoptd-christian-clothing_pNlRVDt8-400x250-1.webp"
+              alt="Adoptd Christian Clothing Collection"
+              fill
+              priority
+              className="object-cover object-center"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+          </div>
+
+        </div>
+      </section>
+
+      {/* 2. FEATURED PRODUCTS GRID (Exact Live Products) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {featuredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>
 
-      {/* Brand Mission Statement */}
-      <section className="bg-stone-100 py-16 sm:py-20 border-y border-stone-200">
+      {/* 3. MISSION SECTION (1:1 Exact Match) */}
+      <section className="bg-stone-50 py-16 sm:py-24 border-y border-stone-200/80">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-stone-900 text-white mx-auto">
-            <Heart className="w-6 h-6" />
-          </div>
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-stone-950">
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900">
             Christian Clothing That Shares Your Faith
           </h2>
-          <p className="text-stone-700 text-sm sm:text-base leading-relaxed">
+          <p className="text-stone-700 text-base sm:text-lg leading-relaxed">
             ADOPTED was created from a simple desire — to share Jesus with the world. I believe clothing can start conversations, provoke questions and offer encouragement in everyday life.
           </p>
-          <p className="text-stone-700 text-sm sm:text-base leading-relaxed">
+          <p className="text-stone-700 text-base sm:text-lg leading-relaxed">
             Every design has a purpose: to get people thinking, talking and, above all, to point people towards Jesus.
           </p>
           <div className="pt-2">
-            <span className="inline-block font-serif text-lg font-semibold text-stone-900 italic">
-              "Small brand. Big message. Jesus at the centre."
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* Church & Ministry Print Services Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-stone-900 text-white rounded-2xl p-8 sm:p-12 flex flex-col lg:flex-row items-center justify-between gap-8 shadow-xl">
-          <div className="space-y-4 max-w-2xl">
-            <div className="inline-flex items-center space-x-2 bg-stone-800 px-3 py-1 rounded-full text-xs font-semibold text-stone-300">
-              <Church className="w-4 h-4 text-amber-400" />
-              <span>For Churches, Worship Teams & Youth Ministries</span>
-            </div>
-            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white">
-              Church & Ministry Custom Print Services
-            </h2>
-            <p className="text-stone-300 text-sm leading-relaxed">
-              Looking for custom hoodies, t-shirts, or tote bags for your church conference, youth camp, or outreach team? We provide ethical, premium-quality apparel printing tailored to your ministry.
+            <p className="font-bold text-stone-950 text-base sm:text-lg tracking-wide uppercase">
+              Small brand. Big message. Jesus at the centre.
             </p>
           </div>
-          <Link
-            href="/church-print-services"
-            className="flex-shrink-0 px-8 py-4 bg-white text-stone-950 hover:bg-stone-200 font-bold text-sm tracking-wider uppercase rounded-xl transition shadow-lg"
-          >
-            Learn More & Get A Quote
-          </Link>
         </div>
       </section>
 
-      {/* Recent Blog / Devotional Highlights */}
-      {blogPosts.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-end mb-8 pb-4 border-b border-stone-200">
-            <div>
-              <span className="text-xs uppercase tracking-[0.25em] text-stone-500 font-bold">
-                From The Blog
-              </span>
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-stone-950 mt-1">
-                Faith & Devotionals
-              </h2>
-            </div>
-            <Link
-              href="/blog"
-              className="text-xs font-semibold uppercase tracking-wider text-stone-800 hover:text-stone-950 flex items-center space-x-1"
-            >
-              <span>Read All Articles</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
+      {/* 4. SHOP BY CATEGORY (1:1 Exact Match) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-10">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+            Shop By Category
+          </h2>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {blogPosts.slice(0, 2).map((post) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {categories.map((cat) => (
+            <div
+              key={cat.slug}
+              className="bg-stone-50 border border-stone-200 rounded-xl p-8 flex flex-col items-center justify-between text-center space-y-6 hover:shadow-lg transition-all"
+            >
+              <div className="relative aspect-square w-32 rounded-lg overflow-hidden bg-stone-200">
+                <Image
+                  src={cat.image}
+                  alt={cat.name}
+                  fill
+                  className="object-cover"
+                  sizes="128px"
+                />
+              </div>
+
+              <h3 className="font-black text-base text-stone-900 tracking-wider">
+                {cat.name}
+              </h3>
+
               <Link
-                key={post.id}
-                href={`/blog/${post.slug}`}
-                className="group flex flex-col sm:flex-row bg-white border border-stone-200 rounded-xl overflow-hidden hover:border-stone-400 transition-all shadow-sm hover:shadow-md"
+                href={`/shop/${cat.slug}`}
+                className="w-full py-2.5 px-6 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-stone-800 transition text-center"
               >
-                <div className="sm:w-1/2 relative aspect-video sm:aspect-auto overflow-hidden bg-stone-100 min-h-[180px]">
-                  <Image
-                    src={post.coverImage}
-                    alt={post.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-6 sm:w-1/2 flex flex-col justify-between space-y-3">
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 bg-stone-100 px-2 py-1 rounded">
-                      {post.category}
-                    </span>
-                    <h3 className="font-serif text-lg font-bold text-stone-900 group-hover:text-stone-700 transition line-clamp-2 mt-2">
-                      {post.title}
-                    </h3>
-                    <p className="text-xs text-stone-600 line-clamp-2 mt-1.5 leading-relaxed">
-                      {post.excerpt}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between text-[11px] text-stone-400 pt-2 border-t border-stone-100">
-                    <span>{post.publishDate}</span>
-                    <span>{post.readingTimeMinutes} min read</span>
-                  </div>
-                </div>
+                Shop
               </Link>
-            ))}
-          </div>
-        </section>
-      )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 5. CUSTOMER TESTIMONIAL / REVIEW (Exact Live Review) */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-10">
+        <div className="bg-stone-50 border border-stone-200 rounded-2xl p-8 sm:p-12 space-y-4 shadow-sm">
+          <Quote className="w-8 h-8 text-stone-400 mx-auto" />
+          <blockquote className="text-stone-700 text-sm sm:text-base leading-relaxed italic">
+            "I’m really glad I found Adoptd Christian Clothing. The T-shirt I bought is more than just something to wear — it’s a simple, meaningful way to share my faith. I love that the message is clear without being overpowering, and the quality is genuinely great. It’s comfortable, fits well, and feels like it was made with care. Knowing that it’s from an independent Christian brand makes it even better. I’ll definitely be ordering again and recommending it to others!"
+          </blockquote>
+          <p className="text-xs font-bold uppercase tracking-wider text-stone-900 pt-2">
+            Verified Customer
+          </p>
+        </div>
+      </section>
+
     </div>
   );
 }
