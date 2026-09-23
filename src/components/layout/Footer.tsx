@@ -112,11 +112,11 @@ export function Footer({ settings }: FooterProps) {
       </div>
 
       {/* 2. Main Dark Charcoal Footer (#424242) */}
-      <div className="bg-[#424242] text-white pt-12 pb-16">
-        <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 space-y-10">
+      <div className="bg-[#424242] text-white pt-14 pb-20">
+        <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 space-y-12">
           
           {/* Top Row: Social Icons */}
-          <div className="flex items-center space-x-4 text-white">
+          <div className="flex items-center space-x-5 text-white">
             <a
               href="https://facebook.com/adoptdclothing25/"
               target="_blank"
@@ -124,7 +124,7 @@ export function Footer({ settings }: FooterProps) {
               className="hover:opacity-80 transition"
               aria-label="Facebook"
             >
-              <Facebook className="w-5 h-5 fill-current" />
+              <Facebook className="w-6 h-6 fill-current" />
             </a>
             <a
               href="https://www.instagram.com/adoptdchristian"
@@ -133,53 +133,53 @@ export function Footer({ settings }: FooterProps) {
               className="hover:opacity-80 transition"
               aria-label="Instagram"
             >
-              <Instagram className="w-5 h-5" />
+              <Instagram className="w-6 h-6" />
             </a>
           </div>
 
           {/* Large Brand Heading */}
           <div>
-            <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">
+            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight text-white">
               @ADOPTD-CLOTHING
             </h3>
           </div>
 
-          {/* 4 Footer Columns (Tighter Column Spacing & Larger Typography) */}
-          <div className="max-w-4xl lg:max-w-5xl grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 lg:gap-10 text-sm sm:text-[15px]">
+          {/* 4 Equilateral Footer Columns Across Full Width with Enlarged Typography */}
+          <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 text-base sm:text-lg">
             
             {/* SHOP Column */}
-            <div className="space-y-3.5">
-              <h4 className="font-black uppercase tracking-wider text-white text-sm sm:text-base">SHOP</h4>
-              <ul className="space-y-2 text-stone-200 font-medium">
-                <li className="flex flex-wrap gap-x-3">
+            <div className="space-y-4">
+              <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">SHOP</h4>
+              <ul className="space-y-2.5 text-stone-200 font-medium">
+                <li className="flex flex-wrap gap-x-4">
                   <Link href="/shop" className="hover:text-white transition">Christmas</Link>
                   <Link href="/shop/tee-shirts" className="hover:text-white transition">T-Shirts</Link>
                   <Link href="/shop/christian-hoodies-uk" className="hover:text-white transition">Hoodies</Link>
                 </li>
-                <li className="flex flex-wrap gap-x-3">
+                <li className="flex flex-wrap gap-x-4">
                   <Link href="/shop/sweaters" className="hover:text-white transition">Sweaters</Link>
                   <Link href="/shop/christian-bags" className="hover:text-white transition">Tote Bags</Link>
                 </li>
-                <li><Link href="/church-print-services" className="hover:text-white transition">Church & Ministry Print Services</Link></li>
+                <li><Link href="/church-print-services" className="hover:text-white transition whitespace-nowrap">Church & Ministry Print Services</Link></li>
                 <li><Link href="/shop" className="hover:text-white transition">Blaze city Merch</Link></li>
               </ul>
             </div>
 
             {/* COMPANY Column */}
-            <div className="space-y-3.5">
-              <h4 className="font-black uppercase tracking-wider text-white text-sm sm:text-base">COMPANY</h4>
-              <ul className="space-y-2 text-stone-200 font-medium">
+            <div className="space-y-4">
+              <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">COMPANY</h4>
+              <ul className="space-y-2.5 text-stone-200 font-medium">
                 <li><Link href="/" className="hover:text-white transition">Home</Link></li>
-                <li><Link href="/church-print-services" className="hover:text-white transition">Church & Ministry Print Services</Link></li>
+                <li><Link href="/church-print-services" className="hover:text-white transition whitespace-nowrap">Church & Ministry Print Services</Link></li>
                 <li><Link href="/shop" className="hover:text-white transition">Blaze city Merch</Link></li>
               </ul>
             </div>
 
             {/* INFO Column */}
-            <div className="space-y-3.5">
-              <h4 className="font-black uppercase tracking-wider text-white text-sm sm:text-base">INFO</h4>
-              <ul className="space-y-2 text-stone-200 font-medium">
-                <li className="flex flex-wrap gap-x-3">
+            <div className="space-y-4">
+              <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">INFO</h4>
+              <ul className="space-y-2.5 text-stone-200 font-medium">
+                <li className="flex flex-wrap gap-x-4">
                   <Link href="/church-print-services" className="hover:text-white transition">Support</Link>
                   <Link href="/church-print-services" className="hover:text-white transition">Contact</Link>
                   <Link href="/shop" className="hover:text-white transition">My account</Link>
@@ -188,20 +188,20 @@ export function Footer({ settings }: FooterProps) {
             </div>
 
             {/* FOLLOW Column */}
-            <div className="space-y-3.5">
-              <h4 className="font-black uppercase tracking-wider text-white text-sm sm:text-base">FOLLOW</h4>
-              <ul className="space-y-2 text-stone-200 font-medium">
-                <li className="flex flex-wrap gap-x-3">
+            <div className="space-y-4">
+              <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">FOLLOW</h4>
+              <ul className="space-y-2.5 text-stone-200 font-medium">
+                <li className="flex flex-wrap gap-x-4">
                   <Link href="/shop/christian-bags" className="hover:text-white transition">Tote Bags</Link>
                   <Link href="/shop" className="hover:text-white transition">Christmas</Link>
                   <Link href="/shop/sweaters" className="hover:text-white transition">Sweaters</Link>
                 </li>
-                <li className="flex flex-wrap gap-x-3">
+                <li className="flex flex-wrap gap-x-4">
                   <Link href="/shop/christian-hoodies-uk" className="hover:text-white transition">Hoodies</Link>
                   <Link href="/shop/tee-shirts" className="hover:text-white transition">T-Shirts</Link>
                   <Link href="/church-print-services" className="hover:text-white transition">Contact</Link>
                 </li>
-                <li className="flex flex-wrap gap-x-3">
+                <li className="flex flex-wrap gap-x-4">
                   <Link href="/shop" className="hover:text-white transition">My account</Link>
                   <Link href="/church-print-services" className="hover:text-white transition">Support</Link>
                 </li>
@@ -211,7 +211,7 @@ export function Footer({ settings }: FooterProps) {
           </div>
 
           {/* Copyright */}
-          <div className="pt-8 text-xs sm:text-sm text-stone-300">
+          <div className="pt-8 border-t border-stone-600/40 text-sm sm:text-base text-stone-300">
             <p>Copyright 2026 AdoptdClothing. All rights reserved.</p>
           </div>
 
