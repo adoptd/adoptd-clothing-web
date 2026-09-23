@@ -24,7 +24,7 @@ export default async function ShopPage() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+    <div className="max-w-[1440px] mx-auto px-2 sm:px-3 lg:px-4 py-12 space-y-10">
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto space-y-3">
         <span className="text-xs uppercase tracking-[0.25em] text-stone-500 font-bold">
