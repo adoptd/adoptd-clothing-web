@@ -45,11 +45,11 @@ export default async function HomePage() {
           <div className="flex flex-col gap-6 justify-between">
             
             {/* Top Panel: SMALL BUSINESS. BIG FAITH with banner image underneath */}
-            <div className="bg-[#efefef] rounded-[24px] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-sm">
+            <div className="bg-[#efefef] rounded-[24px] p-6 sm:p-10 flex flex-col justify-between space-y-6 shadow-sm">
               <div className="space-y-4">
-                <span className="text-xs font-black uppercase tracking-[0.25em] text-stone-900 block">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tight text-stone-950 leading-tight">
                   SMALL BUSINESS. BIG FAITH.
-                </span>
+                </h1>
                 <p className="text-stone-800 text-sm sm:text-base leading-relaxed font-normal">
                   ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity. Every purchase helps a small business keep creating, designing and sharing faith through clothing.
                 </p>
