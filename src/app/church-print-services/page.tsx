@@ -65,87 +65,155 @@ export default function ChurchPrintServicesPage() {
         </div>
       </div>
 
-      {/* Inquiry Form */}
-      <div className="bg-white border border-stone-300 rounded-3xl p-8 sm:p-12 shadow-lg max-w-2xl mx-auto space-y-6">
-        <div className="text-center space-y-2">
-          <h2 className="font-serif text-2xl font-bold text-stone-950">
-            Request A Ministry Quote
-          </h2>
-          <p className="text-xs text-stone-500">
-            Fill out the details below and we will get back to you within 24–48 hours with sample pricing and mockups.
-          </p>
+      {/* Inquiry Form Section - Full Width Spread */}
+      <div className="w-full bg-[#efefef] rounded-[28px] p-6 sm:p-10 lg:p-14 border border-stone-200/80 shadow-sm">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
+          
+          {/* Left Column: Context & Guarantees */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="space-y-3">
+              <span className="text-xs uppercase tracking-[0.25em] text-[#00736a] font-bold block">
+                Custom Ministry Production
+              </span>
+              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-black text-stone-950 leading-tight">
+                Request A Ministry Quote
+              </h2>
+              <p className="text-stone-700 text-base sm:text-lg leading-relaxed font-normal">
+                Fill out your event and garment requirements. Our dedicated production team will get back to you within 24–48 hours with tiered volume discounts, digital mockups, and fabric recommendations.
+              </p>
+            </div>
+
+            {/* Value Props List */}
+            <div className="space-y-3.5 pt-2 border-t border-stone-300/80">
+              <div className="flex items-start space-x-3 text-stone-800 text-sm sm:text-base font-medium">
+                <CheckCircle className="w-5 h-5 text-[#00736a] flex-shrink-0 mt-0.5" />
+                <span>Free digital mockups & artwork proofing before printing</span>
+              </div>
+              <div className="flex items-start space-x-3 text-stone-800 text-sm sm:text-base font-medium">
+                <CheckCircle className="w-5 h-5 text-[#00736a] flex-shrink-0 mt-0.5" />
+                <span>Premium organic ringspun cottons & cozy heavyweight fleece</span>
+              </div>
+              <div className="flex items-start space-x-3 text-stone-800 text-sm sm:text-base font-medium">
+                <CheckCircle className="w-5 h-5 text-[#00736a] flex-shrink-0 mt-0.5" />
+                <span>Transparent tiered volume pricing for UK church budgets</span>
+              </div>
+              <div className="flex items-start space-x-3 text-stone-800 text-sm sm:text-base font-medium">
+                <CheckCircle className="w-5 h-5 text-[#00736a] flex-shrink-0 mt-0.5" />
+                <span>Tracked Royal Mail & courier delivery direct to your church</span>
+              </div>
+            </div>
+
+            {/* Direct Email Callout */}
+            <div className="bg-white p-5 rounded-2xl border border-stone-200/80 space-y-1 text-sm">
+              <p className="text-stone-500 font-medium">Need immediate advice or have ready artwork?</p>
+              <p className="font-bold text-[#00736a]">
+                <a href="mailto:hello@adoptdchristianclothing.co.uk" className="hover:underline">
+                  hello@adoptdchristianclothing.co.uk
+                </a>
+              </p>
+            </div>
+          </div>
+
+          {/* Right Column: Expanded High-Usability Quote Form */}
+          <div className="lg:col-span-7 bg-white p-6 sm:p-10 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+            <form className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-stone-800 mb-1.5">
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Pastor / Leader Name"
+                    className="w-full px-4 py-3.5 border border-stone-300 rounded-xl text-sm sm:text-base focus:ring-2 focus:ring-[#00736a] focus:outline-none bg-stone-50/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-stone-800 mb-1.5">
+                    Church / Ministry Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Grace Church London"
+                    className="w-full px-4 py-3.5 border border-stone-300 rounded-xl text-sm sm:text-base focus:ring-2 focus:ring-[#00736a] focus:outline-none bg-stone-50/50"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-stone-800 mb-1.5">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="leader@church.co.uk"
+                    className="w-full px-4 py-3.5 border border-stone-300 rounded-xl text-sm sm:text-base focus:ring-2 focus:ring-[#00736a] focus:outline-none bg-stone-50/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-stone-800 mb-1.5">
+                    Phone / Contact Number
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="e.g. 07123 456789"
+                    className="w-full px-4 py-3.5 border border-stone-300 rounded-xl text-sm sm:text-base focus:ring-2 focus:ring-[#00736a] focus:outline-none bg-stone-50/50"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-stone-800 mb-1.5">
+                    Garment Types Needed
+                  </label>
+                  <select className="w-full px-4 py-3.5 border border-stone-300 rounded-xl text-sm sm:text-base focus:ring-2 focus:ring-[#00736a] focus:outline-none bg-stone-50/50 text-stone-800">
+                    <option>T-Shirts (Organic Ringspun Cotton)</option>
+                    <option>Hoodies (Heavyweight Fleece)</option>
+                    <option>Sweaters / Crewnecks</option>
+                    <option>Canvas Tote Bags</option>
+                    <option>Mixed Apparel Package</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-stone-800 mb-1.5">
+                    Estimated Quantity
+                  </label>
+                  <select className="w-full px-4 py-3.5 border border-stone-300 rounded-xl text-sm sm:text-base focus:ring-2 focus:ring-[#00736a] focus:outline-none bg-stone-50/50 text-stone-800">
+                    <option>25 - 50 items (Small Group / Staff)</option>
+                    <option>50 - 100 items (Youth Camp / Team)</option>
+                    <option>100 - 250 items (Church Event)</option>
+                    <option>250+ items (Conference / Large Ministry)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-stone-800 mb-1.5">
+                  Project Details, Event Date & Design Notes
+                </label>
+                <textarea
+                  rows={4}
+                  placeholder="Tell us about the event or purpose, required delivery date, preferred garment colors, and whether you already have church logos or scripture artwork..."
+                  className="w-full px-4 py-3.5 border border-stone-300 rounded-xl text-sm sm:text-base focus:ring-2 focus:ring-[#00736a] focus:outline-none bg-stone-50/50"
+                />
+              </div>
+
+              <button
+                type="button"
+                className="w-full py-5 bg-[#00736a] text-white rounded-xl font-black text-base uppercase tracking-wider hover:bg-[#005c55] transition flex items-center justify-center space-x-2 shadow-xl"
+              >
+                <Send className="w-5 h-5" />
+                <span>Send Ministry Inquiry</span>
+              </button>
+            </form>
+          </div>
+
         </div>
-
-        <form className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold uppercase text-stone-700 mb-1">
-                Your Name
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="Pastor / Leader Name"
-                className="w-full px-4 py-3 border border-stone-300 rounded-lg text-xs focus:ring-2 focus:ring-stone-900 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold uppercase text-stone-700 mb-1">
-                Church / Ministry Name
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. Grace Church London"
-                className="w-full px-4 py-3 border border-stone-300 rounded-lg text-xs focus:ring-2 focus:ring-stone-900 focus:outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold uppercase text-stone-700 mb-1">
-                Email Address
-              </label>
-              <input
-                type="email"
-                required
-                placeholder="leader@church.co.uk"
-                className="w-full px-4 py-3 border border-stone-300 rounded-lg text-xs focus:ring-2 focus:ring-stone-900 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold uppercase text-stone-700 mb-1">
-                Estimated Quantity
-              </label>
-              <select className="w-full px-4 py-3 border border-stone-300 rounded-lg text-xs focus:ring-2 focus:ring-stone-900 focus:outline-none bg-white">
-                <option>25 - 50 items</option>
-                <option>50 - 100 items</option>
-                <option>100 - 250 items</option>
-                <option>250+ items</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold uppercase text-stone-700 mb-1">
-              Project Details & Garment Types Needed
-            </label>
-            <textarea
-              rows={4}
-              placeholder="Tell us about the event, required delivery date, and whether you need hoodies, t-shirts, or tote bags..."
-              className="w-full px-4 py-3 border border-stone-300 rounded-lg text-xs focus:ring-2 focus:ring-stone-900 focus:outline-none"
-            />
-          </div>
-
-          <button
-            type="button"
-            className="w-full py-4 bg-stone-950 text-white rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-stone-800 transition flex items-center justify-center space-x-2 shadow-lg"
-          >
-            <Send className="w-4 h-4" />
-            <span>Send Ministry Inquiry</span>
-          </button>
-        </form>
       </div>
     </div>
   );
