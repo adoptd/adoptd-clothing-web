@@ -53,7 +53,7 @@ export default async function HomePage() {
                 <p className="text-stone-800 text-sm sm:text-base leading-relaxed font-normal">
                   ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity. Every purchase helps a small business keep creating, designing and sharing faith through clothing.
                 </p>
-                <p className="text-stone-600 text-xs sm:text-sm italic">
+                <p className="text-stone-900 text-xs sm:text-sm font-bold">
                   Thank you for choosing to support an independent Christian brand.
                 </p>
               </div>
