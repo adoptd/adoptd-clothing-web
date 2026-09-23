@@ -7,9 +7,15 @@ interface SizeGuideModalProps {
   isOpen: boolean;
   onClose: () => void;
   type?: 'unisex-hoodie' | 'unisex-tshirt' | 'sweater' | 'tote-bag';
+  customNotes?: string;
 }
 
-export function SizeGuideModal({ isOpen, onClose, type = 'unisex-hoodie' }: SizeGuideModalProps) {
+export function SizeGuideModal({
+  isOpen,
+  onClose,
+  type = 'unisex-hoodie',
+  customNotes,
+}: SizeGuideModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -98,10 +104,15 @@ export function SizeGuideModal({ isOpen, onClose, type = 'unisex-hoodie' }: Size
           )}
 
           {/* Fit Advice */}
-          <div className="mt-6 pt-4 border-t border-stone-200 text-xs text-stone-600 space-y-1">
+          <div className="mt-6 pt-4 border-t border-stone-200 text-xs text-stone-600 space-y-1.5">
             <p><strong>Fit Guide:</strong> Standard unisex regular fit.</p>
             <p>• If you prefer a tailored fit, choose your usual size.</p>
             <p>• For a cozy, relaxed or streetwear oversized drape, we recommend sizing up one size.</p>
+            {customNotes && (
+              <div className="mt-3 p-3 bg-stone-50 rounded-lg border border-stone-200 text-stone-800">
+                <strong>Specific Garment Note:</strong> {customNotes}
+              </div>
+            )}
           </div>
 
           <div className="mt-6">

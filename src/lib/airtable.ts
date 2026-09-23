@@ -61,6 +61,7 @@ export async function getProducts(): Promise<Product[]> {
         scriptureReference: fields['Scripture Reference'] as string,
         careInstructions: fields['Care Instructions'] as string,
         sizeGuideType: (fields['Size Guide Type'] as any) || 'unisex-hoodie',
+        customSizeNotes: fields['Custom Size Notes'] as string,
         featuredImage,
         relatedProductIds: (fields['Related Products'] as string[]) || [],
         seoTitle: fields['SEO Meta Title'] as string,

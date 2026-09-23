@@ -227,6 +227,7 @@ export function ProductDetailClient({
         isOpen={isSizeGuideOpen}
         onClose={() => setIsSizeGuideOpen(false)}
         type={product.sizeGuideType}
+        customNotes={product.customSizeNotes}
       />
 
       {/* Related Products / Cross-Sells */}

@@ -28,6 +28,7 @@ export interface Product {
   scriptureReference?: string;
   careInstructions?: string;
   sizeGuideType: 'unisex-hoodie' | 'unisex-tshirt' | 'sweater' | 'tote-bag';
+  customSizeNotes?: string;
   featuredImage: string;
   relatedProductIds?: string[];
   seoTitle?: string;
