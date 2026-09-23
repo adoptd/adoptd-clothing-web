@@ -184,6 +184,10 @@ export function Footer({ settings }: FooterProps) {
                   <Link href="/church-print-services" className="hover:text-white transition">Contact</Link>
                   <Link href="/shop" className="hover:text-white transition">My account</Link>
                 </li>
+                <li className="flex flex-wrap gap-x-4">
+                  <Link href="/sitemap" className="hover:text-white transition">Sitemap</Link>
+                  <Link href="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link>
+                </li>
               </ul>
             </div>
 
