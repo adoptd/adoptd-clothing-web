@@ -37,52 +37,105 @@ export default async function HomePage() {
   return (
     <div className="bg-white text-stone-900 space-y-16 sm:space-y-24 pb-16">
       
-      {/* 1. HERO SECTION (1:1 Exact Match with #efefef Block) */}
+      {/* 1. HERO SECTION (2 Main Columns Layout Matching Original) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10">
-        <div className="bg-[#efefef] rounded-[24px] p-8 sm:p-12 lg:p-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          
+          {/* COLUMN 1 (LEFT MAIN COLUMN) */}
+          <div className="flex flex-col gap-6 justify-between">
             
-            {/* Left Text Column */}
-            <div className="space-y-6">
-              <span className="text-xs font-black uppercase tracking-[0.25em] text-stone-900 block">
-                SMALL BUSINESS. BIG FAITH.
-              </span>
-              <p className="text-stone-800 text-base sm:text-lg leading-relaxed font-normal">
-                ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity. Every purchase helps a small business keep creating, designing and sharing faith through clothing.
-              </p>
-              <p className="text-stone-600 text-sm italic">
-                Thank you for choosing to support an independent Christian brand.
-              </p>
+            {/* Top Panel: SMALL BUSINESS. BIG FAITH with banner image underneath */}
+            <div className="bg-[#efefef] rounded-[24px] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-sm">
+              <div className="space-y-4">
+                <span className="text-xs font-black uppercase tracking-[0.25em] text-stone-900 block">
+                  SMALL BUSINESS. BIG FAITH.
+                </span>
+                <p className="text-stone-800 text-sm sm:text-base leading-relaxed font-normal">
+                  ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity. Every purchase helps a small business keep creating, designing and sharing faith through clothing.
+                </p>
+                <p className="text-stone-600 text-xs sm:text-sm italic">
+                  Thank you for choosing to support an independent Christian brand.
+                </p>
+              </div>
 
-              <div className="flex flex-wrap gap-4 pt-2">
-                <Link
-                  href="/shop/tee-shirts"
-                  className="px-6 py-3.5 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-stone-800 transition"
-                >
-                  Shop T-Shirts
-                </Link>
-                <Link
-                  href="/shop/christian-hoodies-uk"
-                  className="px-6 py-3.5 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-stone-800 transition"
-                >
-                  Shop Hoodies
-                </Link>
+              {/* Picture underneath the text within this panel */}
+              <div className="relative aspect-[16/8] sm:aspect-[16/7] w-full rounded-[18px] overflow-hidden bg-white shadow-sm">
+                <Image
+                  src="/images/hero-banner.webp"
+                  alt="Adoptd Christian Clothing Collection"
+                  fill
+                  priority
+                  className="object-cover object-center"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
               </div>
             </div>
 
-            {/* Right Hero Image */}
-            <div className="relative aspect-[4/3] w-full rounded-[20px] overflow-hidden bg-white shadow-sm">
-              <Image
-                src="/images/hero-hoodie.webp"
-                alt="Adoptd Christian Clothing Collection"
-                fill
-                priority
-                className="object-cover object-center"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
+            {/* Bottom Split Sub-Grid: 2 Panels Side-by-Side directly beneath the top panel */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              
+              {/* Left Sub-Panel: Shop T-Shirts */}
+              <Link
+                href="/shop/tee-shirts"
+                className="group relative rounded-[20px] overflow-hidden aspect-[4/3] sm:aspect-square flex items-end p-6 shadow-sm focus:outline-none"
+              >
+                <Image
+                  src="/images/shop-tshirts-bg.webp"
+                  alt="Shop Christian T-Shirts"
+                  fill
+                  className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                  sizes="(max-width: 640px) 100vw, 25vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <div className="relative z-10 w-full flex items-center justify-between">
+                  <span className="text-white text-base sm:text-lg font-black uppercase tracking-wider">
+                    Shop T-Shirts
+                  </span>
+                  <span className="p-2 bg-white text-black rounded-full group-hover:bg-[#00736a] group-hover:text-white transition shadow">
+                    <ArrowRight className="w-4 h-4" />
+                  </span>
+                </div>
+              </Link>
+
+              {/* Right Sub-Panel: Shop Hoodies */}
+              <Link
+                href="/shop/christian-hoodies-uk"
+                className="group relative rounded-[20px] overflow-hidden aspect-[4/3] sm:aspect-square flex items-end p-6 shadow-sm focus:outline-none"
+              >
+                <Image
+                  src="/images/shop-hoodies-bg.webp"
+                  alt="Shop Christian Hoodies"
+                  fill
+                  className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                  sizes="(max-width: 640px) 100vw, 25vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <div className="relative z-10 w-full flex items-center justify-between">
+                  <span className="text-white text-base sm:text-lg font-black uppercase tracking-wider">
+                    Shop Hoodies
+                  </span>
+                  <span className="p-2 bg-white text-black rounded-full group-hover:bg-[#00736a] group-hover:text-white transition shadow">
+                    <ArrowRight className="w-4 h-4" />
+                  </span>
+                </div>
+              </Link>
+
             </div>
 
           </div>
+
+          {/* COLUMN 2 (RIGHT MAIN COLUMN - Stretches full depth of left column) */}
+          <div className="relative w-full h-full min-h-[420px] sm:min-h-[520px] lg:min-h-full rounded-[24px] overflow-hidden bg-[#efefef] shadow-sm group">
+            <Image
+              src="/images/hero-hoodie.webp"
+              alt="Featured Adoptd Christian Hoodie Collection"
+              fill
+              priority
+              className="object-cover object-center group-hover:scale-102 transition-transform duration-500"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+          </div>
+
         </div>
       </section>
 
