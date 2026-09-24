@@ -2,6 +2,7 @@ import Airtable from 'airtable';
 import { Product, BlogPost, SiteSettings } from '@/types';
 import { mockProducts, mockBlogPosts, mockSiteSettings } from '@/data/mockData';
 import { parseDocxBuffer } from './docx-parser';
+import yoastSeoData from '@/data/yoast-seo-data.json';
 
 const apiKey = process.env.AIRTABLE_API_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
@@ -98,10 +99,17 @@ export async function getProducts(): Promise<Product[]> {
         categoryName = 'T-Shirts';
       }
 
+      const slug = (fields['Slug'] as string) || record.id;
+      const yoastProducts = (yoastSeoData as any).products || {};
+      const yoastMatch = yoastProducts[slug] || Object.values(yoastProducts).find((p: any) => p.liveUrl?.includes(slug));
+
+      const seoTitle = (fields['SEO Meta Title'] as string) || (fields['SEO Title'] as string) || yoastMatch?.title || (fields['Product Name'] as string) || 'Untitled Product';
+      const seoDescription = (fields['SEO Meta Description'] as string) || (fields['SEO Description'] as string) || yoastMatch?.description || (fields['Description'] as string) || '';
+
       return {
         id: record.id,
         name: (fields['Product Name'] as string) || 'Untitled Product',
-        slug: (fields['Slug'] as string) || record.id,
+        slug,
         category: categorySlug,
         categoryName,
         price: Number(fields['Price (£)']) || 0,
@@ -116,8 +124,8 @@ export async function getProducts(): Promise<Product[]> {
         customSizeNotes: fields['Custom Size Notes'] as string,
         featuredImage,
         relatedProductIds: (fields['Related Products'] as string[]) || [],
-        seoTitle: fields['SEO Meta Title'] as string,
-        seoDescription: fields['SEO Meta Description'] as string,
+        seoTitle,
+        seoDescription,
       };
     });
   } catch (error) {

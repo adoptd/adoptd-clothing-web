@@ -54,6 +54,9 @@ export function constructMetadata({
       index: true,
       follow: true,
     },
+    verification: {
+      google: '0-4_yYX1Phctphb1rGYCzPDddXcjEJzILNViXbufdh4',
+    },
   };
 }
 
