@@ -9,6 +9,39 @@ const baseId = process.env.AIRTABLE_BASE_ID;
 
 const base = apiKey && baseId ? new Airtable({ apiKey }).base(baseId) : null;
 
+// Fetch all records from dedicated SEO table
+export async function getSeoRecords(): Promise<Record<string, { title?: string; description?: string; keyword?: string }>> {
+  if (!base) return {};
+
+  try {
+    const records = await base('SEO').select().all();
+    const map: Record<string, { title?: string; description?: string; keyword?: string }> = {};
+
+    records.forEach((r) => {
+      const slug = ((r.fields['Slug'] as string) || '').trim().toLowerCase();
+      const name = ((r.fields['Product Name'] as string) || '').trim().toLowerCase();
+      const title = (r.fields['SEO Meta Title'] as string) || '';
+      const description = (r.fields['SEO Meta Description'] as string) || '';
+      const keyword = (r.fields['Focus Keyword'] as string) || '';
+
+      const seoData = { title, description, keyword };
+      if (slug) map[slug] = seoData;
+      if (name) map[name] = seoData;
+    });
+
+    return map;
+  } catch (err) {
+    return {};
+  }
+}
+
+// Fetch single page SEO by slug or path
+export async function getPageSeo(slugOrPath: string) {
+  const seoMap = await getSeoRecords();
+  const cleanKey = slugOrPath.replace(/^\//, '').trim().toLowerCase();
+  return seoMap[cleanKey] || seoMap[slugOrPath.trim().toLowerCase()] || null;
+}
+
 // Fetch all active products
 export async function getProducts(): Promise<Product[]> {
   if (!base) {
@@ -16,12 +49,15 @@ export async function getProducts(): Promise<Product[]> {
   }
 
   try {
-    const records = await base('Products')
-      .select({
-        filterByFormula: '{Published} = TRUE()',
-        view: 'Grid view',
-      })
-      .all();
+    const [records, seoMap] = await Promise.all([
+      base('Products')
+        .select({
+          filterByFormula: '{Published} = TRUE()',
+          view: 'Grid view',
+        })
+        .all(),
+      getSeoRecords(),
+    ]);
 
     if (!records || records.length === 0) {
       return mockProducts;
@@ -105,11 +141,25 @@ export async function getProducts(): Promise<Product[]> {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)+/g, '');
       const slug = (fields['Slug'] as string) || autoSlug || record.id;
+      
       const yoastProducts = (yoastSeoData as any).products || {};
       const yoastMatch = yoastProducts[slug] || Object.values(yoastProducts).find((p: any) => p.liveUrl?.includes(slug));
 
-      const seoTitle = (fields['SEO Meta Title'] as string) || (fields['SEO Title'] as string) || yoastMatch?.title || (fields['Product Name'] as string) || 'Untitled Product';
-      const seoDescription = (fields['SEO Meta Description'] as string) || (fields['SEO Description'] as string) || yoastMatch?.description || (fields['Description'] as string) || '';
+      // Match against dedicated SEO table first, then fallback to Yoast database or defaults
+      const seoEntry = seoMap[slug.toLowerCase()] || seoMap[rawName.toLowerCase()];
+
+      const seoTitle = (fields['SEO Meta Title'] as string) ||
+                       (fields['SEO Title'] as string) ||
+                       seoEntry?.title ||
+                       yoastMatch?.title ||
+                       rawName;
+
+      const seoDescription = (fields['SEO Meta Description'] as string) ||
+                             (fields['SEO Description'] as string) ||
+                             seoEntry?.description ||
+                             yoastMatch?.description ||
+                             (fields['Description'] as string) ||
+                             '';
 
       return {
         id: record.id,

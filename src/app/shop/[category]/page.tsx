@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getProducts } from '@/lib/airtable';
+import { getProducts, getPageSeo } from '@/lib/airtable';
 import { ProductCard } from '@/components/product/ProductCard';
 import { constructMetadata } from '@/lib/seo';
 import { Metadata } from 'next';
@@ -44,14 +44,16 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { category } = await params;
+  const pageSeo = await getPageSeo(`shop/${category}`);
+  
   const info = categoryInfoMap[category] || {
     title: `${category.replace(/-/g, ' ')}`,
     description: 'Shop Christian clothing and apparel.',
   };
 
   return constructMetadata({
-    title: `${info.title} | Adoptd Christian Clothing UK`,
-    description: info.description,
+    title: pageSeo?.title || `${info.title} | Adoptd Christian Clothing UK`,
+    description: pageSeo?.description || info.description,
     slug: `shop/${category}`,
   });
 }
