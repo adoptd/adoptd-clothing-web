@@ -32,6 +32,14 @@ export async function POST(req: Request) {
     const shippingFeePence = totalAmountPence >= freeShippingThresholdPence ? 0 : 395;
     totalAmountPence += shippingFeePence;
 
+    const itemsSummary = items.map((item) => {
+      const p = productMap.get(item.id);
+      const title = p?.name || item.id;
+      const details = [item.selectedColor, item.selectedSize].filter(Boolean).join(' / ');
+      const qty = item.quantity || 1;
+      return `${qty}x ${title}${details ? ` (${details})` : ''}`;
+    }).join(', ');
+
     // Create PaymentIntent with Stripe
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalAmountPence,
@@ -41,6 +49,7 @@ export async function POST(req: Request) {
       },
       metadata: {
         itemCount: items.length.toString(),
+        itemsDescription: itemsSummary.slice(0, 500),
       },
     });
 
