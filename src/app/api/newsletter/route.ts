@@ -23,9 +23,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Multi-layer spam & bot validation
+    // 2. Multi-layer spam & bot validation with strict payload sanitization
     const spamCheck = validateSubmissionSpam({
-      email: email ? email.trim().toLowerCase() : '',
+      email: typeof email === 'string' ? email : '',
+      name: typeof name === 'string' ? name : '',
       honeypot,
       formRenderTime,
       clientIp,
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
 
     if (spamCheck.isSpam) {
       if (spamCheck.silentDrop) {
+        // Return 200 OK so automated scrapers don't retry, but discard payload without saving
         return NextResponse.json({ success: true, message: 'Subscribed successfully' });
       }
 
@@ -42,8 +44,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanName = name ? name.trim() : '';
+    const cleanEmail = spamCheck.sanitizedEmail || email.trim().toLowerCase();
+    const cleanName = spamCheck.sanitizedName || '';
 
     // 3. Save to Airtable
     await recordNewsletterSubscriber(cleanEmail, cleanName);
