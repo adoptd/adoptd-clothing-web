@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
                 shippingAddress.postal_code,
                 shippingAddress.country,
               ].filter(Boolean).join(', '),
-              'Fulfillment Status': 'Unfulfilled',
+              'Fulfilment Status': 'Unfulfilled',
               'Stripe Payment ID': paymentIntent.id,
             },
           },

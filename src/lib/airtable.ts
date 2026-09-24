@@ -28,12 +28,23 @@ export async function getProducts(): Promise<Product[]> {
 
     return records.map((record) => {
       const fields = record.fields;
-      const rawColors = (fields['Available Colors'] as string[]) || ['Black'];
+      const rawColors = (fields['Available Colours'] as string[]) || (fields['Available Colors'] as string[]) || ['Black'];
       
       // Build color variant object
       const colors = rawColors.map((colorName) => {
-        const colorFieldKey = `Color Images: ${colorName.split(' ')[0]}`;
-        const attachments = (fields[colorFieldKey] as any[]) || (fields['Main Featured Image'] as any[]) || [];
+        const colorPrefix = colorName.split(' ')[0];
+        const colorFieldKeyUK = `Colour Images: ${colorName}`;
+        const colorFieldKeyUS = `Color Images: ${colorName}`;
+        const colorFieldKeyShortUK = `Colour Images: ${colorPrefix}`;
+        const colorFieldKeyShortUS = `Color Images: ${colorPrefix}`;
+
+        const attachments = 
+          (fields[colorFieldKeyUK] as any[]) ||
+          (fields[colorFieldKeyUS] as any[]) ||
+          (fields[colorFieldKeyShortUK] as any[]) ||
+          (fields[colorFieldKeyShortUS] as any[]) ||
+          (fields['Main Featured Image'] as any[]) || 
+          [];
         const images = attachments.map((att: any) => att.url);
         
         return {
@@ -160,22 +171,31 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   }
 
   try {
-    const records = await base('Site Settings & SEO').select().all();
+    let records: readonly any[] = [];
+    try {
+      records = await base('Site Settings').select().all();
+    } catch {
+      records = await base('Site Settings & SEO').select().all();
+    }
+
     if (!records || records.length === 0) {
       return mockSiteSettings;
     }
 
     const settingsMap: Record<string, any> = {};
     records.forEach((r) => {
-      const key = r.fields['Setting Key'] as string;
+      const key = (r.fields['Setting Key'] as string) || (r.fields['Key'] as string);
       if (key) {
-        settingsMap[key] = r.fields['Value / Text'];
+        settingsMap[key] = r.fields['Setting Value'] || r.fields['Value / Text'] || r.fields['Value'];
       }
+      if (r.fields['announcement_banner']) settingsMap['announcement_banner'] = r.fields['announcement_banner'];
+      if (r.fields['contact_email']) settingsMap['contact_email'] = r.fields['contact_email'];
+      if (r.fields['free_shipping_threshold']) settingsMap['free_shipping_threshold'] = r.fields['free_shipping_threshold'];
     });
 
     return {
-      announcementBanner: settingsMap['homepage_announcement_banner'] || mockSiteSettings.announcementBanner,
-      announcementActive: true,
+      announcementBanner: settingsMap['announcement_banner'] || settingsMap['homepage_announcement_banner'] || mockSiteSettings.announcementBanner,
+      announcementActive: settingsMap['announcement_active'] !== 'false',
       globalMetaTitle: settingsMap['global_meta_title'] || mockSiteSettings.globalMetaTitle,
       globalMetaDescription: settingsMap['global_meta_description'] || mockSiteSettings.globalMetaDescription,
       contactEmail: settingsMap['contact_email'] || mockSiteSettings.contactEmail,
@@ -199,12 +219,10 @@ export async function recordNewsletterSubscriber(email: string, name?: string) {
   try {
     const fields: any = {
       Email: email,
-      'Consent Given': true,
       Status: 'Active',
     };
     if (name) {
       fields['First Name'] = name;
-      fields['Name'] = name;
     }
 
     await base('Newsletter Subscribers').create([{ fields }]);
