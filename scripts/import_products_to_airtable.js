@@ -11,7 +11,7 @@ const allProducts = [
   {
     name: "He Makes All Things New Tote Bag",
     slug: "he-makes-all-things-new-tote-bag",
-    category: "christian-bags",
+    category: "christian_bags",
     price: 12.00,
     sizes: ["One Size"],
     colors: [{ name: "Natural Canvas", images: ["/images/products/he-makes-all-things-new-tote.webp"] }],
@@ -22,7 +22,7 @@ const allProducts = [
   {
     name: "The True Vine Tote Bag",
     slug: "the-true-vine-tote-bag",
-    category: "christian-bags",
+    category: "christian_bags",
     price: 12.00,
     sizes: ["One Size"],
     colors: [{ name: "Natural Canvas", images: ["/images/products/the-true-vine-tote.webp"] }],
@@ -33,7 +33,7 @@ const allProducts = [
   {
     name: "More of Him Less of Me Tote Bag",
     slug: "more-of-him-less-of-me-tote-bag",
-    category: "christian-bags",
+    category: "christian_bags",
     price: 12.00,
     sizes: ["One Size"],
     colors: [{ name: "Natural Canvas", images: ["/images/products/more-of-him-tote.webp"] }],
@@ -44,7 +44,7 @@ const allProducts = [
   {
     name: "Amazing Grace Tote Bag",
     slug: "amazing-grace-tote-bag",
-    category: "christian-bags",
+    category: "christian_bags",
     price: 12.00,
     sizes: ["One Size"],
     colors: [{ name: "Natural Canvas", images: ["/images/products/amazing-grace-tote.webp"] }],
@@ -57,9 +57,9 @@ const allProducts = [
   {
     name: "Amazing Grace Christian Hoodie",
     slug: "amazing-grace-christian-hoodie",
-    category: "christian-hoodies-uk",
+    category: "hoodies",
     price: 32.00,
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
     colors: [{ name: "Natural Canvas", images: ["/images/products/amazing-grace-hoodie.webp"] }],
     description: "Our iconic Amazing Grace hoodie reminding you of God's unearned, undeserved favor. Ethically crafted heavyweight fleece.",
     scriptureReference: "Ephesians 2:8-9 — 'For by grace you have been saved through faith.'",
@@ -68,9 +68,9 @@ const allProducts = [
   {
     name: "Faith Over Fear Christian Hoodie",
     slug: "faith-over-fear-christian-hoodie",
-    category: "christian-hoodies-uk",
+    category: "hoodies",
     price: 32.00,
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
     colors: [{ name: "Black", images: ["/images/shop-hoodies-bg.webp"] }],
     description: "Our signature Faith Over Fear Christian hoodie is crafted from premium heavyweight organic cotton blend fabric. Designed for warmth, comfort, and bold testimony.",
     scriptureReference: "Psalm 118:6 — 'The Lord is on my side; I will not fear.'",
@@ -79,9 +79,9 @@ const allProducts = [
   {
     name: "He Left the 99 Christian Hoodie",
     slug: "he-left-the-99-christian-hoodie",
-    category: "christian-hoodies-uk",
+    category: "hoodies",
     price: 32.00,
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
     colors: [{ name: "Black", images: ["/images/shop-hoodies-bg.webp"] }],
     description: "A powerful reminder of the relentless love of the Good Shepherd who leaves the ninety-nine to pursue the one lost sheep.",
     scriptureReference: "Luke 15:4",
@@ -90,9 +90,9 @@ const allProducts = [
   {
     name: "Need Prayer Christian Hoodie",
     slug: "need-prayer-christian-hoodie",
-    category: "christian-hoodies-uk",
+    category: "hoodies",
     price: 32.00,
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
     colors: [{ name: "Black", images: ["/images/shop-hoodies-bg.webp"] }],
     description: "A walking invitation for ministry and fellowship. Wearing this hoodie lets people around you know you are open and ready to pray.",
     scriptureReference: "James 5:16",
@@ -101,9 +101,9 @@ const allProducts = [
   {
     name: "Pray Christian Hoodie",
     slug: "pray-christian-hoodie",
-    category: "christian-hoodies-uk",
+    category: "hoodies",
     price: 32.00,
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
     colors: [{ name: "Black", images: ["/images/shop-hoodies-bg.webp"] }],
     description: "Minimalist typography with a timeless message: Pray without ceasing. Soft brushed interior for all-day comfort and warmth.",
     scriptureReference: "1 Thessalonians 5:17",
@@ -114,9 +114,9 @@ const allProducts = [
   {
     name: "Faith Over Fear Christian T-Shirt",
     slug: "faith-over-fear-christian-t-shirt",
-    category: "tee-shirts",
+    category: "t-shirts",
     price: 19.99,
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
     colors: [{ name: "Black", images: ["/images/shop-tshirts-bg.webp"] }],
     description: "Breathable 100% combed ringspun cotton tee with bold typography declaring Faith Over Fear.",
     scriptureReference: "Psalm 118:6",
@@ -125,9 +125,9 @@ const allProducts = [
   {
     name: "Pray Christian T-Shirt",
     slug: "pray-christian-t-shirt",
-    category: "tee-shirts",
+    category: "t-shirts",
     price: 19.99,
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
     colors: [{ name: "Black", images: ["/images/shop-tshirts-bg.webp"] }],
     description: "Clean graphic faith tee designed to encourage disciples to deepen their personal prayer life daily.",
     scriptureReference: "1 Thessalonians 5:17",
@@ -136,9 +136,9 @@ const allProducts = [
   {
     name: "Need Prayer Christian T-Shirt",
     slug: "need-prayer-christian-t-shirt",
-    category: "tee-shirts",
+    category: "t-shirts",
     price: 19.99,
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
     colors: [{ name: "Black", images: ["/images/shop-tshirts-bg.webp"] }],
     description: "Gentle outreach t-shirt inviting those in distress or needing hope to ask for prayer.",
     scriptureReference: "Philippians 4:6",
@@ -147,9 +147,9 @@ const allProducts = [
   {
     name: "The Lord Is My Light Christian T-Shirt",
     slug: "the-lord-is-my-light-christian-t-shirt",
-    category: "tee-shirts",
+    category: "t-shirts",
     price: 19.99,
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
     colors: [{ name: "Black", images: ["/images/shop-tshirts-bg.webp"] }],
     description: "Minimalist sun and scripture emblem illustrating Psalm 27:1.",
     scriptureReference: "Psalm 27:1",
@@ -158,9 +158,9 @@ const allProducts = [
   {
     name: "He Left the 99 Christian T-Shirt",
     slug: "he-left-the-99-christian-t-shirt",
-    category: "tee-shirts",
+    category: "t-shirts",
     price: 19.99,
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
     colors: [{ name: "Black", images: ["/images/shop-tshirts-bg.webp"] }],
     description: "A wearable testimony to Jesus Christ who leaves the ninety-nine to rescue the one wandering sheep.",
     scriptureReference: "Matthew 18:12",
@@ -169,9 +169,9 @@ const allProducts = [
   {
     name: "Faith Can Move Mountains Christian T-Shirt",
     slug: "faith-can-move-mountains-christian-t-shirt",
-    category: "tee-shirts",
+    category: "t-shirts",
     price: 19.99,
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
     colors: [{ name: "Black", images: ["/images/shop-tshirts-bg.webp"] }],
     description: "Hand-drawn mountain line art and bold faith declaration reminding you that even mustard-seed faith moves mountains.",
     scriptureReference: "Matthew 17:20",
@@ -180,9 +180,9 @@ const allProducts = [
   {
     name: "Jesus Christian T-Shirt",
     slug: "jesus-christian-t-shirt",
-    category: "tee-shirts",
+    category: "t-shirts",
     price: 19.99,
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
     colors: [{ name: "Black", images: ["/images/shop-tshirts-bg.webp"] }],
     description: "The name above all names. Clean, bold typography proclaiming Jesus as the centre of all we are and do.",
     scriptureReference: "Philippians 2:9",
@@ -200,22 +200,22 @@ async function runImport() {
   console.log('🚀 Starting import of all live products to Airtable...');
 
   try {
-    // 1. Fetch existing rows to clean out empty placeholder rows
+    // 1. Fetch existing rows to avoid duplicate names
     const existing = await base('Products').select().all();
-    const emptyRows = existing.filter(r => !r.fields['Product Name'] || r.fields['Product Name'].trim() === '');
-    
-    if (emptyRows.length > 0) {
-      console.log(`🧹 Removing ${emptyRows.length} blank placeholder rows...`);
-      for (const row of emptyRows) {
-        await base('Products').destroy(row.id);
-      }
-    }
+    const existingNames = new Set(existing.map(r => r.fields['Product Name']).filter(Boolean));
+    console.log(`Found ${existing.length} existing rows in Products table.`);
 
-    // 2. Format products into Airtable records
-    const validColours = ['Black', 'White', 'Natural Canvas', 'Grey', 'Forest Green', 'Burgundy', 'Navy'];
-    const recordsToCreate = allProducts.map(p => {
+    // 2. Filter out products that already exist
+    const productsToInsert = allProducts.filter(p => !existingNames.has(p.name));
+    console.log(`📦 Inserting ${productsToInsert.length} new products...`);
+
+    const validColours = ['Black', 'White', 'Natural Canvas', 'Grey', 'Forest', 'Green', 'Burgundy', 'Navy'];
+    const validSizes = ['S', 'M', 'L', 'XL', 'One Size'];
+
+    const recordsToCreate = productsToInsert.map(p => {
       const mainImageUrl = getFullImageUrl(p.featuredImage);
-      const availableColours = p.colors.map(c => c.name);
+      const availableColours = p.colors.map(c => c.name).filter(c => validColours.includes(c));
+      const sizes = p.sizes.filter(s => validSizes.includes(s));
 
       const fields = {
         'Product Name': p.name,
@@ -223,35 +223,25 @@ async function runImport() {
         'Category': p.category,
         'Price (£)': p.price,
         'In Stock': true,
-        'Sizes': p.sizes,
-        'Available Colours': availableColours,
+        'Sizes': sizes.length > 0 ? sizes : ['One Size'],
+        'Available Colours': availableColours.length > 0 ? availableColours : ['Black'],
         'Main Featured Image': mainImageUrl ? [{ url: mainImageUrl }] : [],
         'Description': p.description || '',
         'Scripture Reference': p.scriptureReference || '',
         'Published': true,
       };
 
-      // Add color-specific attachments
-      for (const color of p.colors) {
-        if (validColours.includes(color.name) && color.images && color.images.length > 0) {
-          const colField = `Colour Images: ${color.name}`;
-          fields[colField] = color.images.map(img => ({ url: getFullImageUrl(img) }));
-        }
-      }
-
       return { fields };
     });
-
-    console.log(`📦 Inserting ${recordsToCreate.length} products into Airtable...`);
 
     // Insert in batches of 10
     for (let i = 0; i < recordsToCreate.length; i += 10) {
       const batch = recordsToCreate.slice(i, i + 10);
-      await base('Products').create(batch);
-      console.log(`✅ Inserted batch ${Math.floor(i / 10) + 1} (${batch.length} items)`);
+      const res = await base('Products').create(batch);
+      console.log(`✅ Inserted batch ${Math.floor(i / 10) + 1} (${res.length} items)`);
     }
 
-    console.log('🎉 All live products successfully imported into Airtable!');
+    console.log('🎉 All 16 live products are now in your Airtable Products table!');
   } catch (err) {
     console.error('❌ Error during import:', err);
   }
