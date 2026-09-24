@@ -99,7 +99,12 @@ export async function getProducts(): Promise<Product[]> {
         categoryName = 'T-Shirts';
       }
 
-      const slug = (fields['Slug'] as string) || record.id;
+      const rawName = (fields['Product Name'] as string) || 'Untitled Product';
+      const autoSlug = rawName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+      const slug = (fields['Slug'] as string) || autoSlug || record.id;
       const yoastProducts = (yoastSeoData as any).products || {};
       const yoastMatch = yoastProducts[slug] || Object.values(yoastProducts).find((p: any) => p.liveUrl?.includes(slug));
 
