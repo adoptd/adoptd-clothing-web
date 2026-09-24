@@ -57,12 +57,31 @@ export async function getProducts(): Promise<Product[]> {
       const mainImageAtt = (fields['Main Featured Image'] as any[]) || [];
       const featuredImage = mainImageAtt.length > 0 ? mainImageAtt[0].url : colors[0]?.images[0] || '';
 
+      const rawCat = (fields['Category'] as string) || 'tee-shirts';
+      const cleanCat = rawCat.toLowerCase().replace(/_/g, '-');
+      
+      let categorySlug: any = 'tee-shirts';
+      let categoryName = 'Apparel';
+      if (cleanCat.includes('bag') || cleanCat.includes('tote')) {
+        categorySlug = 'christian-bags';
+        categoryName = 'Tote Bags';
+      } else if (cleanCat.includes('hoodie')) {
+        categorySlug = 'christian-hoodies-uk';
+        categoryName = 'Hoodies';
+      } else if (cleanCat.includes('sweater')) {
+        categorySlug = 'sweaters';
+        categoryName = 'Sweaters';
+      } else if (cleanCat.includes('shirt') || cleanCat.includes('tee')) {
+        categorySlug = 'tee-shirts';
+        categoryName = 'T-Shirts';
+      }
+
       return {
         id: record.id,
         name: (fields['Product Name'] as string) || 'Untitled Product',
         slug: (fields['Slug'] as string) || record.id,
-        category: (fields['Category'] as any) || 'tee-shirts',
-        categoryName: (fields['Category'] as string) || 'Apparel',
+        category: categorySlug,
+        categoryName,
         price: Number(fields['Price (£)']) || 0,
         compareAtPrice: fields['Compare at Price (£)'] ? Number(fields['Compare at Price (£)']) : undefined,
         inStock: Boolean(fields['In Stock'] ?? true),
