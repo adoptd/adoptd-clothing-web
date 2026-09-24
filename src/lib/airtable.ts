@@ -30,26 +30,48 @@ export async function getProducts(): Promise<Product[]> {
       const fields = record.fields;
       const rawColors = (fields['Available Colours'] as string[]) || (fields['Available Colors'] as string[]) || ['Black'];
       
-      // Build color variant object
+      // Build color variant object with flexible column matching
+      const allFieldKeys = Object.keys(fields);
       const colors = rawColors.map((colorName) => {
-        const colorPrefix = colorName.split(' ')[0];
-        const colorFieldKeyUK = `Colour Images: ${colorName}`;
-        const colorFieldKeyUS = `Color Images: ${colorName}`;
-        const colorFieldKeyShortUK = `Colour Images: ${colorPrefix}`;
-        const colorFieldKeyShortUS = `Color Images: ${colorPrefix}`;
+        const cleanColor = colorName.trim();
+        const colorLower = cleanColor.toLowerCase();
+        const colorPrefixLower = cleanColor.split(' ')[0].toLowerCase();
 
-        const attachments = 
-          (fields[colorFieldKeyUK] as any[]) ||
-          (fields[colorFieldKeyUS] as any[]) ||
-          (fields[colorFieldKeyShortUK] as any[]) ||
-          (fields[colorFieldKeyShortUS] as any[]) ||
-          (fields['Main Featured Image'] as any[]) || 
-          [];
-        const images = attachments.map((att: any) => att.url);
+        // 1. Try standard keys
+        let attachments: any[] | undefined = 
+          (fields[`Colour Images: ${cleanColor}`] as any[]) ||
+          (fields[`Color Images: ${cleanColor}`] as any[]) ||
+          (fields[`Images: ${cleanColor}`] as any[]) ||
+          (fields[`${cleanColor} Images`] as any[]) ||
+          (fields[`Images (${cleanColor})`] as any[]) ||
+          (fields[`Images - ${cleanColor}`] as any[]) ||
+          (fields[cleanColor] as any[]);
+
+        // 2. If not found, search dynamically across all fields for an attachment column containing the color name
+        if (!attachments || !Array.isArray(attachments) || attachments.length === 0) {
+          const matchingKey = allFieldKeys.find((key) => {
+            const kLower = key.toLowerCase();
+            // Don't match the main image column accidentally
+            if (kLower.includes('main') || kLower.includes('featured')) return false;
+            // Check if column name contains full color name or color prefix
+            return kLower.includes(colorLower) || (colorPrefixLower.length > 2 && kLower.includes(colorPrefixLower));
+          });
+
+          if (matchingKey && Array.isArray(fields[matchingKey])) {
+            attachments = fields[matchingKey] as any[];
+          }
+        }
+
+        // 3. Fallback to Main Featured Image or empty
+        const finalAttachments = (attachments && attachments.length > 0)
+          ? attachments
+          : (fields['Main Featured Image'] as any[]) || [];
+
+        const images = finalAttachments.map((att: any) => att.url).filter(Boolean);
         
         return {
-          name: colorName,
-          hex: getColorHex(colorName),
+          name: cleanColor,
+          hex: getColorHex(cleanColor),
           images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800'],
         };
       });
