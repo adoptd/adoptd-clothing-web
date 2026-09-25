@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getBlogPostBySlug, getBlogPosts, getProducts } from '@/lib/airtable';
+import { getBlogPostBySlug, getBlogPosts, getProducts, getPageSeo } from '@/lib/airtable';
 import { constructMetadata, generateArticleJsonLd } from '@/lib/seo';
 import { ProductCard } from '@/components/product/ProductCard';
 import { Clock, Calendar, ArrowLeft } from 'lucide-react';
@@ -21,15 +21,18 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getBlogPostBySlug(slug);
+  const [post, pageSeo] = await Promise.all([
+    getBlogPostBySlug(slug),
+    getPageSeo(`blog/${slug}`),
+  ]);
 
   if (!post) {
     return constructMetadata({ title: 'Article Not Found' });
   }
 
   return constructMetadata({
-    title: post.seoTitle || post.title,
-    description: post.seoDescription || post.excerpt,
+    title: pageSeo?.title || post.seoTitle || post.title,
+    description: pageSeo?.description || post.seoDescription || post.excerpt,
     image: post.coverImage,
     slug: `blog/${post.slug}`,
   });
