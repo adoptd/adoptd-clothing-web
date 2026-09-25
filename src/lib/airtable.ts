@@ -195,19 +195,29 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   return products.find((p) => p.slug === slug) || null;
 }
 
-// Fetch blog posts (including .docx parsing)
+// Fetch blog posts (including full .docx parsing with inline images & auto-cover extraction)
 export async function getBlogPosts(): Promise<BlogPost[]> {
   if (!base) {
     return mockBlogPosts;
   }
 
   try {
-    const records = await base('Blog Posts')
-      .select({
-        filterByFormula: '{Published} = TRUE()',
-        sort: [{ field: 'Publish Date', direction: 'desc' }],
-      })
-      .all();
+    let records: readonly any[] = [];
+    
+    // Try 'Blog' first, then 'Blog Posts', then 'Journal'
+    const tableCandidates = ['Blog', 'Blog Posts', 'Journal', 'Articles'];
+    for (const tableName of tableCandidates) {
+      try {
+        records = await base(tableName)
+          .select({
+            view: 'Grid view',
+          })
+          .all();
+        if (records && records.length > 0) break;
+      } catch {
+        // Continue trying next table candidate
+      }
+    }
 
     if (!records || records.length === 0) {
       return mockBlogPosts;
@@ -217,10 +227,26 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
 
     for (const record of records) {
       const fields = record.fields;
-      let contentHtml = (fields['Direct Body (Alternative)'] as string) || '';
+      
+      // Filter out explicitly unpublished articles if Published checkbox is present
+      if (fields['Published'] === false || fields['Status'] === 'Draft') {
+        continue;
+      }
 
-      // If a .docx file is attached, parse it!
-      const docxAttachments = (fields['Docx File'] as any[]) || [];
+      let contentHtml = (fields['Direct Body (Alternative)'] as string) || (fields['Content'] as string) || (fields['Body'] as string) || '';
+      let rawText = '';
+      let docxCoverImage: string | null = null;
+
+      // Look for Word Document attachment across common field names
+      const docxAttachments = 
+        (fields['Word Document'] as any[]) ||
+        (fields['Docx File'] as any[]) ||
+        (fields['Document'] as any[]) ||
+        (fields['Word Doc'] as any[]) ||
+        (fields['File'] as any[]) ||
+        (fields['Attachment'] as any[]) ||
+        [];
+
       if (docxAttachments.length > 0 && docxAttachments[0].url) {
         try {
           const res = await fetch(docxAttachments[0].url);
@@ -228,34 +254,62 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
           const parsed = await parseDocxBuffer(Buffer.from(arrayBuffer));
           if (parsed.html) {
             contentHtml = parsed.html;
+            rawText = parsed.rawText;
+            docxCoverImage = parsed.firstImageUrl;
           }
         } catch (docxErr) {
           console.error('Error downloading/parsing attached .docx from Airtable:', docxErr);
         }
       }
 
-      const coverAtt = (fields['Cover Image'] as any[]) || [];
-      const coverImage = coverAtt.length > 0 ? coverAtt[0].url : 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200';
+      // Check explicit cover image attachment
+      const coverAtt = 
+        (fields['Cover Image'] as any[]) ||
+        (fields['Image'] as any[]) ||
+        (fields['Featured Image'] as any[]) ||
+        (fields['Picture'] as any[]) ||
+        [];
+
+      // Cover image priority: 1) Airtable Cover Image column, 2) First image extracted from Word doc, 3) Beautiful editorial fallback
+      const coverImage = coverAtt.length > 0 
+        ? coverAtt[0].url 
+        : docxCoverImage || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200';
+
+      const title = (fields['Title'] as string) || (fields['Post Title'] as string) || (fields['Name'] as string) || 'Faith & Devotion';
+      
+      const autoSlug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+      const slug = (fields['Slug'] as string) || autoSlug || record.id;
+
+      // Auto-generate excerpt if not supplied
+      let excerpt = (fields['Excerpt'] as string) || (fields['Summary'] as string) || '';
+      if (!excerpt && rawText) {
+        excerpt = rawText.split('\n').filter(Boolean).slice(0, 2).join(' ').slice(0, 160) + '...';
+      } else if (!excerpt) {
+        excerpt = 'A biblical reflection and devotional from the ADOPTD journal.';
+      }
 
       posts.push({
         id: record.id,
-        title: (fields['Title'] as string) || 'Untitled Post',
-        slug: (fields['Slug'] as string) || record.id,
+        title,
+        slug,
         coverImage,
         category: (fields['Category'] as string) || 'Devotionals',
-        excerpt: (fields['Excerpt'] as string) || '',
+        excerpt,
         contentHtml,
-        publishDate: (fields['Publish Date'] as string) || new Date().toISOString().split('T')[0],
-        author: (fields['Author'] as string) || 'Adoptd Team',
+        publishDate: (fields['Publish Date'] as string) || (fields['Date'] as string) || new Date().toISOString().split('T')[0],
+        author: (fields['Author'] as string) || 'ADOPTD Team',
         readingTimeMinutes: Math.max(1, Math.ceil((contentHtml.length || 500) / 1000)),
-        featuredProductIds: (fields['Featured Products'] as string[]) || [],
-        seoTitle: fields['SEO Meta Title'] as string,
-        seoDescription: fields['SEO Meta Description'] as string,
+        featuredProductIds: (fields['Featured Products'] as string[]) || (fields['Related Products'] as string[]) || [],
+        seoTitle: (fields['SEO Meta Title'] as string) || title,
+        seoDescription: (fields['SEO Meta Description'] as string) || excerpt,
         published: true,
       });
     }
 
-    return posts;
+    return posts.length > 0 ? posts : mockBlogPosts;
   } catch (error) {
     console.error('Error fetching blog posts from Airtable:', error);
     return mockBlogPosts;
