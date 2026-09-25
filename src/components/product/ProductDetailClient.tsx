@@ -36,12 +36,17 @@ export function ProductDetailClient({
     product.colors.find((c) => c.name === selectedColorName) ||
     product.colors[0];
   
+  const [imgErrorMap, setImgErrorMap] = useState<Record<string, boolean>>({});
+
   const currentImages =
     activeColorVariant && activeColorVariant.images.length > 0
       ? activeColorVariant.images
       : [product.featuredImage];
 
-  const currentDisplayImage = currentImages[activeImageIndex] || currentImages[0];
+  const rawDisplayImage = currentImages[activeImageIndex] || currentImages[0] || product.featuredImage;
+  const currentDisplayImage = imgErrorMap[rawDisplayImage]
+    ? (product.featuredImage || '/images/shop-hoodies-bg.webp')
+    : rawDisplayImage;
 
   const handleColorChange = (colorName: string) => {
     setSelectedColorName(colorName);
@@ -77,6 +82,7 @@ export function ProductDetailClient({
               alt={`${product.name} - ${selectedColorName}`}
               fill
               priority
+              onError={() => setImgErrorMap((prev) => ({ ...prev, [rawDisplayImage]: true }))}
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover object-center transition-all duration-300"
             />

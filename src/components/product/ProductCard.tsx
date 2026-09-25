@@ -11,8 +11,11 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const [activeColorIndex, setActiveColorIndex] = useState(0);
+  const [imgError, setImgError] = useState(false);
   const activeVariant = product.colors[activeColorIndex] || product.colors[0];
-  const displayImage = activeVariant?.images[0] || product.featuredImage;
+  const displayImage = imgError
+    ? (product.featuredImage || '/images/shop-hoodies-bg.webp')
+    : (activeVariant?.images[0] || product.featuredImage || '/images/shop-hoodies-bg.webp');
 
   return (
     <div className="group flex flex-col bg-[#00736a] rounded-xl overflow-hidden border border-[#00736a]/30 hover:border-[#00736a] transition-all duration-300 hover:shadow-md">
@@ -22,6 +25,7 @@ export function ProductCard({ product }: ProductCardProps) {
           src={displayImage}
           alt={product.name}
           fill
+          onError={() => setImgError(true)}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
         />
