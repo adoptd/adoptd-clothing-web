@@ -192,11 +192,12 @@ export function Footer({ settings }: FooterProps) {
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">INFO</h4>
               <ul className="space-y-2.5 text-stone-200 font-medium">
                 <li className="flex flex-wrap gap-x-4">
+                  <Link href="/blog" className="hover:text-white transition">Blog</Link>
                   <Link href="/church-print-services" className="hover:text-white transition">Support</Link>
                   <Link href="/church-print-services" className="hover:text-white transition">Contact</Link>
-                  <Link href="/shop" className="hover:text-white transition">My account</Link>
                 </li>
                 <li className="flex flex-wrap gap-x-4">
+                  <Link href="/shop" className="hover:text-white transition">My account</Link>
                   <Link href="/sitemap" className="hover:text-white transition">Sitemap</Link>
                   <Link href="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link>
                 </li>
