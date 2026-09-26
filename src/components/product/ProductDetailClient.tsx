@@ -93,28 +93,37 @@ export function ProductDetailClient({
             )}
           </div>
 
-          {/* Thumbnail Gallery (if multiple photos for active color) */}
+          {/* Grid-Style Image Gallery Below Main Hero Photo (shown if > 1 image) */}
           {currentImages.length > 1 && (
-            <div className="flex items-center space-x-3 overflow-x-auto pb-2">
-              {currentImages.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveImageIndex(idx)}
-                  className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 ${
-                    idx === activeImageIndex
-                      ? 'border-stone-900 ring-2 ring-stone-900/20'
-                      : 'border-stone-200 opacity-70 hover:opacity-100'
-                  }`}
-                >
-                  <Image
-                    src={img}
-                    alt={`${product.name} thumbnail ${idx + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="80px"
-                  />
-                </button>
-              ))}
+            <div className="grid grid-cols-4 sm:grid-cols-4 gap-3 sm:gap-4 pt-1">
+              {currentImages.map((img, idx) => {
+                const isSelected = idx === activeImageIndex;
+                const displayThumb = imgErrorMap[img] ? product.featuredImage : img;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`group relative aspect-square w-full rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer focus:outline-none ${
+                      isSelected
+                        ? 'border-stone-950 ring-2 ring-stone-950/20 shadow-md opacity-100'
+                        : 'border-stone-200/90 opacity-70 hover:opacity-100 hover:border-stone-400 bg-stone-50'
+                    }`}
+                    aria-label={`View photo ${idx + 1}`}
+                  >
+                    <Image
+                      src={displayThumb}
+                      alt={`${product.name} gallery image ${idx + 1}`}
+                      fill
+                      sizes="(max-width: 640px) 25vw, (max-width: 1024px) 15vw, 120px"
+                      className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                    />
+                    {isSelected && (
+                      <span className="absolute inset-0 bg-stone-900/5 pointer-events-none" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
