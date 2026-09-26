@@ -10,7 +10,7 @@ import { ArrowLeft, ShoppingBag, ShieldCheck, Lock, Truck } from 'lucide-react';
 export default function CheckoutPage() {
   const { items, getSubtotal } = useCartStore();
   const subtotal = getSubtotal();
-  const shippingFee = subtotal >= 40 || items.length === 0 ? 0 : 3.95;
+  const shippingFee = items.length === 0 ? 0 : 3.95;
   const total = subtotal + shippingFee;
 
   return (

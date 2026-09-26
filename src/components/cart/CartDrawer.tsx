@@ -13,9 +13,6 @@ export function CartDrawer() {
 
   const subtotal = getSubtotal();
   const totalItems = getTotalItems();
-  const freeShippingThreshold = 40.0;
-  const progressPercent = Math.min(100, (subtotal / freeShippingThreshold) * 100);
-  const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -45,26 +42,13 @@ export function CartDrawer() {
             </button>
           </div>
 
-          {/* Free Shipping Progress Indicator */}
-          <div className="bg-stone-50 p-4 border-b border-stone-200 text-sm">
-            <div className="flex items-center space-x-2 mb-2 text-stone-700">
-              <Truck className="w-4 h-4 text-stone-900" />
-              <span>
-                {remainingForFreeShipping === 0 ? (
-                  <strong className="text-[#00736a] font-semibold">🎉 You have unlocked Free UK Delivery!</strong>
-                ) : (
-                  <>
-                    Add <strong>£{remainingForFreeShipping.toFixed(2)}</strong> more for <strong>Free UK Delivery</strong>
-                  </>
-                )}
-              </span>
+          {/* Tracked UK Shipping Notice */}
+          <div className="bg-stone-50 p-3.5 border-b border-stone-200 text-xs sm:text-sm text-stone-700 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Truck className="w-4 h-4 text-[#00736a] flex-shrink-0" />
+              <span>Standard Tracked UK Delivery</span>
             </div>
-            <div className="w-full bg-stone-200 h-2 rounded-full overflow-hidden">
-              <div
-                className="bg-stone-900 h-full transition-all duration-300 rounded-full"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
+            <span className="font-bold text-stone-900">£3.95</span>
           </div>
 
           {/* Cart Item List */}
@@ -161,8 +145,8 @@ export function CartDrawer() {
                   <span className="font-bold text-lg text-stone-900">£{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-xs text-stone-500">
-                  <span>Shipping</span>
-                  <span>{subtotal >= freeShippingThreshold ? 'Free' : 'Calculated at checkout'}</span>
+                  <span>Tracked UK Shipping</span>
+                  <span className="font-semibold text-stone-900">£3.95</span>
                 </div>
               </div>
 

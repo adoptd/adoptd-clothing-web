@@ -140,7 +140,7 @@ export function ProductDetailClient({
                 </span>
               )}
               <span className="text-xs sm:text-sm text-stone-500 font-medium pl-3 border-l border-stone-200">
-                Taxes included • Free UK shipping over £40
+                Taxes included • Tracked UK Delivery (£3.95)
               </span>
             </div>
           </div>

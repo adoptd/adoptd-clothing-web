@@ -27,9 +27,8 @@ export async function POST(req: Request) {
       totalAmountPence += itemPricePence * itemQty;
     }
 
-    // Add shipping if under £40 threshold (standard UK shipping £3.95)
-    const freeShippingThresholdPence = 4000;
-    const shippingFeePence = totalAmountPence >= freeShippingThresholdPence ? 0 : 395;
+    // Add flat rate UK tracked shipping (£3.95) to all orders
+    const shippingFeePence = 395;
     totalAmountPence += shippingFeePence;
 
     const itemsSummary = items.map((item) => {
