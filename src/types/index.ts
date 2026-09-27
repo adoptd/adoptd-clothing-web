@@ -30,6 +30,7 @@ export interface Product {
   sizeGuideType: 'unisex-hoodie' | 'unisex-tshirt' | 'sweater' | 'tote-bag';
   customSizeNotes?: string;
   featuredImage: string;
+  categoryOverview?: string;
   relatedProductIds?: string[];
   seoTitle?: string;
   seoDescription?: string;

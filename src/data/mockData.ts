@@ -36,6 +36,7 @@ export const mockProducts: Product[] = [
     careInstructions: "Wipe clean or gentle cold hand wash.",
     sizeGuideType: "tote-bag",
     featuredImage: "/images/products/he-makes-all-things-new-tote.webp",
+    categoryOverview: "Our collection of Christian bags UK believers love combines faith, style, and everyday practicality. Each bag features meaningful Bible verses and Christian messages designed to encourage believers and help share the message of Jesus.\n\nWhether you're looking for a Christian tote bag, a scripture-inspired accessory, or a thoughtful Christian gift, these faith-inspired bags feature bold designs and uplifting scripture that remind us of God’s promises.",
     relatedProductIds: ["prod_bag_2", "prod_bag_3", "prod_hoodie_5"],
     seoTitle: "He Makes All Things New Tote Bag | Adoptd Clothing",
     seoDescription: "Eco-friendly 100% cotton Christian tote bag for study books and daily errands."
@@ -144,6 +145,7 @@ export const mockProducts: Product[] = [
     careInstructions: "Machine wash 30°C inside out. Air dry recommended.",
     sizeGuideType: "unisex-hoodie",
     featuredImage: "/images/products/amazing-grace-hoodie.webp",
+    categoryOverview: "Our collection of Christian hoodies uk is designed to help you share your faith while staying comfortable and stylish. At ADOPTD Christian Clothing UK, we believe clothing can be more than just fashion—it can be a powerful way to express your beliefs and inspire others. Our Christian hoodies feature meaningful Bible verses, faith-inspired messages and bold designs that reflect the hope and truth found in God’s word.\n\nThese faith based hoodies are perfect for everyday wear, church gatherings, youth events or simply sharing your faith wherever you go. Each design is created to spark conversations and encourage others through scripture-inspired messages. Whether you’re looking for a subtle reminder of your faith or a bold statement piece, our Christian hoodies combine modern streetwear style with powerful Christian messages.\n\nMade with high-quality materials and comfortable fits, our Christian apparel is designed to last and keep you warm throughout the year. Every hoodie reflects our mission to create clothing that spreads the message of Jesus and encourages believers to live out their faith with confidence.",
     relatedProductIds: ["prod_bag_4", "prod_hoodie_1", "prod_tee_7"],
     seoTitle: "Amazing Grace Christian Hoodie | Adoptd Clothing UK",
     seoDescription: "Wrap yourself in grace. Heavyweight Christian hoodie designed to start conversations."
@@ -283,6 +285,7 @@ export const mockProducts: Product[] = [
     careInstructions: "Wash inside out at 30°C.",
     sizeGuideType: "unisex-tshirt",
     featuredImage: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80",
+    categoryOverview: "Our Christian T-Shirts are designed to help you share your faith with confidence. Each design features powerful Bible verses and inspiring messages that reflect God’s word.\n\nAt ADOPTD Christian Clothing UK we believe faith-based clothing can be a simple way to start meaningful conversations about Jesus. Our collection of Christian graphic tees combines comfortable everyday wear with scripture-inspired designs that encourage believers and inspire others.",
     relatedProductIds: ["prod_hoodie_1", "prod_tee_2", "prod_bag_1"],
     seoTitle: "Faith Over Fear Christian T-Shirt UK | Adoptd Clothing",
     seoDescription: "Premium organic cotton Christian t-shirt carrying Psalm 118:6."

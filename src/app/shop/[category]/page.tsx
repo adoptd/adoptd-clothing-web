@@ -65,6 +65,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const allProducts = await getProducts();
   const products = allProducts.filter((p) => p.category === category);
   const info = categoryInfoMap[category];
+  const categoryOverview = products.find((p) => p.categoryOverview)?.categoryOverview;
 
   const categories = [
     { name: 'All Products', slug: 'all', href: '/shop' },
@@ -76,16 +77,26 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   return (
     <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 py-12 space-y-10">
       {/* Header */}
-      <div className="text-center max-w-2xl mx-auto space-y-3">
+      <div className="text-center max-w-3xl mx-auto space-y-4">
         <span className="text-xs uppercase tracking-[0.25em] text-stone-500 font-bold">
           {info?.subtitle || 'Collection'}
         </span>
         <h1 className="font-serif text-3xl sm:text-4xl font-bold text-stone-950">
           {info?.title || category.replace(/-/g, ' ')}
         </h1>
-        <p className="text-stone-600 text-sm leading-relaxed">
+        <p className="text-stone-600 text-sm sm:text-base leading-relaxed">
           {info?.description || 'Browse our faith-centred pieces.'}
         </p>
+
+        {categoryOverview && (
+          <div className="pt-4 text-stone-700 text-sm sm:text-base leading-relaxed space-y-3.5 max-w-3xl mx-auto border-t border-stone-200/80 mt-4">
+            {categoryOverview.split(/\n\n+/).map((para, idx) => (
+              <p key={idx} className="leading-relaxed">
+                {para.trim()}
+              </p>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Category Filter Pills */}

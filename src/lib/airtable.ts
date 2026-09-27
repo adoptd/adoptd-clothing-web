@@ -178,6 +178,7 @@ export async function getProducts(): Promise<Product[]> {
         sizeGuideType: (fields['Size Guide Type'] as any) || 'unisex-hoodie',
         customSizeNotes: fields['Custom Size Notes'] as string,
         featuredImage,
+        categoryOverview: (fields['Category Overview'] as string)?.trim() || undefined,
         relatedProductIds: (fields['Related Products'] as string[]) || [],
         seoTitle,
         seoDescription,
