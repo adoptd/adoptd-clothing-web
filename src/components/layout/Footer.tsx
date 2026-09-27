@@ -167,9 +167,6 @@ export function Footer({ settings }: FooterProps) {
                   <Link href="/shop" className="hover:text-white transition">Christmas</Link>
                   <Link href="/shop/tee-shirts" className="hover:text-white transition">T-Shirts</Link>
                   <Link href="/shop/christian-hoodies-uk" className="hover:text-white transition">Hoodies</Link>
-                </li>
-                <li className="flex flex-wrap gap-x-4">
-                  <Link href="/shop/sweaters" className="hover:text-white transition">Sweaters</Link>
                   <Link href="/shop/christian-bags" className="hover:text-white transition">Tote Bags</Link>
                 </li>
                 <li><Link href="/church-print-services" className="hover:text-white transition whitespace-nowrap">Church & Ministry Print Services</Link></li>
@@ -211,11 +208,10 @@ export function Footer({ settings }: FooterProps) {
                 <li className="flex flex-wrap gap-x-4">
                   <Link href="/shop/christian-bags" className="hover:text-white transition">Tote Bags</Link>
                   <Link href="/shop" className="hover:text-white transition">Christmas</Link>
-                  <Link href="/shop/sweaters" className="hover:text-white transition">Sweaters</Link>
-                </li>
-                <li className="flex flex-wrap gap-x-4">
                   <Link href="/shop/christian-hoodies-uk" className="hover:text-white transition">Hoodies</Link>
                   <Link href="/shop/tee-shirts" className="hover:text-white transition">T-Shirts</Link>
+                </li>
+                <li>
                   <Link href="/church-print-services" className="hover:text-white transition">Contact</Link>
                 </li>
                 <li className="flex flex-wrap gap-x-4">

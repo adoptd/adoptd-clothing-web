@@ -24,11 +24,6 @@ export default async function HomePage() {
       image: '/images/shop-hoodies-bg.webp',
     },
     {
-      name: 'SWEATERS',
-      slug: 'sweaters',
-      image: 'https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=800&auto=format&fit=crop&q=80',
-    },
-    {
       name: 'TOTE BAGS',
       slug: 'christian-bags',
       image: 'https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/mockup-of-a-man-with-a-loc-hairstyle-carrying-a-tote-bag-on-his-back-in-a-park-m56958-2-300x300.webp',
@@ -191,7 +186,7 @@ export default async function HomePage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {categories.map((cat) => (
             <div
               key={cat.slug}
