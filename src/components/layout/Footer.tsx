@@ -139,7 +139,7 @@ export function Footer({ settings }: FooterProps) {
               <Facebook className="w-6 h-6 fill-current" />
             </a>
             <a
-              href="https://www.instagram.com/adoptdchristian"
+              href={settings?.instagramUrl || "https://www.instagram.com/adoptdchristian"}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:opacity-80 transition"
@@ -151,9 +151,16 @@ export function Footer({ settings }: FooterProps) {
 
           {/* Large Brand Heading */}
           <div>
-            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight text-white">
-              @ADOPTD-CLOTHING
-            </h3>
+            <a
+              href={settings?.instagramUrl || "https://www.instagram.com/adoptdchristian"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block hover:opacity-90 transition"
+            >
+              <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight text-white">
+                @ADOPTD-CLOTHING
+              </h3>
+            </a>
           </div>
 
           {/* 3 Equilateral Footer Columns Across Full Width with Enlarged Typography */}
