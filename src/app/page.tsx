@@ -16,7 +16,7 @@ export default async function HomePage() {
     {
       name: 'T-SHIRTS',
       slug: 'tee-shirts',
-      image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80',
+      image: '/images/shop-tshirts-bg.webp',
     },
     {
       name: 'HOODIES',
