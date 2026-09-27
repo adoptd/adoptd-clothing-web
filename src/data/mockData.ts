@@ -7,7 +7,7 @@ export const mockSiteSettings: SiteSettings = {
   globalMetaDescription: "ADOPTD is an independent Christian clothing brand creating apparel that carries a message of faith, hope and identity. Small brand. Big message. Jesus at the centre.",
   contactEmail: "hello@adoptdchristianclothing.co.uk",
   instagramUrl: "https://www.instagram.com/adoptdchristian",
-  facebookUrl: "https://facebook.com/adoptdclothing25/",
+  facebookUrl: "https://www.facebook.com/adoptdclothing25/",
   freeShippingThreshold: 40.00,
 };
 

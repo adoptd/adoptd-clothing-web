@@ -130,7 +130,7 @@ export function Footer({ settings }: FooterProps) {
           {/* Top Row: Social Icons */}
           <div className="flex items-center space-x-5 text-white">
             <a
-              href="https://facebook.com/adoptdclothing25/"
+              href={settings?.facebookUrl || "https://www.facebook.com/adoptdclothing25/"}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:opacity-80 transition"
