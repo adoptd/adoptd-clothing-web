@@ -218,9 +218,15 @@ export function ProductDetailClient({
           <div className="space-y-4 pt-4 border-t border-stone-200 text-base text-stone-700">
             <div>
               <h3 className="font-serif font-bold text-stone-900 text-lg mb-2">Description</h3>
-              <p className="leading-relaxed text-stone-600 text-sm sm:text-base">
-                {product.description}
-              </p>
+              <div className="space-y-3 leading-relaxed text-stone-600 text-sm sm:text-base">
+                {(product.longDescription || product.description)
+                  .split(/\n\n+/)
+                  .map((para, idx) => (
+                    <p key={idx} className="leading-relaxed">
+                      {para.trim()}
+                    </p>
+                  ))}
+              </div>
             </div>
 
             {product.careInstructions && (

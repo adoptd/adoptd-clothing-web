@@ -25,6 +25,8 @@ export interface Product {
   availableSizes: string[];
   colors: ProductColorVariant[];
   description: string;
+  shortDescription?: string;
+  longDescription?: string;
   scriptureReference?: string;
   careInstructions?: string;
   sizeGuideType: 'unisex-hoodie' | 'unisex-tshirt' | 'sweater' | 'tote-bag';
