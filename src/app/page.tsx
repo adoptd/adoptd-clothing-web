@@ -21,7 +21,7 @@ export default async function HomePage() {
     {
       name: 'HOODIES',
       slug: 'christian-hoodies-uk',
-      image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&auto=format&fit=crop&q=80',
+      image: '/images/shop-hoodies-bg.webp',
     },
     {
       name: 'SWEATERS',
