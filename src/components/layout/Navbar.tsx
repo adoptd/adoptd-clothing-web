@@ -134,13 +134,6 @@ export function Navbar({ settings }: NavbarProps) {
             Hoodies
           </Link>
           <Link
-            href="/shop/sweaters"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-sm font-semibold text-stone-300 border-b border-stone-800"
-          >
-            Sweaters
-          </Link>
-          <Link
             href="/shop/christian-bags"
             onClick={() => setMobileMenuOpen(false)}
             className="block py-2 text-sm font-semibold text-stone-300 border-b border-stone-800"

@@ -70,7 +70,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     { name: 'All Products', slug: 'all', href: '/shop' },
     { name: 'T-Shirts', slug: 'tee-shirts', href: '/shop/tee-shirts' },
     { name: 'Hoodies', slug: 'christian-hoodies-uk', href: '/shop/christian-hoodies-uk' },
-    { name: 'Sweaters', slug: 'sweaters', href: '/shop/sweaters' },
     { name: 'Tote Bags', slug: 'christian-bags', href: '/shop/christian-bags' },
   ];
 
