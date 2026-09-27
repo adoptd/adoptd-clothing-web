@@ -161,6 +161,19 @@ export async function getProducts(): Promise<Product[]> {
                              (fields['Description'] as string) ||
                              '';
 
+      const allKeys = Object.keys(fields);
+      const longDescKey = allKeys.find(k => k.toLowerCase().replace(/[^a-z]/g, '') === 'longdescription');
+      const shortDescKey = allKeys.find(k => k.toLowerCase().replace(/[^a-z]/g, '') === 'shortdescription');
+      const descKey = allKeys.find(k => k.toLowerCase().trim() === 'description');
+
+      const rawLongDesc = ((longDescKey ? fields[longDescKey] : fields['Long Description']) as string) || '';
+      const rawShortDesc = ((shortDescKey ? fields[shortDescKey] : fields['Short Description']) as string) || '';
+      const rawDesc = ((descKey ? fields[descKey] : fields['Description']) as string) || '';
+
+      const finalDescription = (rawLongDesc || rawDesc || rawShortDesc || '').trim();
+      const finalLongDescription = (rawLongDesc || rawDesc || '').trim();
+      const finalShortDescription = (rawShortDesc || '').trim();
+
       return {
         id: record.id,
         name: (fields['Product Name'] as string) || 'Untitled Product',
@@ -172,9 +185,9 @@ export async function getProducts(): Promise<Product[]> {
         inStock: Boolean(fields['In Stock'] ?? true),
         availableSizes: (fields['Sizes'] as string[]) || ['S', 'M', 'L', 'XL'],
         colors,
-        description: ((fields['Long Description'] as string) || (fields['Description'] as string) || (fields['Short Description'] as string) || '').trim(),
-        shortDescription: (fields['Short Description'] as string)?.trim(),
-        longDescription: (fields['Long Description'] as string)?.trim(),
+        description: finalDescription,
+        shortDescription: finalShortDescription || undefined,
+        longDescription: finalLongDescription || undefined,
         scriptureReference: fields['Scripture Reference'] as string,
         careInstructions: fields['Care Instructions'] as string,
         sizeGuideType: (fields['Size Guide Type'] as any) || 'unisex-hoodie',
