@@ -156,8 +156,8 @@ export function Footer({ settings }: FooterProps) {
             </h3>
           </div>
 
-          {/* 4 Equilateral Footer Columns Across Full Width with Enlarged Typography */}
-          <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 text-base sm:text-lg">
+          {/* 3 Equilateral Footer Columns Across Full Width with Enlarged Typography */}
+          <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 lg:gap-12 text-base sm:text-lg">
             
             {/* SHOP Column */}
             <div className="space-y-4">
@@ -197,26 +197,6 @@ export function Footer({ settings }: FooterProps) {
                   <Link href="/shop" className="hover:text-white transition">My account</Link>
                   <Link href="/sitemap" className="hover:text-white transition">Sitemap</Link>
                   <Link href="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* FOLLOW Column */}
-            <div className="space-y-4">
-              <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">FOLLOW</h4>
-              <ul className="space-y-2.5 text-stone-200 font-medium">
-                <li className="flex flex-wrap gap-x-4">
-                  <Link href="/shop/christian-bags" className="hover:text-white transition">Tote Bags</Link>
-                  <Link href="/shop" className="hover:text-white transition">Christmas</Link>
-                  <Link href="/shop/christian-hoodies-uk" className="hover:text-white transition">Hoodies</Link>
-                  <Link href="/shop/tee-shirts" className="hover:text-white transition">T-Shirts</Link>
-                </li>
-                <li>
-                  <Link href="/church-print-services" className="hover:text-white transition">Contact</Link>
-                </li>
-                <li className="flex flex-wrap gap-x-4">
-                  <Link href="/shop" className="hover:text-white transition">My account</Link>
-                  <Link href="/church-print-services" className="hover:text-white transition">Support</Link>
                 </li>
               </ul>
             </div>
