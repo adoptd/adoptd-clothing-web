@@ -63,142 +63,192 @@ export async function getProducts(): Promise<Product[]> {
       return mockProducts;
     }
 
-    return records.map((record) => {
-      const fields = record.fields;
-      const rawColors = (fields['Available Colours'] as string[]) || (fields['Available Colors'] as string[]) || ['Black'];
-      
-      // Build color variant object with flexible column matching
-      const allFieldKeys = Object.keys(fields);
-      const colors = rawColors.map((colorName) => {
-        const cleanColor = colorName.trim();
-        const colorLower = cleanColor.toLowerCase();
-        const colorPrefixLower = cleanColor.split(' ')[0].toLowerCase();
+    return await Promise.all(
+      records.map(async (record) => {
+        const fields = record.fields;
+        const rawColors = (fields['Available Colours'] as string[]) || (fields['Available Colors'] as string[]) || ['Black'];
+        
+        // Build color variant object with flexible column matching
+        const allFieldKeys = Object.keys(fields);
+        const colors = rawColors.map((colorName) => {
+          const cleanColor = colorName.trim();
+          const colorLower = cleanColor.toLowerCase();
+          const colorPrefixLower = cleanColor.split(' ')[0].toLowerCase();
 
-        // 1. Try standard keys
-        let attachments: any[] | undefined = 
-          (fields[`Colour Images: ${cleanColor}`] as any[]) ||
-          (fields[`Color Images: ${cleanColor}`] as any[]) ||
-          (fields[`Images: ${cleanColor}`] as any[]) ||
-          (fields[`${cleanColor} Images`] as any[]) ||
-          (fields[`Images (${cleanColor})`] as any[]) ||
-          (fields[`Images - ${cleanColor}`] as any[]) ||
-          (fields[cleanColor] as any[]);
+          // 1. Try standard keys
+          let attachments: any[] | undefined = 
+            (fields[`Colour Images: ${cleanColor}`] as any[]) ||
+            (fields[`Color Images: ${cleanColor}`] as any[]) ||
+            (fields[`Images: ${cleanColor}`] as any[]) ||
+            (fields[`${cleanColor} Images`] as any[]) ||
+            (fields[`Images (${cleanColor})`] as any[]) ||
+            (fields[`Images - ${cleanColor}`] as any[]) ||
+            (fields[cleanColor] as any[]);
 
-        // 2. If not found, search dynamically across all fields for an attachment column containing the color name
-        if (!attachments || !Array.isArray(attachments) || attachments.length === 0) {
-          const matchingKey = allFieldKeys.find((key) => {
-            const kLower = key.toLowerCase();
-            // Don't match the main image column accidentally
-            if (kLower.includes('main') || kLower.includes('featured')) return false;
-            // Check if column name contains full color name or color prefix
-            return kLower.includes(colorLower) || (colorPrefixLower.length > 2 && kLower.includes(colorPrefixLower));
-          });
+          // 2. If not found, search dynamically across all fields for an attachment column containing the color name
+          if (!attachments || !Array.isArray(attachments) || attachments.length === 0) {
+            const matchingKey = allFieldKeys.find((key) => {
+              const kLower = key.toLowerCase();
+              // Don't match the main image column accidentally
+              if (kLower.includes('main') || kLower.includes('featured')) return false;
+              // Check if column name contains full color name or color prefix
+              return kLower.includes(colorLower) || (colorPrefixLower.length > 2 && kLower.includes(colorPrefixLower));
+            });
 
-          if (matchingKey && Array.isArray(fields[matchingKey])) {
-            attachments = fields[matchingKey] as any[];
+            if (matchingKey && Array.isArray(fields[matchingKey])) {
+              attachments = fields[matchingKey] as any[];
+            }
           }
+
+          // 3. Fallback to Main Featured Image or empty
+          const finalAttachments = (attachments && attachments.length > 0)
+            ? attachments
+            : (fields['Main Featured Image'] as any[]) || [];
+
+          const images = finalAttachments.map((att: any) => att.url).filter(Boolean);
+          
+          return {
+            name: cleanColor,
+            hex: getColorHex(cleanColor),
+            images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800'],
+          };
+        });
+
+        const mainImageAtt = (fields['Main Featured Image'] as any[]) || [];
+        const featuredImage = mainImageAtt.length > 0 ? mainImageAtt[0].url : colors[0]?.images[0] || '';
+
+        const rawCat = (fields['Category'] as string) || 'tee-shirts';
+        const cleanCat = rawCat.toLowerCase().replace(/_/g, '-');
+        
+        let categorySlug: any = 'tee-shirts';
+        let categoryName = 'Apparel';
+        if (cleanCat.includes('bag') || cleanCat.includes('tote')) {
+          categorySlug = 'christian-bags';
+          categoryName = 'Tote Bags';
+        } else if (cleanCat.includes('hoodie')) {
+          categorySlug = 'christian-hoodies-uk';
+          categoryName = 'Hoodies';
+        } else if (cleanCat.includes('sweater')) {
+          categorySlug = 'sweaters';
+          categoryName = 'Sweaters';
+        } else if (cleanCat.includes('shirt') || cleanCat.includes('tee')) {
+          categorySlug = 'tee-shirts';
+          categoryName = 'T-Shirts';
         }
 
-        // 3. Fallback to Main Featured Image or empty
-        const finalAttachments = (attachments && attachments.length > 0)
-          ? attachments
-          : (fields['Main Featured Image'] as any[]) || [];
-
-        const images = finalAttachments.map((att: any) => att.url).filter(Boolean);
+        const rawName = (fields['Product Name'] as string) || 'Untitled Product';
+        const autoSlug = rawName
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)+/g, '');
+        const slug = (fields['Slug'] as string) || autoSlug || record.id;
         
+        const yoastProducts = (yoastSeoData as any).products || {};
+        const yoastMatch = yoastProducts[slug] || Object.values(yoastProducts).find((p: any) => p.liveUrl?.includes(slug));
+
+        // Match against dedicated SEO table first, then fallback to Yoast database or defaults
+        const seoEntry = seoMap[slug.toLowerCase()] || seoMap[rawName.toLowerCase()];
+
+        const seoTitle = (fields['SEO Meta Title'] as string) ||
+                         (fields['SEO Title'] as string) ||
+                         seoEntry?.title ||
+                         yoastMatch?.title ||
+                         rawName;
+
+        const seoDescription = (fields['SEO Meta Description'] as string) ||
+                               (fields['SEO Description'] as string) ||
+                               seoEntry?.description ||
+                               yoastMatch?.description ||
+                               (fields['Description'] as string) ||
+                               '';
+
+        const allKeys = Object.keys(fields);
+        const longDescKey = allKeys.find(k => k.toLowerCase().replace(/[^a-z]/g, '') === 'longdescription');
+        const shortDescKey = allKeys.find(k => k.toLowerCase().replace(/[^a-z]/g, '') === 'shortdescription');
+        const descKey = allKeys.find(k => k.toLowerCase().trim() === 'description');
+
+        // Parse Long Description (Word docx attachment or plain text)
+        let rawLongDesc = '';
+        const rawLongDescVal = longDescKey ? fields[longDescKey] : fields['Long Description'];
+        if (Array.isArray(rawLongDescVal) && rawLongDescVal.length > 0) {
+          const docxAtt = rawLongDescVal.find(
+            (att: any) => att.url && (att.filename?.endsWith('.docx') || att.type?.includes('word'))
+          ) || rawLongDescVal[0];
+          if (docxAtt && docxAtt.url) {
+            try {
+              const fileRes = await fetch(docxAtt.url);
+              if (fileRes.ok) {
+                const arrayBuffer = await fileRes.arrayBuffer();
+                const buffer = Buffer.from(arrayBuffer);
+                const parsed = await parseDocxBuffer(buffer);
+                rawLongDesc = parsed.html;
+              }
+            } catch (err) {
+              console.error(`Error parsing Long Description docx for ${rawName}:`, err);
+            }
+          }
+        } else if (typeof rawLongDescVal === 'string') {
+          rawLongDesc = rawLongDescVal;
+        }
+
+        const rawShortDesc = ((shortDescKey ? fields[shortDescKey] : fields['Short Description']) as string) || '';
+        const rawDesc = ((descKey ? fields[descKey] : fields['Description']) as string) || '';
+
+        const finalDescription = (rawLongDesc || rawDesc || rawShortDesc || '').trim();
+        const finalLongDescription = (rawLongDesc || rawDesc || '').trim();
+        const finalShortDescription = (rawShortDesc || '').trim();
+
+        // Parse Category Overview (Word docx attachment or plain text)
+        let categoryOverview: string | undefined = undefined;
+        const rawCategoryOverview = fields['Category Overview'];
+        if (Array.isArray(rawCategoryOverview) && rawCategoryOverview.length > 0) {
+          const docxAtt = rawCategoryOverview.find(
+            (att: any) => att.url && (att.filename?.endsWith('.docx') || att.type?.includes('word'))
+          ) || rawCategoryOverview[0];
+
+          if (docxAtt && docxAtt.url) {
+            try {
+              const fileRes = await fetch(docxAtt.url);
+              if (fileRes.ok) {
+                const arrayBuffer = await fileRes.arrayBuffer();
+                const buffer = Buffer.from(arrayBuffer);
+                const parsed = await parseDocxBuffer(buffer);
+                categoryOverview = parsed.html;
+              }
+            } catch (docErr) {
+              console.error(`Error parsing Category Overview docx for ${rawName}:`, docErr);
+            }
+          }
+        } else if (typeof rawCategoryOverview === 'string' && rawCategoryOverview.trim()) {
+          categoryOverview = rawCategoryOverview.trim();
+        }
+
         return {
-          name: cleanColor,
-          hex: getColorHex(cleanColor),
-          images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800'],
+          id: record.id,
+          name: (fields['Product Name'] as string) || 'Untitled Product',
+          slug,
+          category: categorySlug,
+          categoryName,
+          price: Number(fields['Price (£)']) || 0,
+          compareAtPrice: fields['Compare at Price (£)'] ? Number(fields['Compare at Price (£)']) : undefined,
+          inStock: Boolean(fields['In Stock'] ?? true),
+          availableSizes: (fields['Sizes'] as string[]) || ['S', 'M', 'L', 'XL'],
+          colors,
+          description: finalDescription,
+          shortDescription: finalShortDescription || undefined,
+          longDescription: finalLongDescription || undefined,
+          scriptureReference: fields['Scripture Reference'] as string,
+          careInstructions: fields['Care Instructions'] as string,
+          sizeGuideType: (fields['Size Guide Type'] as any) || 'unisex-hoodie',
+          customSizeNotes: fields['Custom Size Notes'] as string,
+          featuredImage,
+          categoryOverview,
+          relatedProductIds: (fields['Related Products'] as string[]) || [],
+          seoTitle,
+          seoDescription,
         };
-      });
-
-      const mainImageAtt = (fields['Main Featured Image'] as any[]) || [];
-      const featuredImage = mainImageAtt.length > 0 ? mainImageAtt[0].url : colors[0]?.images[0] || '';
-
-      const rawCat = (fields['Category'] as string) || 'tee-shirts';
-      const cleanCat = rawCat.toLowerCase().replace(/_/g, '-');
-      
-      let categorySlug: any = 'tee-shirts';
-      let categoryName = 'Apparel';
-      if (cleanCat.includes('bag') || cleanCat.includes('tote')) {
-        categorySlug = 'christian-bags';
-        categoryName = 'Tote Bags';
-      } else if (cleanCat.includes('hoodie')) {
-        categorySlug = 'christian-hoodies-uk';
-        categoryName = 'Hoodies';
-      } else if (cleanCat.includes('sweater')) {
-        categorySlug = 'sweaters';
-        categoryName = 'Sweaters';
-      } else if (cleanCat.includes('shirt') || cleanCat.includes('tee')) {
-        categorySlug = 'tee-shirts';
-        categoryName = 'T-Shirts';
-      }
-
-      const rawName = (fields['Product Name'] as string) || 'Untitled Product';
-      const autoSlug = rawName
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)+/g, '');
-      const slug = (fields['Slug'] as string) || autoSlug || record.id;
-      
-      const yoastProducts = (yoastSeoData as any).products || {};
-      const yoastMatch = yoastProducts[slug] || Object.values(yoastProducts).find((p: any) => p.liveUrl?.includes(slug));
-
-      // Match against dedicated SEO table first, then fallback to Yoast database or defaults
-      const seoEntry = seoMap[slug.toLowerCase()] || seoMap[rawName.toLowerCase()];
-
-      const seoTitle = (fields['SEO Meta Title'] as string) ||
-                       (fields['SEO Title'] as string) ||
-                       seoEntry?.title ||
-                       yoastMatch?.title ||
-                       rawName;
-
-      const seoDescription = (fields['SEO Meta Description'] as string) ||
-                             (fields['SEO Description'] as string) ||
-                             seoEntry?.description ||
-                             yoastMatch?.description ||
-                             (fields['Description'] as string) ||
-                             '';
-
-      const allKeys = Object.keys(fields);
-      const longDescKey = allKeys.find(k => k.toLowerCase().replace(/[^a-z]/g, '') === 'longdescription');
-      const shortDescKey = allKeys.find(k => k.toLowerCase().replace(/[^a-z]/g, '') === 'shortdescription');
-      const descKey = allKeys.find(k => k.toLowerCase().trim() === 'description');
-
-      const rawLongDesc = ((longDescKey ? fields[longDescKey] : fields['Long Description']) as string) || '';
-      const rawShortDesc = ((shortDescKey ? fields[shortDescKey] : fields['Short Description']) as string) || '';
-      const rawDesc = ((descKey ? fields[descKey] : fields['Description']) as string) || '';
-
-      const finalDescription = (rawLongDesc || rawDesc || rawShortDesc || '').trim();
-      const finalLongDescription = (rawLongDesc || rawDesc || '').trim();
-      const finalShortDescription = (rawShortDesc || '').trim();
-
-      return {
-        id: record.id,
-        name: (fields['Product Name'] as string) || 'Untitled Product',
-        slug,
-        category: categorySlug,
-        categoryName,
-        price: Number(fields['Price (£)']) || 0,
-        compareAtPrice: fields['Compare at Price (£)'] ? Number(fields['Compare at Price (£)']) : undefined,
-        inStock: Boolean(fields['In Stock'] ?? true),
-        availableSizes: (fields['Sizes'] as string[]) || ['S', 'M', 'L', 'XL'],
-        colors,
-        description: finalDescription,
-        shortDescription: finalShortDescription || undefined,
-        longDescription: finalLongDescription || undefined,
-        scriptureReference: fields['Scripture Reference'] as string,
-        careInstructions: fields['Care Instructions'] as string,
-        sizeGuideType: (fields['Size Guide Type'] as any) || 'unisex-hoodie',
-        customSizeNotes: fields['Custom Size Notes'] as string,
-        featuredImage,
-        categoryOverview: (fields['Category Overview'] as string)?.trim() || undefined,
-        relatedProductIds: (fields['Related Products'] as string[]) || [],
-        seoTitle,
-        seoDescription,
-      };
-    });
+      })
+    );
   } catch (error) {
     console.error('Error fetching products from Airtable:', error);
     return mockProducts;

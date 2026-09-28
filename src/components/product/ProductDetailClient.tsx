@@ -219,9 +219,16 @@ export function ProductDetailClient({
             <div>
               <h3 className="font-serif font-bold text-stone-900 text-lg mb-2">Description</h3>
               {((product.longDescription || product.description) ? (
-                <div className="leading-relaxed text-stone-600 text-sm sm:text-base whitespace-pre-line space-y-3">
-                  {product.longDescription || product.description}
-                </div>
+                (product.longDescription || product.description).includes('<') && (product.longDescription || product.description).includes('>') ? (
+                  <div
+                    className="leading-relaxed text-stone-600 text-sm sm:text-base space-y-3 [&>p]:leading-relaxed [&>p]:mb-3 [&_strong]:text-stone-950 [&_strong]:font-bold"
+                    dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
+                  />
+                ) : (
+                  <div className="leading-relaxed text-stone-600 text-sm sm:text-base whitespace-pre-line space-y-3">
+                    {product.longDescription || product.description}
+                  </div>
+                )
               ) : (
                 <p className="text-sm text-stone-500 italic">No description available.</p>
               ))}
