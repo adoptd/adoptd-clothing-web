@@ -163,8 +163,8 @@ export function Footer({ settings }: FooterProps) {
             </a>
           </div>
 
-          {/* 5-Column Footer Grid with SHOP taking 3 columns, COMPANY & INFO taking 1 column each */}
-          <div className="w-full grid grid-cols-1 md:grid-cols-5 gap-8 sm:gap-10 lg:gap-12 text-base sm:text-lg">
+          {/* 6-Column Footer Grid: SHOP (3 cols), COMPANY (1 col), INFO (2 cols) */}
+          <div className="w-full grid grid-cols-1 md:grid-cols-6 gap-8 sm:gap-10 lg:gap-12 text-base sm:text-lg">
             
             {/* SHOP Section (spread across 3 columns) */}
             <div className="md:col-span-3 space-y-4">
@@ -193,15 +193,19 @@ export function Footer({ settings }: FooterProps) {
               </ul>
             </div>
 
-            {/* INFO Column (1 column wide) */}
-            <div className="md:col-span-1 space-y-4">
+            {/* INFO Section (spread across 2 columns) */}
+            <div className="md:col-span-2 space-y-4">
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">INFO</h4>
-              <ul className="space-y-2.5 text-stone-200 font-medium">
-                <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition">Support/Contact</Link></li>
-                <li><Link href="/sitemap" className="hover:text-white transition">Sitemap</Link></li>
-                <li><Link href="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link></li>
-              </ul>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 text-stone-200 font-medium">
+                <ul className="space-y-2.5">
+                  <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
+                  <li><Link href="/contact" className="hover:text-white transition">Support/Contact</Link></li>
+                </ul>
+                <ul className="space-y-2.5">
+                  <li><Link href="/sitemap" className="hover:text-white transition">Sitemap</Link></li>
+                  <li><Link href="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link></li>
+                </ul>
+              </div>
             </div>
 
           </div>
