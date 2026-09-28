@@ -10,7 +10,52 @@ export const revalidate = 60;
 
 export default async function HomePage() {
   const products = await getProducts();
-  const featuredProducts = products.slice(0, 5);
+  
+  // Ensure at least 3 distinct product categories are featured (T-Shirts, Hoodies, Tote Bags, etc.)
+  const categoryOrder = ['tee-shirts', 'christian-hoodies-uk', 'christian-bags', 'christmas', 'sweaters'];
+  const featuredProducts: typeof products = [];
+  const productsByCategory: Record<string, typeof products> = {};
+
+  products.forEach((p) => {
+    const cat = p.category || 'tee-shirts';
+    if (!productsByCategory[cat]) {
+      productsByCategory[cat] = [];
+    }
+    productsByCategory[cat].push(p);
+  });
+
+  // Round-robin selection across distinct categories
+  let round = 0;
+  while (featuredProducts.length < 5 && round < 10) {
+    for (const cat of categoryOrder) {
+      if (featuredProducts.length >= 5) break;
+      const list = productsByCategory[cat];
+      if (list && list[round]) {
+        featuredProducts.push(list[round]);
+      }
+    }
+    // Also include any other categories not in categoryOrder
+    for (const cat in productsByCategory) {
+      if (featuredProducts.length >= 5) break;
+      if (!categoryOrder.includes(cat)) {
+        const list = productsByCategory[cat];
+        if (list && list[round]) {
+          featuredProducts.push(list[round]);
+        }
+      }
+    }
+    round++;
+  }
+
+  // Fallback to fill any remaining slots up to 5
+  if (featuredProducts.length < 5) {
+    for (const p of products) {
+      if (!featuredProducts.some((fp) => fp.id === p.id)) {
+        featuredProducts.push(p);
+        if (featuredProducts.length >= 5) break;
+      }
+    }
+  }
 
   const categories = [
     {
