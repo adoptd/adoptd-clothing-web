@@ -200,10 +200,10 @@ export function Footer({ settings }: FooterProps) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-2.5 text-stone-200 font-medium">
                 <ul className="space-y-2.5">
                   <li><Link href="/contact" className="hover:text-white transition whitespace-nowrap">Support/Contact</Link></li>
+                  <li><Link href="/privacy-policy" className="hover:text-white transition whitespace-nowrap">Privacy Policy</Link></li>
                 </ul>
                 <ul className="space-y-2.5">
                   <li><Link href="/sitemap" className="hover:text-white transition whitespace-nowrap">Sitemap</Link></li>
-                  <li><Link href="/privacy-policy" className="hover:text-white transition whitespace-nowrap">Privacy Policy</Link></li>
                 </ul>
               </div>
             </div>
