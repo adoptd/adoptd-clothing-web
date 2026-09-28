@@ -22,12 +22,12 @@ export default async function SitemapPage() {
     { name: 'All Products', href: '/shop' },
     { name: 'Christian T-Shirts', href: '/shop/tee-shirts' },
     { name: 'Christian Hoodies UK', href: '/shop/christian-hoodies-uk' },
-    { name: 'Sweaters & Crewnecks', href: '/shop/sweaters' },
     { name: 'Christian Tote Bags', href: '/shop/christian-bags' },
   ];
 
   const mainPages = [
     { name: 'Home', href: '/' },
+    { name: 'About Us', href: '/about' },
     { name: 'Church & Ministry Print Services', href: '/church-print-services' },
     { name: 'The Adoptd Journal (Blog)', href: '/blog' },
     { name: 'Privacy Policy & GDPR Compliance', href: '/privacy-policy' },

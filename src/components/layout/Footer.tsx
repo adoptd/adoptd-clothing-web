@@ -185,9 +185,7 @@ export function Footer({ settings }: FooterProps) {
             <div className="space-y-4">
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">COMPANY</h4>
               <ul className="space-y-2.5 text-stone-200 font-medium">
-                <li><Link href="/" className="hover:text-white transition">Home</Link></li>
-                <li><Link href="/church-print-services" className="hover:text-white transition whitespace-nowrap">Church & Ministry Print Services</Link></li>
-                <li><Link href="/shop" className="hover:text-white transition">Blaze city Merch</Link></li>
+                <li><Link href="/about" className="hover:text-white transition">About Us</Link></li>
               </ul>
             </div>
 

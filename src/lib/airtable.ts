@@ -261,6 +261,93 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   return products.find((p) => p.slug === slug) || null;
 }
 
+export interface AboutPageData {
+  title: string;
+  contentHtml: string;
+  rawText: string;
+  seoTitle?: string;
+  seoDescription?: string;
+}
+
+// Fetch About page data from dedicated Airtable 'About' table with automatic .docx parsing
+export async function getAboutPageData(): Promise<AboutPageData> {
+  const defaultData: AboutPageData = {
+    title: 'About Adoptd Christian Clothing',
+    contentHtml: `
+      <p>ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity.</p>
+      <p>Every purchase helps a small business keep creating, designing and sharing faith through clothing.</p>
+      <p>Every design has a purpose: to get people thinking, talking and, above all, to point people towards Jesus.</p>
+    `,
+    rawText: 'ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity.',
+  };
+
+  if (!base) return defaultData;
+
+  try {
+    const [records, seoEntry] = await Promise.all([
+      base('About').select().all(),
+      getPageSeo('about'),
+    ]);
+
+    if (!records || records.length === 0) {
+      return defaultData;
+    }
+
+    const record = records.find(r => r.fields['Title'] || r.fields['Content'] || r.fields['content']) || records[0];
+    const fields = record.fields;
+
+    const title = (fields['Title'] as string) || (fields['title'] as string) || defaultData.title;
+    
+    // Check Content field (Word .docx attachment, URL, or plain text)
+    const contentField = fields['Content'] || fields['content'] || fields['Word Document'] || fields['Document'];
+    let contentHtml = defaultData.contentHtml;
+    let rawText = defaultData.rawText;
+
+    if (Array.isArray(contentField) && contentField.length > 0) {
+      const docxAtt = contentField.find(
+        (att: any) => att.url && (att.filename?.endsWith('.docx') || att.type?.includes('word'))
+      ) || contentField[0];
+
+      if (docxAtt && docxAtt.url) {
+        try {
+          const fileRes = await fetch(docxAtt.url);
+          if (fileRes.ok) {
+            const arrayBuffer = await fileRes.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            const parsed = await parseDocxBuffer(buffer);
+            contentHtml = parsed.html;
+            rawText = parsed.rawText;
+          }
+        } catch (err) {
+          console.error('Error parsing About Word doc:', err);
+        }
+      }
+    } else if (typeof contentField === 'string' && contentField.trim()) {
+      if (contentField.includes('<') && contentField.includes('>')) {
+        contentHtml = contentField.trim();
+      } else {
+        contentHtml = contentField
+          .trim()
+          .split(/\n\n+/)
+          .map(p => `<p>${p.trim()}</p>`)
+          .join('');
+      }
+      rawText = contentField.trim();
+    }
+
+    return {
+      title,
+      contentHtml,
+      rawText,
+      seoTitle: seoEntry?.title || `${title} | Adoptd Christian Clothing UK`,
+      seoDescription: seoEntry?.description || rawText.slice(0, 160),
+    };
+  } catch (error) {
+    console.error('Error fetching About table from Airtable:', error);
+    return defaultData;
+  }
+}
+
 // Fetch blog posts (including full .docx parsing with inline images & auto-cover extraction)
 export async function getBlogPosts(): Promise<BlogPost[]> {
   if (!base) {
