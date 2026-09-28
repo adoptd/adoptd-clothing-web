@@ -20,6 +20,7 @@ export default async function ShopPage() {
     { name: 'T-Shirts', slug: 'tee-shirts', href: '/shop/tee-shirts' },
     { name: 'Hoodies', slug: 'christian-hoodies-uk', href: '/shop/christian-hoodies-uk' },
     { name: 'Tote Bags', slug: 'christian-bags', href: '/shop/christian-bags' },
+    { name: 'Christmas', slug: 'christmas', href: '/shop/christmas' },
   ];
 
   return (

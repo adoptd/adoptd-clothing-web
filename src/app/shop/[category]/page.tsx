@@ -31,6 +31,11 @@ const categoryInfoMap: Record<string, { title: string; subtitle: string; descrip
     subtitle: 'Everyday Canvas Faith Accessories',
     description: 'Durable 100% natural organic cotton Christian tote bags for Bibles, study books, and daily life.',
   },
+  'christmas': {
+    title: 'Christian Christmas Collection',
+    subtitle: 'Seasonal Faith Apparel & Thoughtful Gifts',
+    description: 'Celebrate the birth of Christ with our faith-inspired Christmas collection, scripture gifts, and festive apparel.',
+  },
 };
 
 export async function generateStaticParams() {
@@ -39,6 +44,7 @@ export async function generateStaticParams() {
     { category: 'christian-hoodies-uk' },
     { category: 'sweaters' },
     { category: 'christian-bags' },
+    { category: 'christmas' },
   ];
 }
 
@@ -72,6 +78,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     { name: 'T-Shirts', slug: 'tee-shirts', href: '/shop/tee-shirts' },
     { name: 'Hoodies', slug: 'christian-hoodies-uk', href: '/shop/christian-hoodies-uk' },
     { name: 'Tote Bags', slug: 'christian-bags', href: '/shop/christian-bags' },
+    { name: 'Christmas', slug: 'christmas', href: '/shop/christmas' },
   ];
 
   return (

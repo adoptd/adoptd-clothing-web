@@ -23,6 +23,7 @@ export default async function SitemapPage() {
     { name: 'Christian T-Shirts', href: '/shop/tee-shirts' },
     { name: 'Christian Hoodies UK', href: '/shop/christian-hoodies-uk' },
     { name: 'Christian Tote Bags', href: '/shop/christian-bags' },
+    { name: 'Christian Christmas Collection', href: '/shop/christmas' },
   ];
 
   const mainPages = [

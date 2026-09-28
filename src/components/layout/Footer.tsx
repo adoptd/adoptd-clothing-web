@@ -171,10 +171,10 @@ export function Footer({ settings }: FooterProps) {
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">SHOP</h4>
               <ul className="space-y-2.5 text-stone-200 font-medium">
                 <li className="flex flex-wrap gap-x-4">
-                  <Link href="/shop" className="hover:text-white transition">Christmas</Link>
                   <Link href="/shop/tee-shirts" className="hover:text-white transition">T-Shirts</Link>
                   <Link href="/shop/christian-hoodies-uk" className="hover:text-white transition">Hoodies</Link>
                   <Link href="/shop/christian-bags" className="hover:text-white transition">Tote Bags</Link>
+                  <Link href="/shop/christmas" className="hover:text-white transition">Christmas</Link>
                 </li>
                 <li><Link href="/church-print-services" className="hover:text-white transition whitespace-nowrap">Church & Ministry Print Services</Link></li>
                 <li><Link href="/shop" className="hover:text-white transition">Blaze city Merch</Link></li>

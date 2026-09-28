@@ -141,6 +141,13 @@ export function Navbar({ settings }: NavbarProps) {
             Tote Bags
           </Link>
           <Link
+            href="/shop/christmas"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block py-2 text-sm font-semibold text-stone-300 border-b border-stone-800"
+          >
+            Christmas
+          </Link>
+          <Link
             href="/church-print-services"
             onClick={() => setMobileMenuOpen(false)}
             className="block py-2 text-sm font-semibold text-stone-300 border-b border-stone-800"
