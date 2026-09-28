@@ -163,11 +163,11 @@ export function Footer({ settings }: FooterProps) {
             </a>
           </div>
 
-          {/* 3 Equilateral Footer Columns Across Full Width with Enlarged Typography */}
-          <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 lg:gap-12 text-base sm:text-lg">
+          {/* 4-Column Footer Grid with SHOP taking 2 columns, COMPANY & INFO taking 1 column each */}
+          <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 text-base sm:text-lg">
             
-            {/* SHOP Column */}
-            <div className="space-y-4">
+            {/* SHOP Column (2 columns wide) */}
+            <div className="md:col-span-2 space-y-4">
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">SHOP</h4>
               <ul className="space-y-2.5 text-stone-200 font-medium">
                 <li className="flex flex-wrap gap-x-4">
@@ -181,16 +181,16 @@ export function Footer({ settings }: FooterProps) {
               </ul>
             </div>
 
-            {/* COMPANY Column */}
-            <div className="space-y-4">
+            {/* COMPANY Column (1 column wide) */}
+            <div className="md:col-span-1 space-y-4">
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">COMPANY</h4>
               <ul className="space-y-2.5 text-stone-200 font-medium">
                 <li><Link href="/about" className="hover:text-white transition">About Us</Link></li>
               </ul>
             </div>
 
-            {/* INFO Column */}
-            <div className="space-y-4">
+            {/* INFO Column (1 column wide) */}
+            <div className="md:col-span-1 space-y-4">
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">INFO</h4>
               <ul className="space-y-2.5 text-stone-200 font-medium">
                 <li className="flex flex-wrap gap-x-4">
