@@ -22,7 +22,6 @@ const nextConfig: NextConfig = {
       { source: '/support', destination: '/church-print-services', permanent: true },
       { source: '/my-account', destination: '/checkout', permanent: true },
       { source: '/cart', destination: '/checkout', permanent: true },
-      { source: '/about', destination: '/', permanent: true },
       { source: '/contact', destination: '/church-print-services', permanent: true },
 
       // --- 4. Old Blog Categories & Post URLs ---
