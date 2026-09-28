@@ -166,19 +166,21 @@ export function Footer({ settings }: FooterProps) {
           {/* 4-Column Footer Grid with SHOP taking 2 columns, COMPANY & INFO taking 1 column each */}
           <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 text-base sm:text-lg">
             
-            {/* SHOP Column (2 columns wide) */}
+            {/* SHOP Column (spread across 2 columns) */}
             <div className="md:col-span-2 space-y-4">
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">SHOP</h4>
-              <ul className="space-y-2.5 text-stone-200 font-medium">
-                <li className="flex flex-wrap gap-x-4">
-                  <Link href="/shop/tee-shirts" className="hover:text-white transition">T-Shirts</Link>
-                  <Link href="/shop/christian-hoodies-uk" className="hover:text-white transition">Hoodies</Link>
-                  <Link href="/shop/christian-bags" className="hover:text-white transition">Tote Bags</Link>
-                  <Link href="/shop/christmas" className="hover:text-white transition">Christmas</Link>
-                </li>
-                <li><Link href="/church-print-services" className="hover:text-white transition whitespace-nowrap">Church & Ministry Print Services</Link></li>
-                <li><Link href="/shop" className="hover:text-white transition">Blaze city Merch</Link></li>
-              </ul>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 text-stone-200 font-medium">
+                <ul className="space-y-2.5">
+                  <li><Link href="/shop/tee-shirts" className="hover:text-white transition">T-Shirts</Link></li>
+                  <li><Link href="/shop/christian-hoodies-uk" className="hover:text-white transition">Hoodies</Link></li>
+                  <li><Link href="/shop/christian-bags" className="hover:text-white transition">Tote Bags</Link></li>
+                  <li><Link href="/shop/christmas" className="hover:text-white transition">Christmas</Link></li>
+                </ul>
+                <ul className="space-y-2.5">
+                  <li><Link href="/church-print-services" className="hover:text-white transition">Church &amp; Ministry Print Services</Link></li>
+                  <li><Link href="/shop" className="hover:text-white transition">Blaze city Merch</Link></li>
+                </ul>
+              </div>
             </div>
 
             {/* COMPANY Column (1 column wide) */}
@@ -193,14 +195,10 @@ export function Footer({ settings }: FooterProps) {
             <div className="md:col-span-1 space-y-4">
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">INFO</h4>
               <ul className="space-y-2.5 text-stone-200 font-medium">
-                <li className="flex flex-wrap gap-x-4">
-                  <Link href="/blog" className="hover:text-white transition">Blog</Link>
-                  <Link href="/contact" className="hover:text-white transition">Support/Contact</Link>
-                </li>
-                <li className="flex flex-wrap gap-x-4">
-                  <Link href="/sitemap" className="hover:text-white transition">Sitemap</Link>
-                  <Link href="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link>
-                </li>
+                <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
+                <li><Link href="/contact" className="hover:text-white transition">Support/Contact</Link></li>
+                <li><Link href="/sitemap" className="hover:text-white transition">Sitemap</Link></li>
+                <li><Link href="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link></li>
               </ul>
             </div>
 
