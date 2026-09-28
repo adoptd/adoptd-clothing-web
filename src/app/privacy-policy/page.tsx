@@ -37,16 +37,17 @@ export default function PrivacyPolicyPage() {
 
           <section className="space-y-4">
             <h2 className="font-serif text-2xl font-bold text-stone-900">2. Information We Collect</h2>
-            <p>We only collect personal information that is necessary to fulfill your orders or provide you with updates when you explicitly consent:</p>
+            <p>We only collect personal information that is necessary to fulfill your orders, respond to your inquiries, or provide you with updates when you explicitly consent:</p>
             <ul className="list-disc pl-6 space-y-2 text-stone-600 text-sm sm:text-base">
               <li><strong>Order Fulfillment Information:</strong> Your name, delivery address, billing address, phone number, and email address when you complete an order.</li>
-              <li><strong>Newsletter Data:</strong> Your email address and opt-in timestamp when you voluntarily subscribe to our community newsletter.</li>
-              <li><strong>Technical Data:</strong> Essential device and browser data to maintain session security and shopping cart persistence.</li>
+              <li><strong>Customer Support &amp; Contact Inquiries:</strong> Your name, email address, topic/inquiry category, order number (if applicable), and message content when you submit an inquiry through our Support/Contact form or via email. This data is used exclusively to assist you with your inquiry and provide customer care.</li>
+              <li><strong>Newsletter Data:</strong> Your email address, optional first name, and opt-in timestamp when you voluntarily subscribe to our community newsletter.</li>
+              <li><strong>Technical Data:</strong> Essential device and browser data to maintain session security, prevent spam/abuse, and ensure shopping cart persistence.</li>
             </ul>
           </section>
 
           <section className="space-y-4">
-            <h2 className="font-serif text-2xl font-bold text-stone-900">3. Payment Processing & Stripe</h2>
+            <h2 className="font-serif text-2xl font-bold text-stone-900">3. Payment Processing &amp; Stripe</h2>
             <p>
               We use <strong>Stripe Payments Europe, Ltd.</strong> as our secure payment gateway. When you make a purchase, your payment card details are collected and processed directly by Stripe using 256-bit SSL encryption.
             </p>
@@ -57,11 +58,11 @@ export default function PrivacyPolicyPage() {
 
           <section className="space-y-4">
             <h2 className="font-serif text-2xl font-bold text-stone-900">4. Third-Party Data Processors</h2>
-            <p>We work with vetted processors to operate our storefront:</p>
+            <p>We work with vetted processors to operate our storefront securely:</p>
             <ul className="list-disc pl-6 space-y-2 text-stone-600 text-sm sm:text-base">
               <li><strong>Stripe (Ireland / UK):</strong> Payment processing and fraud prevention.</li>
-              <li><strong>Airtable (Formagrid, Inc.):</strong> Secure database management for order fulfillment records and subscriber lists.</li>
-              <li><strong>Vercel, Inc.:</strong> Web application hosting and global CDN delivery.</li>
+              <li><strong>Airtable (Formagrid, Inc.):</strong> Secure cloud database management for order fulfillment records, subscriber lists, and customer support logs.</li>
+              <li><strong>Vercel, Inc.:</strong> Web application hosting, serverless routing, and global CDN delivery.</li>
               <li><strong>Royal Mail / Courier Services:</strong> Delivering your packages to your specified address.</li>
             </ul>
           </section>
@@ -80,11 +81,16 @@ export default function PrivacyPolicyPage() {
           <section className="space-y-4 pt-6 border-t border-stone-200">
             <h2 className="font-serif text-2xl font-bold text-stone-900">6. Contact Us</h2>
             <p>
-              If you have questions about this privacy policy, your personal data, or wish to exercise your rights, please reach out to us at:
+              If you have questions about this privacy policy, your personal data, or wish to exercise your rights, please reach out to us:
             </p>
-            <p className="font-medium text-stone-900 text-lg">
-              Email: <a href="mailto:hello@adoptdchristianclothing.co.uk" className="underline">hello@adoptdchristianclothing.co.uk</a>
-            </p>
+            <div className="space-y-2 text-base sm:text-lg">
+              <p className="font-medium text-stone-900">
+                Email: <a href="mailto:hello@adoptdchristianclothing.co.uk" className="underline hover:text-[#00736a] text-[#00736a]">hello@adoptdchristianclothing.co.uk</a>
+              </p>
+              <p className="text-stone-600 text-sm">
+                Or submit a message via our <a href="/contact" className="underline hover:text-[#00736a] text-[#00736a] font-medium">Support &amp; Contact Form</a>.
+              </p>
+            </div>
           </section>
         </div>
       </div>
