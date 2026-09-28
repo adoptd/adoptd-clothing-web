@@ -28,6 +28,11 @@ export default async function HomePage() {
       slug: 'christian-bags',
       image: 'https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/mockup-of-a-man-with-a-loc-hairstyle-carrying-a-tote-bag-on-his-back-in-a-park-m56958-2-300x300.webp',
     },
+    {
+      name: 'CHRISTMAS',
+      slug: 'christmas',
+      image: '/images/hero-banner.webp',
+    },
   ];
 
   return (
@@ -186,7 +191,7 @@ export default async function HomePage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((cat) => (
             <div
               key={cat.slug}
