@@ -190,6 +190,7 @@ export function Footer({ settings }: FooterProps) {
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">COMPANY</h4>
               <ul className="space-y-2.5 text-stone-200 font-medium">
                 <li><Link href="/about" className="hover:text-white transition whitespace-nowrap">About Us</Link></li>
+                <li><Link href="/blog" className="hover:text-white transition whitespace-nowrap">Blog</Link></li>
               </ul>
             </div>
 
@@ -198,7 +199,6 @@ export function Footer({ settings }: FooterProps) {
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">INFO</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-2.5 text-stone-200 font-medium">
                 <ul className="space-y-2.5">
-                  <li><Link href="/blog" className="hover:text-white transition whitespace-nowrap">Blog</Link></li>
                   <li><Link href="/contact" className="hover:text-white transition whitespace-nowrap">Support/Contact</Link></li>
                 </ul>
                 <ul className="space-y-2.5">
