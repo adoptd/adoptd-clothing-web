@@ -163,16 +163,18 @@ export function Footer({ settings }: FooterProps) {
             </a>
           </div>
 
-          {/* 4-Column Footer Grid with SHOP taking 2 columns, COMPANY & INFO taking 1 column each */}
-          <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 text-base sm:text-lg">
+          {/* 5-Column Footer Grid with SHOP taking 3 columns, COMPANY & INFO taking 1 column each */}
+          <div className="w-full grid grid-cols-1 md:grid-cols-5 gap-8 sm:gap-10 lg:gap-12 text-base sm:text-lg">
             
-            {/* SHOP Column (spread across 2 columns) */}
-            <div className="md:col-span-2 space-y-4">
+            {/* SHOP Section (spread across 3 columns) */}
+            <div className="md:col-span-3 space-y-4">
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">SHOP</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 text-stone-200 font-medium">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-2.5 text-stone-200 font-medium">
                 <ul className="space-y-2.5">
                   <li><Link href="/shop/tee-shirts" className="hover:text-white transition">T-Shirts</Link></li>
                   <li><Link href="/shop/christian-hoodies-uk" className="hover:text-white transition">Hoodies</Link></li>
+                </ul>
+                <ul className="space-y-2.5">
                   <li><Link href="/shop/christian-bags" className="hover:text-white transition">Tote Bags</Link></li>
                   <li><Link href="/shop/christmas" className="hover:text-white transition">Christmas</Link></li>
                 </ul>
