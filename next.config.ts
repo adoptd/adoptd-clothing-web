@@ -19,10 +19,9 @@ const nextConfig: NextConfig = {
       { source: '/shop/uncategorized/:slug', destination: '/product/:slug', permanent: true },
 
       // --- 3. Old WordPress Standalone Pages ---
-      { source: '/support', destination: '/church-print-services', permanent: true },
+      { source: '/support', destination: '/contact', permanent: false },
       { source: '/my-account', destination: '/checkout', permanent: true },
       { source: '/cart', destination: '/checkout', permanent: true },
-      { source: '/contact', destination: '/church-print-services', permanent: true },
 
       // --- 4. Old Blog Categories & Post URLs ---
       { source: '/category/:slug*', destination: '/blog', permanent: true },
