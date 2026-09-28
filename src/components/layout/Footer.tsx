@@ -164,23 +164,23 @@ export function Footer({ settings }: FooterProps) {
           </div>
 
           {/* 6-Column Footer Grid: SHOP (3 cols), COMPANY (1 col), INFO (2 cols) */}
-          <div className="w-full grid grid-cols-1 md:grid-cols-6 gap-8 sm:gap-10 lg:gap-12 text-base sm:text-lg">
+          <div className="w-full grid grid-cols-1 md:grid-cols-6 gap-6 sm:gap-8 lg:gap-10 text-base sm:text-lg">
             
-            {/* SHOP Section (spread across 3 columns) */}
+            {/* SHOP Section (spread across 3 columns with flexible sub-column widths) */}
             <div className="md:col-span-3 space-y-4">
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">SHOP</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-2.5 text-stone-200 font-medium">
+              <div className="grid grid-cols-1 sm:grid-cols-[auto_auto_1fr] gap-x-6 sm:gap-x-8 lg:gap-x-10 gap-y-2.5 text-stone-200 font-medium">
                 <ul className="space-y-2.5">
-                  <li><Link href="/shop/tee-shirts" className="hover:text-white transition">T-Shirts</Link></li>
-                  <li><Link href="/shop/christian-hoodies-uk" className="hover:text-white transition">Hoodies</Link></li>
+                  <li><Link href="/shop/tee-shirts" className="hover:text-white transition whitespace-nowrap">T-Shirts</Link></li>
+                  <li><Link href="/shop/christian-hoodies-uk" className="hover:text-white transition whitespace-nowrap">Hoodies</Link></li>
                 </ul>
                 <ul className="space-y-2.5">
-                  <li><Link href="/shop/christian-bags" className="hover:text-white transition">Tote Bags</Link></li>
-                  <li><Link href="/shop/christmas" className="hover:text-white transition">Christmas</Link></li>
+                  <li><Link href="/shop/christian-bags" className="hover:text-white transition whitespace-nowrap">Tote Bags</Link></li>
+                  <li><Link href="/shop/christmas" className="hover:text-white transition whitespace-nowrap">Christmas</Link></li>
                 </ul>
                 <ul className="space-y-2.5">
-                  <li><Link href="/church-print-services" className="hover:text-white transition">Church &amp; Ministry Print Services</Link></li>
-                  <li><Link href="/shop" className="hover:text-white transition">Blaze city Merch</Link></li>
+                  <li><Link href="/church-print-services" className="hover:text-white transition whitespace-nowrap">Church &amp; Ministry Print Services</Link></li>
+                  <li><Link href="/shop" className="hover:text-white transition whitespace-nowrap">Blaze city Merch</Link></li>
                 </ul>
               </div>
             </div>
@@ -189,21 +189,21 @@ export function Footer({ settings }: FooterProps) {
             <div className="md:col-span-1 space-y-4">
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">COMPANY</h4>
               <ul className="space-y-2.5 text-stone-200 font-medium">
-                <li><Link href="/about" className="hover:text-white transition">About Us</Link></li>
+                <li><Link href="/about" className="hover:text-white transition whitespace-nowrap">About Us</Link></li>
               </ul>
             </div>
 
             {/* INFO Section (spread across 2 columns) */}
             <div className="md:col-span-2 space-y-4">
               <h4 className="font-black uppercase tracking-wider text-white text-base sm:text-lg lg:text-xl">INFO</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 text-stone-200 font-medium">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-2.5 text-stone-200 font-medium">
                 <ul className="space-y-2.5">
-                  <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
-                  <li><Link href="/contact" className="hover:text-white transition">Support/Contact</Link></li>
+                  <li><Link href="/blog" className="hover:text-white transition whitespace-nowrap">Blog</Link></li>
+                  <li><Link href="/contact" className="hover:text-white transition whitespace-nowrap">Support/Contact</Link></li>
                 </ul>
                 <ul className="space-y-2.5">
-                  <li><Link href="/sitemap" className="hover:text-white transition">Sitemap</Link></li>
-                  <li><Link href="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link></li>
+                  <li><Link href="/sitemap" className="hover:text-white transition whitespace-nowrap">Sitemap</Link></li>
+                  <li><Link href="/privacy-policy" className="hover:text-white transition whitespace-nowrap">Privacy Policy</Link></li>
                 </ul>
               </div>
             </div>
