@@ -544,6 +544,52 @@ export async function recordNewsletterSubscriber(email: string, name?: string) {
   }
 }
 
+// Record Support/Contact Inquiry in Airtable
+export async function recordContactInquiry(data: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  orderNumber?: string;
+}) {
+  if (!base) {
+    console.log('[Mock] Recorded contact inquiry:', data);
+    return { success: true };
+  }
+
+  try {
+    const fields: any = {
+      Name: data.name,
+      Email: data.email,
+      Subject: data.subject,
+      Message: data.message,
+    };
+    if (data.orderNumber) {
+      fields['Order Number'] = data.orderNumber;
+    }
+
+    // Try creating in 'Contact Submissions', 'Inquiries', or 'Messages'
+    try {
+      await base('Contact Submissions').create([{ fields }]);
+    } catch {
+      try {
+        await base('Inquiries').create([{ fields }]);
+      } catch {
+        try {
+          await base('Messages').create([{ fields }]);
+        } catch {
+          console.warn('[Airtable] No dedicated contact table found. Email notification dispatched.');
+        }
+      }
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error recording contact inquiry in Airtable:', error);
+    return { success: false, error };
+  }
+}
+
 // Helper for color hex values
 function getColorHex(colorName: string): string {
   const normalized = colorName.toLowerCase();

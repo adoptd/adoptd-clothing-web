@@ -195,8 +195,7 @@ export function Footer({ settings }: FooterProps) {
               <ul className="space-y-2.5 text-stone-200 font-medium">
                 <li className="flex flex-wrap gap-x-4">
                   <Link href="/blog" className="hover:text-white transition">Blog</Link>
-                  <Link href="/church-print-services" className="hover:text-white transition">Support</Link>
-                  <Link href="/church-print-services" className="hover:text-white transition">Contact</Link>
+                  <Link href="/contact" className="hover:text-white transition">Support/Contact</Link>
                 </li>
                 <li className="flex flex-wrap gap-x-4">
                   <Link href="/shop" className="hover:text-white transition">My account</Link>

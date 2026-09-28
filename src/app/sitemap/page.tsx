@@ -28,6 +28,7 @@ export default async function SitemapPage() {
   const mainPages = [
     { name: 'Home', href: '/' },
     { name: 'About Us', href: '/about' },
+    { name: 'Support / Contact', href: '/contact' },
     { name: 'Church & Ministry Print Services', href: '/church-print-services' },
     { name: 'The Adoptd Journal (Blog)', href: '/blog' },
     { name: 'Privacy Policy & GDPR Compliance', href: '/privacy-policy' },
