@@ -53,18 +53,36 @@ export function Navbar({ settings }: NavbarProps) {
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-8 xl:space-x-12">
+            <nav className="hidden lg:flex items-center space-x-5 xl:space-x-8">
               <Link
                 href="/"
-                className="text-base xl:text-lg font-bold tracking-wide text-white hover:text-[#00736a] transition"
+                className="text-sm xl:text-base font-bold tracking-wide text-white hover:text-[#00736a] transition whitespace-nowrap"
               >
                 Home
               </Link>
               <Link
                 href="/church-print-services"
-                className="text-base xl:text-lg font-bold tracking-wide text-stone-200 hover:text-[#00736a] transition"
+                className="text-sm xl:text-base font-bold tracking-wide text-stone-200 hover:text-[#00736a] transition whitespace-nowrap"
               >
                 Church & Ministry Print Services
+              </Link>
+              <Link
+                href="/shop/tee-shirts"
+                className="text-sm xl:text-base font-bold tracking-wide text-stone-200 hover:text-[#00736a] transition whitespace-nowrap"
+              >
+                T-Shirts
+              </Link>
+              <Link
+                href="/shop/christian-hoodies-uk"
+                className="text-sm xl:text-base font-bold tracking-wide text-stone-200 hover:text-[#00736a] transition whitespace-nowrap"
+              >
+                Hoodies
+              </Link>
+              <Link
+                href="/shop/christian-bags"
+                className="text-sm xl:text-base font-bold tracking-wide text-stone-200 hover:text-[#00736a] transition whitespace-nowrap"
+              >
+                Tote Bags
               </Link>
             </nav>
 
