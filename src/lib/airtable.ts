@@ -114,7 +114,14 @@ export async function getProducts(): Promise<Product[]> {
           };
         });
 
-        const mainImageAtt = (fields['Main Featured Image'] as any[]) || [];
+        const mainImageAtt = 
+          (fields['Main Featured Image'] as any[]) ||
+          (fields['Main Image'] as any[]) ||
+          (fields['Featured Image'] as any[]) ||
+          (fields['Main Category Image'] as any[]) ||
+          (fields['Category Main Image'] as any[]) ||
+          (fields['Category Image'] as any[]) ||
+          (fields['Image'] as any[]) || [];
         const featuredImage = mainImageAtt.length > 0 ? mainImageAtt[0].url : colors[0]?.images[0] || '';
 
         const rawCat = (fields['Category'] as string) || 'tee-shirts';

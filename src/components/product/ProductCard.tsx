@@ -10,12 +10,12 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const [activeColorIndex, setActiveColorIndex] = useState(0);
+  const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(null);
   const [imgError, setImgError] = useState(false);
-  const activeVariant = product.colors[activeColorIndex] || product.colors[0];
+  const activeVariant = selectedColorIndex !== null ? product.colors[selectedColorIndex] : null;
   const displayImage = imgError
     ? (product.featuredImage || '/images/shop-hoodies-bg.webp')
-    : (activeVariant?.images[0] || product.featuredImage || '/images/shop-hoodies-bg.webp');
+    : (activeVariant?.images[0] || product.featuredImage || product.colors[0]?.images[0] || '/images/shop-hoodies-bg.webp');
 
   return (
     <div className="group flex flex-col bg-[#00736a] rounded-xl overflow-hidden border border-[#00736a]/30 hover:border-[#00736a] transition-all duration-300 hover:shadow-md">
@@ -61,10 +61,10 @@ export function ProductCard({ product }: ProductCardProps) {
                 key={color.name}
                 onClick={(e) => {
                   e.preventDefault();
-                  setActiveColorIndex(idx);
+                  setSelectedColorIndex(idx);
                 }}
                 className={`w-4 h-4 rounded-full border transition-all ${
-                  idx === activeColorIndex
+                  idx === selectedColorIndex
                     ? 'ring-2 ring-white ring-offset-1 ring-offset-[#00736a] scale-110'
                     : 'border-white/50 opacity-80 hover:opacity-100'
                 }`}
