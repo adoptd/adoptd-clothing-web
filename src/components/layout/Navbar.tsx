@@ -53,7 +53,7 @@ export function Navbar({ settings }: NavbarProps) {
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-5 xl:space-x-8">
+            <nav className="hidden lg:flex items-center space-x-4 xl:space-x-6 2xl:space-x-8">
               <Link
                 href="/"
                 className="text-sm xl:text-base font-bold tracking-wide text-white hover:text-[#00736a] transition whitespace-nowrap"
@@ -83,6 +83,12 @@ export function Navbar({ settings }: NavbarProps) {
                 className="text-sm xl:text-base font-bold tracking-wide text-stone-200 hover:text-[#00736a] transition whitespace-nowrap"
               >
                 Tote Bags
+              </Link>
+              <Link
+                href="/shop/christmas"
+                className="text-sm xl:text-base font-bold tracking-wide text-stone-200 hover:text-[#00736a] transition whitespace-nowrap"
+              >
+                Christmas
               </Link>
             </nav>
 
