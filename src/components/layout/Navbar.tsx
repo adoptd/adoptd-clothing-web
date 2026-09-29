@@ -66,12 +66,6 @@ export function Navbar({ settings }: NavbarProps) {
               >
                 Church & Ministry Print Services
               </Link>
-              <Link
-                href="/shop"
-                className="text-base xl:text-lg font-bold tracking-wide text-stone-200 hover:text-[#00736a] transition"
-              >
-                Blaze city Merch
-              </Link>
             </nav>
 
             {/* Right Header: Cart button & Shop Now Button */}
