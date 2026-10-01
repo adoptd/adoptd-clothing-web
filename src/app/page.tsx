@@ -76,7 +76,7 @@ export default async function HomePage() {
     {
       name: 'CHRISTMAS',
       slug: 'christmas',
-      image: '/images/hero-banner.webp',
+      image: '/images/shop-christmas-bg.webp',
     },
   ];
 
