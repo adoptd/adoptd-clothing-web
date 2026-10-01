@@ -208,7 +208,7 @@ export default function ChurchPrintServicesPage() {
                 className="w-full py-5 bg-[#00736a] text-white rounded-xl font-black text-base uppercase tracking-wider hover:bg-[#005c55] transition flex items-center justify-center space-x-2 shadow-xl"
               >
                 <Send className="w-5 h-5" />
-                <span>Send Ministry Inquiry</span>
+                <span>Send Ministry Enquiry</span>
               </button>
             </form>
           </div>
