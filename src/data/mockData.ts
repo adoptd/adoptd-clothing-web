@@ -5,7 +5,7 @@ export const mockSiteSettings: SiteSettings = {
   announcementActive: false,
   globalMetaTitle: "Adoptd Christian Clothing | Wear The Word. Share The Light.",
   globalMetaDescription: "ADOPTD is an independent Christian clothing brand creating apparel that carries a message of faith, hope and identity. Small brand. Big message. Jesus at the centre.",
-  contactEmail: "hello@adoptdchristianclothing.co.uk",
+  contactEmail: "adoptdclothing@gmail.com",
   instagramUrl: "https://www.instagram.com/adoptdchristian",
   facebookUrl: "https://www.facebook.com/adoptdclothing25/",
   freeShippingThreshold: 40.00,

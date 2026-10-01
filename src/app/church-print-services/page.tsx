@@ -107,8 +107,8 @@ export default function ChurchPrintServicesPage() {
             <div className="bg-white p-5 rounded-2xl border border-stone-200/80 space-y-1 text-sm">
               <p className="text-stone-500 font-medium">Need immediate advice or have ready artwork?</p>
               <p className="font-bold text-[#00736a]">
-                <a href="mailto:hello@adoptdchristianclothing.co.uk" className="hover:underline">
-                  hello@adoptdchristianclothing.co.uk
+                <a href="mailto:adoptdclothing@gmail.com" className="hover:underline">
+                  adoptdclothing@gmail.com
                 </a>
               </p>
             </div>

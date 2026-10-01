@@ -79,6 +79,49 @@ export async function POST(req: NextRequest) {
         console.error('[Vercel Postgres] Error mirroring order:', pgErr);
       }
     }
+
+    // 3. Dispatch new order email alert to store owner (adoptdclothing@gmail.com)
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (resendApiKey) {
+      try {
+        const itemsDesc = paymentIntent.metadata?.itemsDescription || `${paymentIntent.metadata?.itemCount || 1} item(s)`;
+        const fullAddress = [
+          shippingAddress.line1,
+          shippingAddress.line2,
+          shippingAddress.city,
+          shippingAddress.postal_code,
+          shippingAddress.country,
+        ].filter(Boolean).join(', ');
+
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${resendApiKey}`,
+          },
+          body: JSON.stringify({
+            from: process.env.RESEND_FROM_EMAIL || 'ADOPTD Orders <onboarding@resend.dev>',
+            to: ['adoptdclothing@gmail.com'],
+            subject: `🎉 New Order Received: ${orderNumber} (£${totalAmount.toFixed(2)})`,
+            html: `
+              <div style="font-family: sans-serif; font-size: 16px; color: #1c1917; max-width: 600px; line-height: 1.6;">
+                <h2 style="color: #00736a; margin-bottom: 8px;">🎉 New Order Received: ${orderNumber}</h2>
+                <p><strong>Customer:</strong> ${customerName} (<a href="mailto:${customerEmail}">${customerEmail}</a>)</p>
+                <p><strong>Total Paid:</strong> £${totalAmount.toFixed(2)}</p>
+                <p><strong>Items:</strong> ${itemsDesc}</p>
+                <p><strong>Delivery Address:</strong> ${fullAddress || 'N/A'}</p>
+                <p><strong>Stripe Payment ID:</strong> ${paymentIntent.id}</p>
+                <hr style="border: 0; border-top: 1px solid #e7e5e4; margin: 20px 0;" />
+                <p style="font-size: 13px; color: #78716c;">Recorded automatically in Airtable Orders.</p>
+              </div>
+            `,
+          }),
+        });
+        console.log(`[Email Alert] Dispatched order notification to adoptdclothing@gmail.com for ${orderNumber}`);
+      } catch (emailErr) {
+        console.error('[Email Alert] Error dispatching order email:', emailErr);
+      }
+    }
   }
 
   return NextResponse.json({ received: true });

@@ -85,7 +85,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <div className="space-y-2 text-base sm:text-lg">
               <p className="font-medium text-stone-900">
-                Email: <a href="mailto:hello@adoptdchristianclothing.co.uk" className="underline hover:text-[#00736a] text-[#00736a]">hello@adoptdchristianclothing.co.uk</a>
+                Email: <a href="mailto:adoptdclothing@gmail.com" className="underline hover:text-[#00736a] text-[#00736a]">adoptdclothing@gmail.com</a>
               </p>
               <p className="text-stone-600 text-sm">
                 Or submit a message via our <a href="/contact" className="underline hover:text-[#00736a] text-[#00736a] font-medium">Support &amp; Contact Form</a>.

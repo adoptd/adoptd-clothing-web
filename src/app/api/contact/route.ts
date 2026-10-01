@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     const cleanOrderNumber = typeof orderNumber === 'string' ? orderNumber.trim() : '';
 
     // 3. Dispatch email via Resend if RESEND_API_KEY is configured
-    const recipientEmail = 'hello@adoptdchristianclothing.co.uk';
+    const recipientEmail = 'adoptdclothing@gmail.com';
     const resendApiKey = process.env.RESEND_API_KEY;
 
     if (resendApiKey) {
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
             Authorization: `Bearer ${resendApiKey}`,
           },
           body: JSON.stringify({
-            from: 'ADOPTD Support <support@adoptdchristianclothing.co.uk>',
+            from: process.env.RESEND_FROM_EMAIL || 'ADOPTD Support <onboarding@resend.dev>',
             to: [recipientEmail],
             reply_to: cleanEmail,
             subject: `[Website Support] ${cleanSubject} - ${cleanName}`,

@@ -99,10 +99,10 @@ export default function ContactPage() {
                   Prefer regular email? Reach out straight to our inbox:
                 </p>
                 <a
-                  href="mailto:hello@adoptdchristianclothing.co.uk"
+                  href="mailto:adoptdclothing@gmail.com"
                   className="inline-block pt-2 text-[#00736a] font-bold text-lg hover:underline underline-offset-4"
                 >
-                  hello@adoptdchristianclothing.co.uk
+                  adoptdclothing@gmail.com
                 </a>
               </div>
             </div>
@@ -159,7 +159,7 @@ export default function ContactPage() {
                 </div>
                 <h3 className="text-2xl font-bold font-serif text-stone-950">Thank You for Reaching Out!</h3>
                 <p className="text-stone-600 max-w-md mx-auto text-base leading-relaxed">
-                  Your message has been sent to our customer care team at <strong className="text-stone-900">hello@adoptdchristianclothing.co.uk</strong>. We will get back to you promptly.
+                  Your message has been sent to our customer care team at <strong className="text-stone-900">adoptdclothing@gmail.com</strong>. We will get back to you promptly.
                 </p>
                 <button
                   type="button"
