@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
+import { clearAirtableCache } from '@/lib/airtable';
 
 export async function POST(req: NextRequest) {
   const secret = req.nextUrl.searchParams.get('secret');
@@ -10,6 +11,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    clearAirtableCache();
     revalidatePath('/', 'layout');
     return NextResponse.json({ revalidated: true, timestamp: Date.now() });
   } catch (err: any) {

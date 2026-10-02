@@ -5,7 +5,7 @@ import { constructMetadata } from '@/lib/seo';
 import { Metadata } from 'next';
 import { Heart, Sparkles, ArrowRight } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getAboutPageData();

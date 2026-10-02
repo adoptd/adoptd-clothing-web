@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  compress: true,
+  poweredByHeader: false,
+  reactStrictMode: true,
   async redirects() {
     return [
       // --- 1. Product Categories (WooCommerce -> Next.js) ---
@@ -32,6 +35,8 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days edge caching for optimized images
     remotePatterns: [
       {
         protocol: "https",

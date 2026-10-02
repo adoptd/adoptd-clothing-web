@@ -9,8 +9,61 @@ const baseId = process.env.AIRTABLE_BASE_ID;
 
 const base = apiKey && baseId ? new Airtable({ apiKey }).base(baseId) : null;
 
-// Fetch all records from dedicated SEO table
+// ============================================================================
+// HIGH-PERFORMANCE IN-MEMORY CACHING LAYER
+// ============================================================================
+const CACHE_TTL_MS = 60 * 1000; // 60 seconds TTL
+
+let cachedProducts: { data: Product[]; timestamp: number } | null = null;
+const cachedProductsBySlug = new Map<string, Product>();
+const cachedProductsById = new Map<string, Product>();
+
+let cachedSeoRecords: { data: Record<string, { title?: string; description?: string; keyword?: string }>; timestamp: number } | null = null;
+
+let cachedBlogPosts: { data: BlogPost[]; timestamp: number } | null = null;
+const cachedBlogPostsBySlug = new Map<string, BlogPost>();
+
+let cachedAboutData: { data: any; timestamp: number } | null = null;
+let cachedSiteSettings: { data: SiteSettings; timestamp: number } | null = null;
+
+const docxCache = new Map<string, { html: string; rawText: string; firstImageUrl?: string | null }>();
+
+export function clearAirtableCache() {
+  cachedProducts = null;
+  cachedProductsBySlug.clear();
+  cachedProductsById.clear();
+  cachedSeoRecords = null;
+  cachedBlogPosts = null;
+  cachedBlogPostsBySlug.clear();
+  cachedAboutData = null;
+  cachedSiteSettings = null;
+  docxCache.clear();
+}
+
+async function getCachedDocx(url: string) {
+  if (docxCache.has(url)) {
+    return docxCache.get(url)!;
+  }
+  try {
+    const fileRes = await fetch(url);
+    if (fileRes.ok) {
+      const arrayBuffer = await fileRes.arrayBuffer();
+      const parsed = await parseDocxBuffer(Buffer.from(arrayBuffer));
+      docxCache.set(url, parsed);
+      return parsed;
+    }
+  } catch (err) {
+    console.error('Error fetching/parsing docx attachment:', err);
+  }
+  return { html: '', rawText: '' };
+}
+
+// Fetch all records from dedicated SEO table (Cached)
 export async function getSeoRecords(): Promise<Record<string, { title?: string; description?: string; keyword?: string }>> {
+  if (cachedSeoRecords && Date.now() - cachedSeoRecords.timestamp < CACHE_TTL_MS) {
+    return cachedSeoRecords.data;
+  }
+
   if (!base) return {};
 
   try {
@@ -29,9 +82,10 @@ export async function getSeoRecords(): Promise<Record<string, { title?: string; 
       if (name) map[name] = seoData;
     });
 
+    cachedSeoRecords = { data: map, timestamp: Date.now() };
     return map;
-  } catch (err) {
-    return {};
+  } catch {
+    return cachedSeoRecords?.data || {};
   }
 }
 
@@ -42,8 +96,12 @@ export async function getPageSeo(slugOrPath: string) {
   return seoMap[cleanKey] || seoMap[slugOrPath.trim().toLowerCase()] || null;
 }
 
-// Fetch all active products
+// Fetch all active products (Cached)
 export async function getProducts(): Promise<Product[]> {
+  if (cachedProducts && Date.now() - cachedProducts.timestamp < CACHE_TTL_MS) {
+    return cachedProducts.data;
+  }
+
   if (!base) {
     return mockProducts;
   }
@@ -63,7 +121,7 @@ export async function getProducts(): Promise<Product[]> {
       return mockProducts;
     }
 
-    return await Promise.all(
+    const products: Product[] = await Promise.all(
       records.map(async (record) => {
         const fields = record.fields;
         const rawColors = (fields['Available Colours'] as string[]) || (fields['Available Colors'] as string[]) || ['Black'];
@@ -89,9 +147,7 @@ export async function getProducts(): Promise<Product[]> {
           if (!attachments || !Array.isArray(attachments) || attachments.length === 0) {
             const matchingKey = allFieldKeys.find((key) => {
               const kLower = key.toLowerCase();
-              // Don't match the main image column accidentally
               if (kLower.includes('main') || kLower.includes('featured')) return false;
-              // Check if column name contains full color name or color prefix
               return kLower.includes(colorLower) || (colorPrefixLower.length > 2 && kLower.includes(colorPrefixLower));
             });
 
@@ -177,7 +233,7 @@ export async function getProducts(): Promise<Product[]> {
         const shortDescKey = allKeys.find(k => k.toLowerCase().replace(/[^a-z]/g, '') === 'shortdescription');
         const descKey = allKeys.find(k => k.toLowerCase().trim() === 'description');
 
-        // Parse Long Description (Word docx attachment or plain text)
+        // Parse Long Description (Cached docx attachment or plain text)
         let rawLongDesc = '';
         const rawLongDescVal = longDescKey ? fields[longDescKey] : fields['Long Description'];
         if (Array.isArray(rawLongDescVal) && rawLongDescVal.length > 0) {
@@ -185,17 +241,8 @@ export async function getProducts(): Promise<Product[]> {
             (att: any) => att.url && (att.filename?.endsWith('.docx') || att.type?.includes('word'))
           ) || rawLongDescVal[0];
           if (docxAtt && docxAtt.url) {
-            try {
-              const fileRes = await fetch(docxAtt.url);
-              if (fileRes.ok) {
-                const arrayBuffer = await fileRes.arrayBuffer();
-                const buffer = Buffer.from(arrayBuffer);
-                const parsed = await parseDocxBuffer(buffer);
-                rawLongDesc = parsed.html;
-              }
-            } catch (err) {
-              console.error(`Error parsing Long Description docx for ${rawName}:`, err);
-            }
+            const parsed = await getCachedDocx(docxAtt.url);
+            rawLongDesc = parsed.html;
           }
         } else if (typeof rawLongDescVal === 'string') {
           rawLongDesc = rawLongDescVal;
@@ -208,7 +255,7 @@ export async function getProducts(): Promise<Product[]> {
         const finalLongDescription = (rawLongDesc || rawDesc || '').trim();
         const finalShortDescription = (rawShortDesc || '').trim();
 
-        // Parse Category Overview (Word docx attachment or plain text)
+        // Parse Category Overview (Cached docx attachment or plain text)
         let categoryOverview: string | undefined = undefined;
         const rawCategoryOverview = fields['Category Overview'];
         if (Array.isArray(rawCategoryOverview) && rawCategoryOverview.length > 0) {
@@ -217,25 +264,16 @@ export async function getProducts(): Promise<Product[]> {
           ) || rawCategoryOverview[0];
 
           if (docxAtt && docxAtt.url) {
-            try {
-              const fileRes = await fetch(docxAtt.url);
-              if (fileRes.ok) {
-                const arrayBuffer = await fileRes.arrayBuffer();
-                const buffer = Buffer.from(arrayBuffer);
-                const parsed = await parseDocxBuffer(buffer);
-                categoryOverview = parsed.html;
-              }
-            } catch (docErr) {
-              console.error(`Error parsing Category Overview docx for ${rawName}:`, docErr);
-            }
+            const parsed = await getCachedDocx(docxAtt.url);
+            categoryOverview = parsed.html;
           }
-        } else if (typeof rawCategoryOverview === 'string' && rawCategoryOverview.trim()) {
-          categoryOverview = rawCategoryOverview.trim();
+        } else if (typeof rawCategoryOverview === 'string') {
+          categoryOverview = rawCategoryOverview;
         }
 
         return {
           id: record.id,
-          name: (fields['Product Name'] as string) || 'Untitled Product',
+          name: rawName,
           slug,
           category: categorySlug,
           categoryName,
@@ -263,34 +301,59 @@ export async function getProducts(): Promise<Product[]> {
         };
       })
     );
+
+    // Populate lookup maps for O(1) instantaneous access
+    cachedProductsBySlug.clear();
+    cachedProductsById.clear();
+    products.forEach((p) => {
+      cachedProductsBySlug.set(p.slug.toLowerCase(), p);
+      cachedProductsById.set(p.id, p);
+    });
+
+    cachedProducts = { data: products, timestamp: Date.now() };
+    return products;
   } catch (error) {
     console.error('Error fetching products from Airtable:', error);
-    return mockProducts;
+    return cachedProducts?.data || mockProducts;
   }
 }
 
-// Fetch single product by slug
+// Fetch single product by slug (Instant O(1) Memory Lookup)
 export async function getProductBySlug(slug: string): Promise<Product | null> {
+  const cleanSlug = slug.trim().toLowerCase();
+  if (cachedProductsBySlug.has(cleanSlug)) {
+    return cachedProductsBySlug.get(cleanSlug)!;
+  }
   const products = await getProducts();
-  return products.find((p) => p.slug === slug) || null;
+  return cachedProductsBySlug.get(cleanSlug) || products.find((p) => p.slug.toLowerCase() === cleanSlug) || null;
 }
 
-export interface AboutPageData {
+// Fetch single product by ID (Instant O(1) Memory Lookup)
+export async function getProductById(id: string): Promise<Product | null> {
+  if (cachedProductsById.has(id)) {
+    return cachedProductsById.get(id)!;
+  }
+  const products = await getProducts();
+  return cachedProductsById.get(id) || products.find((p) => p.id === id) || null;
+}
+
+// Fetch About page content (Cached)
+export async function getAboutPageData(): Promise<{
   title: string;
   contentHtml: string;
   rawText: string;
   seoTitle?: string;
   seoDescription?: string;
-}
+}> {
+  if (cachedAboutData && Date.now() - cachedAboutData.timestamp < CACHE_TTL_MS) {
+    return cachedAboutData.data;
+  }
 
-// Fetch About page data from dedicated Airtable 'About' table with automatic .docx parsing
-export async function getAboutPageData(): Promise<AboutPageData> {
-  const defaultData: AboutPageData = {
+  const defaultData = {
     title: 'About Adoptd Christian Clothing',
     contentHtml: `
       <p>ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity.</p>
       <p>Every purchase helps a small business keep creating, designing and sharing faith through clothing.</p>
-      <p>Every design has a purpose: to get people thinking, talking and, above all, to point people towards Jesus.</p>
     `,
     rawText: 'ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity.',
   };
@@ -312,7 +375,6 @@ export async function getAboutPageData(): Promise<AboutPageData> {
 
     const title = (fields['Title'] as string) || (fields['title'] as string) || defaultData.title;
     
-    // Check Content field (Word .docx attachment, URL, or plain text)
     const contentField = fields['Content'] || fields['content'] || fields['Word Document'] || fields['Document'];
     let contentHtml = defaultData.contentHtml;
     let rawText = defaultData.rawText;
@@ -323,18 +385,9 @@ export async function getAboutPageData(): Promise<AboutPageData> {
       ) || contentField[0];
 
       if (docxAtt && docxAtt.url) {
-        try {
-          const fileRes = await fetch(docxAtt.url);
-          if (fileRes.ok) {
-            const arrayBuffer = await fileRes.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-            const parsed = await parseDocxBuffer(buffer);
-            contentHtml = parsed.html;
-            rawText = parsed.rawText;
-          }
-        } catch (err) {
-          console.error('Error parsing About Word doc:', err);
-        }
+        const parsed = await getCachedDocx(docxAtt.url);
+        contentHtml = parsed.html;
+        rawText = parsed.rawText;
       }
     } else if (typeof contentField === 'string' && contentField.trim()) {
       if (contentField.includes('<') && contentField.includes('>')) {
@@ -349,21 +402,28 @@ export async function getAboutPageData(): Promise<AboutPageData> {
       rawText = contentField.trim();
     }
 
-    return {
+    const result = {
       title,
       contentHtml,
       rawText,
       seoTitle: seoEntry?.title || `${title} | Adoptd Christian Clothing UK`,
       seoDescription: seoEntry?.description || rawText.slice(0, 160),
     };
+
+    cachedAboutData = { data: result, timestamp: Date.now() };
+    return result;
   } catch (error) {
     console.error('Error fetching About table from Airtable:', error);
-    return defaultData;
+    return cachedAboutData?.data || defaultData;
   }
 }
 
-// Fetch blog posts (including full .docx parsing with inline images & auto-cover extraction)
+// Fetch blog posts (Cached)
 export async function getBlogPosts(): Promise<BlogPost[]> {
+  if (cachedBlogPosts && Date.now() - cachedBlogPosts.timestamp < CACHE_TTL_MS) {
+    return cachedBlogPosts.data;
+  }
+
   if (!base) {
     return mockBlogPosts;
   }
@@ -371,7 +431,6 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
   try {
     let records: readonly any[] = [];
     
-    // Try 'Blog' first, then 'Blog Posts', then 'Journal'
     const tableCandidates = ['Blog', 'Blog Posts', 'Journal', 'Articles'];
     for (const tableName of tableCandidates) {
       try {
@@ -382,7 +441,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
           .all();
         if (records && records.length > 0) break;
       } catch {
-        // Continue trying next table candidate
+        // Try next candidate
       }
     }
 
@@ -395,7 +454,6 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     for (const record of records) {
       const fields = record.fields;
       
-      // Filter out explicitly unpublished articles if Published checkbox is present
       if (fields['Published'] === false || fields['Status'] === 'Draft') {
         continue;
       }
@@ -404,7 +462,6 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       let rawText = '';
       let docxCoverImage: string | null = null;
 
-      // Look for Word Document attachment across common field names
       const docxAttachments = 
         (fields['Word Document'] as any[]) ||
         (fields['Docx File'] as any[]) ||
@@ -415,21 +472,14 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         [];
 
       if (docxAttachments.length > 0 && docxAttachments[0].url) {
-        try {
-          const res = await fetch(docxAttachments[0].url);
-          const arrayBuffer = await res.arrayBuffer();
-          const parsed = await parseDocxBuffer(Buffer.from(arrayBuffer));
-          if (parsed.html) {
-            contentHtml = parsed.html;
-            rawText = parsed.rawText;
-            docxCoverImage = parsed.firstImageUrl;
-          }
-        } catch (docxErr) {
-          console.error('Error downloading/parsing attached .docx from Airtable:', docxErr);
+        const parsed = await getCachedDocx(docxAttachments[0].url);
+        if (parsed.html) {
+          contentHtml = parsed.html;
+          rawText = parsed.rawText;
+          docxCoverImage = parsed.firstImageUrl || null;
         }
       }
 
-      // Check explicit cover image attachment
       const coverAtt = 
         (fields['Cover Image'] as any[]) ||
         (fields['Image'] as any[]) ||
@@ -437,7 +487,6 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         (fields['Picture'] as any[]) ||
         [];
 
-      // Cover image priority: 1) Airtable Cover Image column, 2) First image extracted from Word doc, 3) Beautiful editorial fallback
       const coverImage = coverAtt.length > 0 
         ? coverAtt[0].url 
         : docxCoverImage || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200';
@@ -450,47 +499,65 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         .replace(/(^-|-$)+/g, '');
       const slug = (fields['Slug'] as string) || autoSlug || record.id;
 
-      // Auto-generate excerpt if not supplied
       let excerpt = (fields['Excerpt'] as string) || (fields['Summary'] as string) || '';
       if (!excerpt && rawText) {
-        excerpt = rawText.split('\n').filter(Boolean).slice(0, 2).join(' ').slice(0, 160) + '...';
+        excerpt = rawText.slice(0, 160).trim() + '...';
       } else if (!excerpt) {
         excerpt = 'A biblical reflection and devotional from the ADOPTD journal.';
       }
+
+      const wordCount = (rawText || contentHtml.replace(/<[^>]*>/g, '')).split(/\s+/).length;
+      const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 200));
+
+      const featuredProductNames = (fields['Featured Products'] as string[]) || [];
 
       posts.push({
         id: record.id,
         title,
         slug,
         coverImage,
-        category: (fields['Category'] as string) || 'Devotionals',
+        category: (fields['Category'] as string) || 'Faith & Devotion',
         excerpt,
         contentHtml,
         publishDate: (fields['Publish Date'] as string) || (fields['Date'] as string) || new Date().toISOString().split('T')[0],
         author: (fields['Author'] as string) || 'ADOPTD Team',
-        readingTimeMinutes: Math.max(1, Math.ceil((contentHtml.length || 500) / 1000)),
-        featuredProductIds: (fields['Featured Products'] as string[]) || (fields['Related Products'] as string[]) || [],
-        seoTitle: (fields['SEO Meta Title'] as string) || title,
+        readingTimeMinutes,
+        featuredProductIds: featuredProductNames,
+        seoTitle: (fields['SEO Meta Title'] as string) || `${title} | ADOPTD Journal`,
         seoDescription: (fields['SEO Meta Description'] as string) || excerpt,
         published: true,
       });
     }
 
-    return posts.length > 0 ? posts : mockBlogPosts;
+    cachedBlogPostsBySlug.clear();
+    posts.forEach((p) => {
+      cachedBlogPostsBySlug.set(p.slug.toLowerCase(), p);
+    });
+
+    cachedBlogPosts = { data: posts, timestamp: Date.now() };
+    return posts;
   } catch (error) {
     console.error('Error fetching blog posts from Airtable:', error);
-    return mockBlogPosts;
+    return cachedBlogPosts?.data || mockBlogPosts;
   }
 }
 
-// Fetch single blog post by slug
+// Fetch single blog post by slug (Instant O(1) Lookup)
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  const cleanSlug = slug.trim().toLowerCase();
+  if (cachedBlogPostsBySlug.has(cleanSlug)) {
+    return cachedBlogPostsBySlug.get(cleanSlug)!;
+  }
   const posts = await getBlogPosts();
-  return posts.find((p) => p.slug === slug) || null;
+  return cachedBlogPostsBySlug.get(cleanSlug) || posts.find((p) => p.slug.toLowerCase() === cleanSlug) || null;
 }
 
-// Fetch site settings
+// Fetch global site settings (Cached)
 export async function getSiteSettings(): Promise<SiteSettings> {
+  if (cachedSiteSettings && Date.now() - cachedSiteSettings.timestamp < CACHE_TTL_MS) {
+    return cachedSiteSettings.data;
+  }
+
   if (!base) {
     return mockSiteSettings;
   }
@@ -518,7 +585,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
       if (r.fields['free_shipping_threshold']) settingsMap['free_shipping_threshold'] = r.fields['free_shipping_threshold'];
     });
 
-    return {
+    const settings: SiteSettings = {
       announcementBanner: settingsMap['announcement_banner'] || settingsMap['homepage_announcement_banner'] || mockSiteSettings.announcementBanner,
       announcementActive: settingsMap['announcement_active'] !== 'false',
       globalMetaTitle: settingsMap['global_meta_title'] || mockSiteSettings.globalMetaTitle,
@@ -528,9 +595,12 @@ export async function getSiteSettings(): Promise<SiteSettings> {
       facebookUrl: settingsMap['facebook_url'] || mockSiteSettings.facebookUrl,
       freeShippingThreshold: Number(settingsMap['free_shipping_threshold']) || 40.00,
     };
+
+    cachedSiteSettings = { data: settings, timestamp: Date.now() };
+    return settings;
   } catch (error) {
     console.error('Error fetching site settings from Airtable:', error);
-    return mockSiteSettings;
+    return cachedSiteSettings?.data || mockSiteSettings;
   }
 }
 
@@ -582,7 +652,6 @@ export async function recordContactInquiry(data: {
       fields['Order Number'] = data.orderNumber;
     }
 
-    // Try creating in 'Contact Submissions', 'Inquiries', or 'Messages'
     try {
       await base('Contact Submissions').create([{ fields }]);
     } catch {
