@@ -249,7 +249,11 @@ export async function getProducts(): Promise<Product[]> {
           longDescription: finalLongDescription || undefined,
           scriptureReference: fields['Scripture Reference'] as string,
           careInstructions: fields['Care Instructions'] as string,
-          sizeGuideType: (fields['Size Guide Type'] as any) || 'unisex-hoodie',
+          sizeGuideType: (fields['Size Guide Type'] as any) || (
+            categorySlug === 'tee-shirts' ? 'unisex-tshirt' :
+            categorySlug === 'sweaters' ? 'sweater' :
+            categorySlug === 'christian-bags' ? 'tote-bag' : 'unisex-hoodie'
+          ),
           customSizeNotes: fields['Custom Size Notes'] as string,
           featuredImage,
           categoryOverview,
