@@ -66,6 +66,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "adoptdchristianclothing.co.uk",
       },
+      {
+        protocol: "https",
+        hostname: "**.public.blob.vercel-storage.com",
+      },
+      {
+        protocol: "https",
+        hostname: "public.blob.vercel-storage.com",
+      },
     ],
   },
 };
