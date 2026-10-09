@@ -36,6 +36,11 @@ const categoryInfoMap: Record<string, { title: string; subtitle: string; descrip
     subtitle: 'Seasonal Faith Apparel & Thoughtful Gifts',
     description: 'Celebrate the birth of Christ with our faith-inspired Christmas collection, scripture gifts, and festive apparel.',
   },
+  'gym-sportswear': {
+    title: 'Christian Gym & Sportswear',
+    subtitle: 'Faith for Every Rep, Run & Rest Day',
+    description: 'Move with purpose in Christian gym and sportswear from Adoptd. Discover faith-inspired activewear designed to encourage you to train with perseverance, keep your eyes on Jesus, and carry your faith into everyday life.',
+  },
 };
 
 export async function generateStaticParams() {
@@ -45,6 +50,7 @@ export async function generateStaticParams() {
     { category: 'sweaters' },
     { category: 'christian-bags' },
     { category: 'christmas' },
+    { category: 'gym-sportswear' },
   ];
 }
 
@@ -79,6 +85,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     { name: 'Hoodies', slug: 'christian-hoodies-uk', href: '/shop/christian-hoodies-uk' },
     { name: 'Tote Bags', slug: 'christian-bags', href: '/shop/christian-bags' },
     { name: 'Christmas', slug: 'christmas', href: '/shop/christmas' },
+    { name: 'Gym & Sportswear', slug: 'gym-sportswear', href: '/shop/gym-sportswear' },
   ];
 
   return (
