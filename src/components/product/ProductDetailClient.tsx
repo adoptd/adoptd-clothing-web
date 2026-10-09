@@ -214,37 +214,7 @@ export function ProductDetailClient({
             </div>
           </div>
 
-          {/* Description & Care Accordion */}
-          <div className="space-y-4 pt-4 border-t border-stone-200 text-base text-stone-700">
-            <div>
-              <h3 className="font-serif font-bold text-stone-900 text-lg mb-2">Description</h3>
-              {((product.longDescription || product.description) ? (
-                (product.longDescription || product.description).includes('<') && (product.longDescription || product.description).includes('>') ? (
-                  <div
-                    className="leading-relaxed text-stone-600 text-sm sm:text-base space-y-3 [&>p]:leading-relaxed [&>p]:mb-3 [&_strong]:text-stone-950 [&_strong]:font-bold"
-                    dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
-                  />
-                ) : (
-                  <div className="leading-relaxed text-stone-600 text-sm sm:text-base whitespace-pre-line space-y-3">
-                    {product.longDescription || product.description}
-                  </div>
-                )
-              ) : (
-                <p className="text-sm text-stone-500 italic">No description available.</p>
-              ))}
-            </div>
 
-            {product.careInstructions && (
-              <div className="pt-2">
-                <h4 className="font-semibold text-stone-900 text-xs uppercase tracking-wider mb-1">
-                  Care Guidelines
-                </h4>
-                <p className="text-xs sm:text-sm text-stone-500 leading-relaxed">
-                  {product.careInstructions}
-                </p>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
@@ -275,6 +245,43 @@ export function ProductDetailClient({
           </div>
         </section>
       )}
+
+      {/* Long Description & Care Guidelines — below related products */}
+      <section className="pt-12 border-t border-stone-200">
+        <div className="max-w-4xl mx-auto space-y-4 text-base text-stone-700">
+            {/* Description & Care */}
+            <div className="space-y-4 pt-4 border-t border-stone-200 text-base text-stone-700">
+              <div>
+                <h3 className="font-serif font-bold text-stone-900 text-lg mb-2">Description</h3>
+                {((product.longDescription || product.description) ? (
+                  (product.longDescription || product.description).includes('<') && (product.longDescription || product.description).includes('>') ? (
+                    <div
+                      className="leading-relaxed text-stone-600 text-sm sm:text-base space-y-3 [&>p]:leading-relaxed [&>p]:mb-3 [&_strong]:text-stone-950 [&_strong]:font-bold"
+                      dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
+                    />
+                  ) : (
+                    <div className="leading-relaxed text-stone-600 text-sm sm:text-base whitespace-pre-line space-y-3">
+                      {product.longDescription || product.description}
+                    </div>
+                  )
+                ) : (
+                  <p className="text-sm text-stone-500 italic">No description available.</p>
+                ))}
+              </div>
+  
+              {product.careInstructions && (
+                <div className="pt-2">
+                  <h4 className="font-semibold text-stone-900 text-xs uppercase tracking-wider mb-1">
+                    Care Guidelines
+                  </h4>
+                  <p className="text-xs sm:text-sm text-stone-500 leading-relaxed">
+                    {product.careInstructions}
+                  </p>
+                </div>
+              )}
+            </div>
+        </div>
+      </section>
     </div>
   );
 }
