@@ -11,7 +11,7 @@ export const revalidate = 60;
 export default async function HomePage() {
   const products = await getProducts();
 
-  const categoryOrder = ['tee-shirts', 'christian-hoodies-uk', 'christian-bags', 'christmas', 'sweaters'];
+  const categoryOrder = ['tee-shirts', 'christian-hoodies-uk', 'christian-bags', 'christmas', 'gym-sportswear', 'sweaters'];
   const featuredProducts: typeof products = [];
   const productsByCategory: Record<string, typeof products> = {};
 
@@ -64,6 +64,7 @@ export default async function HomePage() {
       'christian-hoodies-uk': '/images/shop-hoodies-bg.webp',
       'christian-bags': 'https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/mockup-of-a-man-with-a-loc-hairstyle-carrying-a-tote-bag-on-his-back-in-a-park-m56958-2-300x300.webp',
       'christmas': '/images/shop-christmas-bg.webp',
+      'gym-sportswear': '/images/shop-hoodies-bg.webp',
     };
     return fallbacks[slug] || '/images/shop-tshirts-bg.webp';
   };
@@ -89,6 +90,11 @@ export default async function HomePage() {
       slug: 'christmas',
       image: getCategoryImage('christmas'),
     },
+    {
+      name: 'GYM & SPORTSWEAR',
+      slug: 'gym-sportswear',
+      image: getCategoryImage('gym-sportswear'),
+    },
   ];
 
   return (
@@ -102,7 +108,7 @@ export default async function HomePage() {
                   SMALL BUSINESS. BIG FAITH.
                 </h1>
                 <p className="text-stone-800 text-sm sm:text-base leading-relaxed font-normal">
-                  ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity. Every purchase helps a small[...]
+                  ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity. Every purchase helps a small independent business and supports a bigger mission: to point people toward Jesus through everyday style.
                 </p>
                 <p className="text-stone-900 text-xs sm:text-sm font-bold">
                   Thank you for choosing to support an independent Christian brand.
@@ -202,7 +208,7 @@ export default async function HomePage() {
 
             <div className="flex flex-col justify-between h-full space-y-4 lg:space-y-0 text-left">
               <p className="text-stone-300 text-base sm:text-lg leading-relaxed font-normal">
-                ADOPTED was created from a simple desire — <strong className="text-white font-bold">to share Jesus with the world.</strong> I believe clothing can start conversations, provoke questi[...]
+                ADOPTED was created from a simple desire — <strong className="text-white font-bold">to share Jesus with the world.</strong> I believe clothing can start conversations, provoke questions, and remind people that they are valued and loved by God.
               </p>
               <p className="text-stone-300 text-base sm:text-lg leading-relaxed font-normal">
                 Every design has a purpose: <strong className="text-white font-bold">to get people thinking, talking and, above all, to point people towards Jesus.</strong>
