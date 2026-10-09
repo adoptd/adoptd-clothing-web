@@ -104,20 +104,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           </p>
         </div>
 
-        {categoryOverview && (
-          <div className="w-full pt-6 border-t border-stone-200">
-            {categoryOverview.includes('<') && categoryOverview.includes('>') ? (
-              <div
-                className="text-stone-700 text-sm sm:text-base leading-relaxed space-y-4 w-full text-left [&>p]:leading-relaxed [&>p]:mb-4 [&_strong]:text-stone-950 [&_strong]:font-bold [&_h2]:font-serif [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-stone-900 [&_h3]:font-serif [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-stone-900 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1"
-                dangerouslySetInnerHTML={{ __html: categoryOverview }}
-              />
-            ) : (
-              <div className="text-stone-700 text-sm sm:text-base leading-relaxed space-y-4 w-full text-left whitespace-pre-line">
-                {categoryOverview}
-              </div>
-            )}
-          </div>
-        )}
+
       </div>
 
       {/* Category Filter Pills */}
@@ -153,6 +140,22 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
+        </div>
+      )}
+      
+      {/* Long SEO category description below the products */}
+      {categoryOverview && (
+        <div className="w-full pt-8 border-t border-stone-200">
+          {categoryOverview.includes('<') && categoryOverview.includes('>') ? (
+            <div
+              className="text-stone-700 text-sm sm:text-base leading-relaxed space-y-4 w-full text-left [&>p]:leading-relaxed [&>p]:mb-4 [&_strong]:text-stone-950 [&_strong]:font-bold [&_h2]:font-serif [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-stone-900 [&_h3]:font-serif [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-stone-900 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1"
+              dangerouslySetInnerHTML={{ __html: categoryOverview }}
+            />
+          ) : (
+            <div className="text-stone-700 text-sm sm:text-base leading-relaxed space-y-4 w-full text-left whitespace-pre-line">
+              {categoryOverview}
+            </div>
+          )}
         </div>
       )}
     </div>
