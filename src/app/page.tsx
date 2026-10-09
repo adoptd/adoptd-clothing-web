@@ -91,9 +91,6 @@ export default async function HomePage() {
     },
   ];
 
-  const heroBannerImage = '/images/hero-banner.webp';
-  const heroHoodieImage = '/images/hero-hoodie.webp';
-
   return (
     <div className="bg-white text-stone-900 space-y-16 sm:space-y-24 pb-0">
       <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 pt-6 sm:pt-10">
@@ -105,7 +102,7 @@ export default async function HomePage() {
                   SMALL BUSINESS. BIG FAITH.
                 </h1>
                 <p className="text-stone-800 text-sm sm:text-base leading-relaxed font-normal">
-                  ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity. Every purchase helps a small independent business and supports a bigger mission: to point people toward Jesus through everyday style.
+                  ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity. Every purchase helps a small[...]
                 </p>
                 <p className="text-stone-900 text-xs sm:text-sm font-bold">
                   Thank you for choosing to support an independent Christian brand.
@@ -114,7 +111,7 @@ export default async function HomePage() {
 
               <div className="relative aspect-[16/8] sm:aspect-[16/7] w-full rounded-[18px] overflow-hidden bg-white shadow-sm">
                 <Image
-                  src={heroBannerImage}
+                  src="/images/hero-banner.webp"
                   alt="Adoptd Christian Clothing Collection"
                   fill
                   priority
@@ -173,7 +170,7 @@ export default async function HomePage() {
 
           <div className="relative w-full h-full min-h-[420px] sm:min-h-[520px] lg:min-h-full rounded-[24px] overflow-hidden bg-[#efefef] shadow-sm group">
             <Image
-              src={heroHoodieImage}
+              src="/images/hero-hoodie.webp"
               alt="Featured Adoptd Christian Hoodie Collection"
               fill
               priority
@@ -205,7 +202,7 @@ export default async function HomePage() {
 
             <div className="flex flex-col justify-between h-full space-y-4 lg:space-y-0 text-left">
               <p className="text-stone-300 text-base sm:text-lg leading-relaxed font-normal">
-                ADOPTED was created from a simple desire — <strong className="text-white font-bold">to share Jesus with the world.</strong> I believe clothing can start conversations, provoke questions, and remind people that they are valued and loved by God.
+                ADOPTED was created from a simple desire — <strong className="text-white font-bold">to share Jesus with the world.</strong> I believe clothing can start conversations, provoke questi[...]
               </p>
               <p className="text-stone-300 text-base sm:text-lg leading-relaxed font-normal">
                 Every design has a purpose: <strong className="text-white font-bold">to get people thinking, talking and, above all, to point people towards Jesus.</strong>
