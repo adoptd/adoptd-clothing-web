@@ -5,7 +5,8 @@ export type ProductCategory =
   | 'christian-bags'
   | 'church-print-services'
   | 'blaze-city-merch'
-  | 'christmas';
+  | 'christmas'
+  | 'gym-sportswear';
 
 export interface ProductColorVariant {
   name: string;

@@ -90,6 +90,12 @@ export function Navbar({ settings }: NavbarProps) {
               >
                 Christmas
               </Link>
+              <Link
+                href="/shop/gym-sportswear"
+                className="text-sm xl:text-base font-bold tracking-wide text-stone-200 hover:text-[#00736a] transition whitespace-nowrap"
+              >
+                Gym &amp; Sportswear
+              </Link>
             </nav>
 
             {/* Right Header: Cart button & Shop Now Button */}
@@ -164,6 +170,13 @@ export function Navbar({ settings }: NavbarProps) {
             className="block py-2 text-sm font-semibold text-stone-300 border-b border-stone-800"
           >
             Christmas
+          </Link>
+          <Link
+            href="/shop/gym-sportswear"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block py-2 text-sm font-semibold text-stone-300 border-b border-stone-800"
+          >
+            Gym &amp; Sportswear
           </Link>
           <Link
             href="/church-print-services"

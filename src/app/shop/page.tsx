@@ -21,6 +21,7 @@ export default async function ShopPage() {
     { name: 'Hoodies', slug: 'christian-hoodies-uk', href: '/shop/christian-hoodies-uk' },
     { name: 'Tote Bags', slug: 'christian-bags', href: '/shop/christian-bags' },
     { name: 'Christmas', slug: 'christmas', href: '/shop/christmas' },
+    { name: 'Gym & Sportswear', slug: 'gym-sportswear', href: '/shop/gym-sportswear' },
   ];
 
   return (
