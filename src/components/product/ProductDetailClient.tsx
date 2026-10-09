@@ -213,8 +213,6 @@ export function ProductDetailClient({
               <span>Ethical Apparel Sourcing</span>
             </div>
           </div>
-
-
         </div>
       </div>
 
@@ -250,7 +248,7 @@ export function ProductDetailClient({
       <section className="pt-12 border-t border-stone-200">
         <div className="max-w-4xl mx-auto space-y-4 text-base text-stone-700">
             {/* Description & Care */}
-            <div className="space-y-4 pt-4 border-t border-stone-200 text-base text-stone-700">
+            <div className="space-y-4 text-base text-stone-700">
               <div>
                 <h3 className="font-serif font-bold text-stone-900 text-lg mb-2">Description</h3>
                 {((product.longDescription || product.description) ? (
