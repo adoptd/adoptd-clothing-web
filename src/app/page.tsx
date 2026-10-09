@@ -10,8 +10,7 @@ export const revalidate = 60;
 
 export default async function HomePage() {
   const products = await getProducts();
-  
-  // Ensure at least 3 distinct product categories are featured (T-Shirts, Hoodies, Tote Bags, etc.)
+
   const categoryOrder = ['tee-shirts', 'christian-hoodies-uk', 'christian-bags', 'christmas', 'sweaters'];
   const featuredProducts: typeof products = [];
   const productsByCategory: Record<string, typeof products> = {};
@@ -24,7 +23,6 @@ export default async function HomePage() {
     productsByCategory[cat].push(p);
   });
 
-  // Round-robin selection across distinct categories
   let round = 0;
   while (featuredProducts.length < 5 && round < 10) {
     for (const cat of categoryOrder) {
@@ -34,7 +32,6 @@ export default async function HomePage() {
         featuredProducts.push(list[round]);
       }
     }
-    // Also include any other categories not in categoryOrder
     for (const cat in productsByCategory) {
       if (featuredProducts.length >= 5) break;
       if (!categoryOrder.includes(cat)) {
@@ -47,7 +44,6 @@ export default async function HomePage() {
     round++;
   }
 
-  // Fallback to fill any remaining slots up to 5
   if (featuredProducts.length < 5) {
     for (const p of products) {
       if (!featuredProducts.some((fp) => fp.id === p.id)) {
@@ -57,40 +53,52 @@ export default async function HomePage() {
     }
   }
 
+  const getCategoryImage = (slug: string): string => {
+    const categoryProducts = productsByCategory[slug] || [];
+    if (categoryProducts.length > 0) {
+      return categoryProducts[0].featuredImage || '/images/shop-tshirts-bg.webp';
+    }
+
+    const fallbacks: Record<string, string> = {
+      'tee-shirts': '/images/shop-tshirts-bg.webp',
+      'christian-hoodies-uk': '/images/shop-hoodies-bg.webp',
+      'christian-bags': 'https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/mockup-of-a-man-with-a-loc-hairstyle-carrying-a-tote-bag-on-his-back-in-a-park-m56958-2-300x300.webp',
+      'christmas': '/images/shop-christmas-bg.webp',
+    };
+    return fallbacks[slug] || '/images/shop-tshirts-bg.webp';
+  };
+
   const categories = [
     {
       name: 'T-SHIRTS',
       slug: 'tee-shirts',
-      image: '/images/shop-tshirts-bg.webp',
+      image: getCategoryImage('tee-shirts'),
     },
     {
       name: 'HOODIES',
       slug: 'christian-hoodies-uk',
-      image: '/images/shop-hoodies-bg.webp',
+      image: getCategoryImage('christian-hoodies-uk'),
     },
     {
       name: 'TOTE BAGS',
       slug: 'christian-bags',
-      image: 'https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/mockup-of-a-man-with-a-loc-hairstyle-carrying-a-tote-bag-on-his-back-in-a-park-m56958-2-300x300.webp',
+      image: getCategoryImage('christian-bags'),
     },
     {
       name: 'CHRISTMAS',
       slug: 'christmas',
-      image: '/images/shop-christmas-bg.webp',
+      image: getCategoryImage('christmas'),
     },
   ];
 
+  const heroBannerImage = productsByCategory['tee-shirts']?.[0]?.featuredImage || '/images/hero-banner.webp';
+  const heroHoodieImage = productsByCategory['christian-hoodies-uk']?.[0]?.featuredImage || '/images/hero-hoodie.webp';
+
   return (
     <div className="bg-white text-stone-900 space-y-16 sm:space-y-24 pb-0">
-      
-      {/* 1. HERO SECTION (2 Main Columns Layout Matching Original) */}
       <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 pt-6 sm:pt-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          
-          {/* COLUMN 1 (LEFT MAIN COLUMN) */}
           <div className="flex flex-col gap-6 justify-between">
-            
-            {/* Top Panel: SMALL BUSINESS. BIG FAITH with banner image underneath */}
             <div className="bg-[#efefef] rounded-[24px] p-6 sm:p-10 flex flex-col justify-between space-y-6 shadow-sm">
               <div className="space-y-4">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tight text-stone-950 leading-tight">
@@ -104,10 +112,9 @@ export default async function HomePage() {
                 </p>
               </div>
 
-              {/* Picture underneath the text within this panel */}
               <div className="relative aspect-[16/8] sm:aspect-[16/7] w-full rounded-[18px] overflow-hidden bg-white shadow-sm">
                 <Image
-                  src="/images/hero-banner.webp"
+                  src={heroBannerImage}
                   alt="Adoptd Christian Clothing Collection"
                   fill
                   priority
@@ -117,16 +124,13 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Bottom Split Sub-Grid: 2 Panels Side-by-Side directly beneath the top panel */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              
-              {/* Left Sub-Panel: Shop T-Shirts */}
               <Link
                 href="/shop/tee-shirts"
                 className="group relative rounded-[20px] overflow-hidden aspect-[4/3] sm:aspect-square flex items-end p-6 shadow-sm focus:outline-none"
               >
                 <Image
-                  src="/images/shop-tshirts-bg.webp"
+                  src={getCategoryImage('tee-shirts')}
                   alt="Shop Christian T-Shirts"
                   fill
                   className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
@@ -143,13 +147,12 @@ export default async function HomePage() {
                 </div>
               </Link>
 
-              {/* Right Sub-Panel: Shop Hoodies */}
               <Link
                 href="/shop/christian-hoodies-uk"
                 className="group relative rounded-[20px] overflow-hidden aspect-[4/3] sm:aspect-square flex items-end p-6 shadow-sm focus:outline-none"
               >
                 <Image
-                  src="/images/shop-hoodies-bg.webp"
+                  src={getCategoryImage('christian-hoodies-uk')}
                   alt="Shop Christian Hoodies"
                   fill
                   className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
@@ -165,15 +168,12 @@ export default async function HomePage() {
                   </span>
                 </div>
               </Link>
-
             </div>
-
           </div>
 
-          {/* COLUMN 2 (RIGHT MAIN COLUMN - Stretches full depth of left column) */}
           <div className="relative w-full h-full min-h-[420px] sm:min-h-[520px] lg:min-h-full rounded-[24px] overflow-hidden bg-[#efefef] shadow-sm group">
             <Image
-              src="/images/hero-hoodie.webp"
+              src={heroHoodieImage}
               alt="Featured Adoptd Christian Hoodie Collection"
               fill
               priority
@@ -181,14 +181,11 @@ export default async function HomePage() {
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
           </div>
-
         </div>
       </section>
 
-      {/* Full-Width Bold Black Divider Line */}
       <div className="w-full border-t-2 border-black" />
 
-      {/* 2. FEATURED PRODUCTS GRID (Exact Live Products) */}
       <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {featuredProducts.map((product) => (
@@ -197,22 +194,18 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 3. MISSION SECTION (Full-Width White on Black 2-Column Layout - Perfectly Aligned Top & Bottom) */}
       <section className="w-full bg-[#030303] text-white py-16 sm:py-24 border-y border-stone-800">
         <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-stretch">
-            
-            {/* Left Column: Large Headline (Matches Right Column Depth) */}
             <div className="flex flex-col justify-between h-full">
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-[62px] font-black tracking-tight text-white leading-[1.12] text-left">
                 Christian Clothing That Shares Your Faith
               </h2>
             </div>
 
-            {/* Right Column: Copy Proportioned to Match Left Column Height */}
             <div className="flex flex-col justify-between h-full space-y-4 lg:space-y-0 text-left">
               <p className="text-stone-300 text-base sm:text-lg leading-relaxed font-normal">
-                ADOPTED was created from a simple desire — <strong className="text-white font-bold">to share Jesus with the world.</strong> I believe clothing can start conversations, provoke questions and offer encouragement in everyday life.
+                ADOPTED was created from a simple desire — <strong className="text-white font-bold">to share Jesus with the world.</strong> I believe clothing can start conversations, provoke questions and spark meaningful conversations.
               </p>
               <p className="text-stone-300 text-base sm:text-lg leading-relaxed font-normal">
                 Every design has a purpose: <strong className="text-white font-bold">to get people thinking, talking and, above all, to point people towards Jesus.</strong>
@@ -223,12 +216,10 @@ export default async function HomePage() {
                 </p>
               </div>
             </div>
-
           </div>
         </div>
       </section>
 
-      {/* 4. SHOP BY CATEGORY (1:1 Exact Match with Block Cards) */}
       <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
         <div className="text-center mb-10">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
@@ -267,13 +258,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 5. CUSTOMER TESTIMONIALS (Full-Width Unrounded Section with Interactive Carousel) */}
       <section className="w-full bg-[#808080] text-white py-14 sm:py-20">
         <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
           <TestimonialsCarousel />
         </div>
       </section>
-
     </div>
   );
 }
