@@ -185,7 +185,10 @@ export async function getProducts(): Promise<Product[]> {
         
         let categorySlug: any = 'tee-shirts';
         let categoryName = 'Apparel';
-        if (cleanCat.includes('christmas') || cleanCat.includes('xmas')) {
+        if (cleanCat.includes('gym') || cleanCat.includes('sport') || cleanCat.includes('activewear') || cleanCat.includes('active-wear')) {
+          categorySlug = 'gym-sportswear';
+          categoryName = 'Gym & Sportswear';
+        } else if (cleanCat.includes('christmas') || cleanCat.includes('xmas')) {
           categorySlug = 'christmas';
           categoryName = 'Christmas';
         } else if (cleanCat.includes('bag') || cleanCat.includes('tote')) {
