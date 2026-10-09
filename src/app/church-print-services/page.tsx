@@ -172,7 +172,7 @@ export default function ChurchPrintServicesPage() {
                     Garment Types Needed
                   </label>
                   <select className="w-full px-4 py-3.5 border border-stone-300 rounded-xl text-sm sm:text-base focus:ring-2 focus:ring-[#00736a] focus:outline-none bg-stone-50/50 text-stone-800">
-                    <option>T-Shirts (Organic Ringspun Cotton)</option>
+                    <option>T-Shirts</option>
                     <option>Hoodies (Heavyweight Fleece)</option>
                     <option>Sweaters / Crewnecks</option>
                     <option>Canvas Tote Bags</option>
