@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { getSiteSettings } from "@/lib/airtable";
 import { constructMetadata } from "@/lib/seo";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = constructMetadata({});
 
@@ -22,6 +23,7 @@ export default async function RootLayout({
         <main className="flex-1">{children}</main>
         <CartDrawer />
         <Footer settings={settings} />
+        <Analytics />
       </body>
     </html>
   );
