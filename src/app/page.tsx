@@ -99,6 +99,25 @@ export default async function HomePage() {
 
   return (
     <div className="bg-white text-stone-900 space-y-16 sm:space-y-24 pb-0">
+      <section aria-label="Shop the Adoptd gym and sportswear collection" className="w-full">
+        <Link
+          href="/shop/gym-sportswear"
+          aria-label="Shop the Adoptd gym and sportswear collection"
+          className="group relative block w-full overflow-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00736a]"
+        >
+          <div className="relative aspect-[2.4/1] sm:aspect-[3.8/1] w-full">
+            <Image
+              src="/images/gym-sportswear-banner.png"
+              alt="Built on Faith — shop Adoptd Christian gym and sportswear"
+              fill
+              priority
+              className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.01]"
+              sizes="100vw"
+            />
+          </div>
+        </Link>
+      </section>
+
       <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 pt-6 sm:pt-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
           <div className="flex flex-col gap-6 justify-between">
