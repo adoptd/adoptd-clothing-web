@@ -105,13 +105,18 @@ export default async function HomePage() {
           aria-label="Shop the Adoptd gym and sportswear collection"
           className="group relative block w-full overflow-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00736a]"
         >
-          <div className="relative aspect-[4/3] sm:aspect-[3.2/1] w-full bg-white">
+          <img
+            src="/images/gym-sportswear-banner.png"
+            alt="Built on Faith — shop Adoptd Christian gym and sportswear"
+            className="block h-auto w-full sm:hidden"
+          />
+          <div className="relative hidden aspect-[3.2/1] w-full bg-white sm:block">
             <Image
               src="/images/gym-sportswear-banner.png"
               alt="Built on Faith — shop Adoptd Christian gym and sportswear"
               fill
               priority
-              className="object-contain object-center sm:object-cover transition-transform duration-500 sm:group-hover:scale-[1.01]"
+              className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.01]"
               sizes="100vw"
             />
           </div>
