@@ -15,8 +15,8 @@ export function constructMetadata({
   image?: string;
   slug?: string;
 }): Metadata {
-  const fullTitle = title 
-    ? `${title} | Adoptd Christian Clothing`
+  const fullTitle = title
+    ? (/adoptd/i.test(title) ? title : `${title} | Adoptd Christian Clothing`)
     : mockSiteSettings.globalMetaTitle;
   
   const fullDescription = description || mockSiteSettings.globalMetaDescription;

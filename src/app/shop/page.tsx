@@ -6,7 +6,7 @@ import { constructMetadata } from '@/lib/seo';
 
 export const metadata = constructMetadata({
   title: 'Shop All Christian Clothing & Apparel',
-  description: 'Explore our full collection of faith-based hoodies, t-shirts, sweaters, and tote bags designed in the UK.',
+  description: 'Explore Christian hoodies, faith-inspired t-shirts, tote bags and seasonal clothing from Adoptd Christian Clothing in the UK.',
   slug: 'shop',
 });
 
