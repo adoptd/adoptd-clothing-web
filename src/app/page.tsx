@@ -98,8 +98,8 @@ export default async function HomePage() {
   ];
 
   return (
-    <div className="bg-white text-stone-900 space-y-16 sm:space-y-24 pb-0">
-      <section aria-label="Shop the Adoptd gym and sportswear collection" className="w-full">
+    <div className="bg-white text-stone-900 space-y-10 sm:space-y-24 pb-0">
+      <section aria-label="Shop the Adoptd gym and sportswear collection" className="w-full -mb-6 sm:mb-0">
         <Link
           href="/shop/gym-sportswear"
           aria-label="Shop the Adoptd gym and sportswear collection"
