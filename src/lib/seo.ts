@@ -26,6 +26,11 @@ export function constructMetadata({
   return {
     title: fullTitle,
     description: fullDescription,
+    icons: {
+      icon: '/images/logo.png',
+      shortcut: '/images/logo.png',
+      apple: '/images/logo.png',
+    },
     alternates: {
       canonical: canonicalUrl,
     },
