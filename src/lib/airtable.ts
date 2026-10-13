@@ -676,6 +676,57 @@ export async function recordContactInquiry(data: {
   }
 }
 
+
+export interface BlogComment {
+  id: string;
+  name: string;
+  comment: string;
+  submittedAt: string;
+}
+
+// Publicly show approved comments only. Configure the Airtable table/fields listed in setup instructions.
+export async function getApprovedBlogComments(slug: string): Promise<BlogComment[]> {
+  if (!base) return [];
+  try {
+    const safeSlug = slug.replace(/'/g, "\\'");
+    const records = await base('Blog Comments').select({
+      filterByFormula: `AND({Blog Slug}='${safeSlug}', {Status}='Approved')`,
+      sort: [{ field: 'Submitted At', direction: 'asc' }],
+      maxRecords: 100,
+    }).all();
+    return records.map((record) => ({
+      id: record.id,
+      name: String(record.fields['Name'] || 'Reader'),
+      comment: String(record.fields['Comment'] || ''),
+      submittedAt: String(record.fields['Submitted At'] || record.fields['Created'] || ''),
+    })).filter((item) => item.comment.trim());
+  } catch (error) {
+    console.error('Error fetching approved blog comments from Airtable:', error);
+    return [];
+  }
+}
+
+export async function createBlogComment(data: {
+  slug: string;
+  title: string;
+  name: string;
+  email?: string;
+  comment: string;
+}) {
+  if (!base) throw new Error('Comments storage is not configured.');
+  await base('Blog Comments').create([{
+    fields: {
+      'Blog Slug': data.slug,
+      'Blog Title': data.title,
+      Name: data.name,
+      ...(data.email ? { Email: data.email } : {}),
+      Comment: data.comment,
+      Status: 'Pending',
+    },
+  }]);
+  return { success: true };
+}
+
 // Helper for color hex values
 function getColorHex(colorName: string): string {
   const normalized = colorName.toLowerCase();
