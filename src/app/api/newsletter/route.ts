@@ -47,10 +47,44 @@ export async function POST(req: NextRequest) {
     const cleanEmail = spamCheck.sanitizedEmail || email.trim().toLowerCase();
     const cleanName = spamCheck.sanitizedName || '';
 
-    // 3. Save to Airtable
+    // 3. Add the subscriber to MailerLite using a server-only API key.
+    // Do not expose MAILERLITE_API_KEY to client-side code.
+    const mailerLiteApiKey = process.env.MAILERLITE_API_KEY;
+    if (!mailerLiteApiKey) {
+      console.error('[MailerLite] MAILERLITE_API_KEY is not configured.');
+      return NextResponse.json(
+        { error: 'Newsletter sign-up is temporarily unavailable. Please try again later.' },
+        { status: 503 }
+      );
+    }
+
+    const mailerLiteResponse = await fetch('https://connect.mailerlite.com/api/subscribers', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${mailerLiteApiKey}`,
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        email: cleanEmail,
+        fields: cleanName ? { name: cleanName } : {},
+      }),
+      cache: 'no-store',
+    });
+
+    if (!mailerLiteResponse.ok) {
+      const responseDetails = await mailerLiteResponse.text();
+      console.error('[MailerLite] Subscriber request failed:', mailerLiteResponse.status, responseDetails);
+      return NextResponse.json(
+        { error: 'We couldn’t complete your newsletter sign-up. Please try again later.' },
+        { status: 502 }
+      );
+    }
+
+    // 4. Save to Airtable as well, preserving the existing subscriber record flow.
     await recordNewsletterSubscriber(cleanEmail, cleanName);
 
-    // 4. Also store in Vercel Postgres if connected
+    // 5. Also store in Vercel Postgres if connected
     if (process.env.POSTGRES_URL) {
       try {
         await sql`
