@@ -21,7 +21,7 @@ export function constructMetadata({
   
   const fullDescription = description || mockSiteSettings.globalMetaDescription;
   const canonicalUrl = `${siteUrl}/${slug.replace(/^\//, '')}`;
-  const ogImage = image || `${siteUrl}/og-image.jpg`;
+  const ogImage = image || `${siteUrl}/images/hero-banner.webp`;
 
   return {
     title: fullTitle,
