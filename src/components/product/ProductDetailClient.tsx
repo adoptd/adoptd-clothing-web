@@ -79,7 +79,7 @@ export function ProductDetailClient({
           <div className="relative aspect-square w-full bg-stone-100 rounded-2xl overflow-hidden border border-stone-200 shadow-sm">
             <Image
               src={currentDisplayImage}
-              alt={`${product.name} - ${selectedColorName}`}
+              alt={`${product.name} in ${selectedColorName} - Christian ${product.categoryName.toLowerCase()} from Adoptd`}
               fill
               priority
               onError={() => setImgErrorMap((prev) => ({ ...prev, [rawDisplayImage]: true }))}
@@ -109,11 +109,11 @@ export function ProductDetailClient({
                         ? 'border-stone-950 ring-2 ring-stone-950/20 shadow-md opacity-100'
                         : 'border-stone-200/90 opacity-70 hover:opacity-100 hover:border-stone-400 bg-stone-50'
                     }`}
-                    aria-label={`View photo ${idx + 1}`}
+                    aria-label={`View ${product.name} photo ${idx + 1} in ${selectedColorName}`}
                   >
                     <Image
                       src={displayThumb}
-                      alt={`${product.name} gallery image ${idx + 1}`}
+                      alt={`${product.name} in ${selectedColorName}, product photo ${idx + 1}`}
                       fill
                       sizes="(max-width: 640px) 25vw, (max-width: 1024px) 15vw, 120px"
                       className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
