@@ -96,6 +96,12 @@ export function Navbar({ settings }: NavbarProps) {
               >
                 Gym &amp; Sportswear
               </Link>
+              <Link
+                href="/blog"
+                className="text-sm xl:text-base font-bold tracking-wide text-stone-200 hover:text-[#00736a] transition whitespace-nowrap"
+              >
+                Blog
+              </Link>
             </nav>
 
             {/* Right Header: Cart button & Shop Now Button */}
