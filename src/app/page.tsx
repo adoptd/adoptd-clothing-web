@@ -4,9 +4,16 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { getProducts } from '@/lib/airtable';
 import { ProductCard } from '@/components/product/ProductCard';
+import { constructMetadata } from '@/lib/seo';
 import { TestimonialsCarousel } from '@/components/home/TestimonialsCarousel';
 
 export const revalidate = 60;
+
+export const metadata = constructMetadata({
+  title: 'Christian Clothing UK | Faith-Inspired Apparel',
+  description: 'Shop Christian clothing in the UK at Adoptd. Discover faith-inspired T-shirts, hoodies, tote bags and sportswear designed to wear the Word and share the light.',
+  slug: '',
+});
 
 export default async function HomePage() {
   const products = await getProducts();

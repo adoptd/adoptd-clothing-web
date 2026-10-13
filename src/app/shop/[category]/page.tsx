@@ -73,6 +73,14 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     });
   }
 
+  if (category === 'christian-hoodies-uk') {
+    return constructMetadata({
+      title: 'Christian Hoodies UK | Faith-Inspired Hoodies',
+      description: 'Shop Christian hoodies in the UK at Adoptd. Explore comfortable faith-inspired hoodies featuring Bible verses and meaningful designs to wear your faith and share the light.',
+      slug: 'shop/christian-hoodies-uk',
+    });
+  }
+
   return constructMetadata({
     title: pageSeo?.title || `${info.title} | Adoptd Christian Clothing UK`,
     description: pageSeo?.description || info.description,
