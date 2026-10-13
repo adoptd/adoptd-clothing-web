@@ -18,7 +18,7 @@ export const metadata = constructMetadata({
 export default async function HomePage() {
   const products = await getProducts();
 
-  const categoryOrder = ['tee-shirts', 'christian-hoodies-uk', 'christian-bags', 'christmas', 'gym-sportswear', 'sweaters'];
+  const categoryOrder = ['tee-shirts', 'christian-hoodies-uk', 'christian-bags', 'christmas', 'gym-sportswear'];
   const featuredProducts: typeof products = [];
   const productsByCategory: Record<string, typeof products> = {};
 
