@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { getBlogPostBySlug, getBlogPosts, getProducts, getPageSeo } from '@/lib/airtable';
 import { constructMetadata, generateArticleJsonLd } from '@/lib/seo';
 import { ProductCard } from '@/components/product/ProductCard';
+import { BlogComments } from '@/components/blog/BlogComments';
 import { Clock, Calendar, ArrowLeft } from 'lucide-react';
 import { Metadata } from 'next';
 
@@ -109,6 +110,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         className="max-w-4xl mx-auto prose-article text-stone-800 leading-relaxed font-normal text-lg sm:text-xl space-y-6"
         dangerouslySetInnerHTML={{ __html: post.contentHtml || `<p>${post.excerpt}</p>` }}
       />
+
+      <BlogComments slug={post.slug} />
 
       {/* Featured Products Mentioned in Article */}
       {featuredProducts.length > 0 && (
