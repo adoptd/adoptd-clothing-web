@@ -112,7 +112,7 @@ export function generateArticleJsonLd(post: BlogPost) {
       name: 'Adoptd Christian Clothing',
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/logo.png`,
+        url: `${siteUrl}/images/logo.png`,
       },
     },
     mainEntityOfPage: {
