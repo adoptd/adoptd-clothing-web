@@ -24,9 +24,20 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     return constructMetadata({ title: 'Product Not Found' });
   }
 
+  const rawDescription = product.seoDescription || product.shortDescription || product.description;
+  const cleanDescription = rawDescription
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const metaDescription = cleanDescription.length <= 155
+    ? cleanDescription
+    : (cleanDescription.slice(0, 152).replace(/\s+\S*$/, '').trimEnd() + '...');
+
   return constructMetadata({
     title: product.seoTitle || product.name,
-    description: product.seoDescription || product.description.slice(0, 150),
+    description: metaDescription,
     image: product.featuredImage,
     slug: `product/${product.slug}`,
   });
