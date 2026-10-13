@@ -167,10 +167,11 @@ export function validateSubmissionSpam({
     return { isSpam: true, silentDrop: false, reason: 'Temporary or disposable email addresses are not accepted.' };
   }
 
-  // G. Malicious Script & Spam Keyword Check in Email or Name
-  const combinedInput = `${rawEmail} ${rawName}`;
+  // G. Malicious Script & Spam Keyword Check on the name only.
+  // Do not scan the email address for generic URL fragments such as ".com":
+  // those fragments are normal in valid email addresses and would silently drop real subscribers.
   for (const pattern of SPAM_PATTERNS) {
-    if (pattern.test(combinedInput)) {
+    if (pattern.test(rawName)) {
       return { isSpam: true, silentDrop: true, reason: 'Suspicious content or script pattern detected' };
     }
   }
