@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
       { source: '/shop/tote-bags/:slug', destination: '/product/:slug', permanent: true },
       { source: '/shop/uncategorized/:slug', destination: '/product/:slug', permanent: true },
 
+      // --- 3. Legacy collection URLs ---
+      // Preserve visitors and historical search signals from the old standalone T-shirt URL.
+      { source: '/tee-shirts', destination: '/shop/tee-shirts', permanent: true },
+
       // --- 3. Old WordPress Standalone Pages ---
       { source: '/support', destination: '/contact', permanent: false },
       { source: '/my-account', destination: '/checkout', permanent: true },
