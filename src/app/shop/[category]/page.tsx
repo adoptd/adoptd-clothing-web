@@ -14,7 +14,7 @@ const categoryInfoMap: Record<string, { title: string; subtitle: string; descrip
   'tee-shirts': {
     title: 'Christian T-Shirts',
     subtitle: 'Classic Tees & Faith Statements',
-    description: '100% soft organic cotton Christian t-shirts crafted in the UK with minimalist faith designs.',
+    description: 'Shop Christian T-shirts with faith-inspired designs, meaningful messages and Bible verses. Find everyday graphic tees that help you wear your faith and share the light.',
   },
   'christian-hoodies-uk': {
     title: 'Christian Hoodies UK',
