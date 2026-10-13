@@ -63,6 +63,16 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     description: 'Shop Christian clothing and apparel.',
   };
 
+  // Use focused, click-friendly metadata for the T-Shirts collection.
+  // Other categories continue to use the SEO table and their existing fallback metadata.
+  if (category === 'tee-shirts') {
+    return constructMetadata({
+      title: 'Christian T-Shirts UK | Faith Graphic Tees',
+      description: 'Shop Christian T-shirts in the UK at Adoptd. Discover faith-inspired graphic tees featuring Bible verses and meaningful designs to wear your faith and share the light.',
+      slug: 'shop/tee-shirts',
+    });
+  }
+
   return constructMetadata({
     title: pageSeo?.title || `${info.title} | Adoptd Christian Clothing UK`,
     description: pageSeo?.description || info.description,
