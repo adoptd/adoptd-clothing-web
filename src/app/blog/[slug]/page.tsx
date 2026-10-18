@@ -28,22 +28,26 @@ function addContextualInternalLinks(
 
   products.forEach((product) => {
     candidates.push({ phrase: product.name, href: `/product/${product.slug}` });
-    // Product designs are often referred to by their shorter design name in article copy.
-    const aliases = [
-      'Faith Over Fear',
-      'He Makes All Things New',
-      'Amazing Grace',
-      'The True Vine',
-      'More of Him Less of Me',
-      'Need Prayer',
-      'The Lord Is My Light',
-      'He Left the 99',
-    ];
-    aliases.forEach((phrase) => {
-      if (product.name.toLowerCase().includes(phrase.toLowerCase())) {
-        candidates.push({ phrase, href: `/product/${product.slug}` });
-      }
-    });
+  });
+
+  // Use short design names only when they identify one product unambiguously.
+  const aliases = [
+    'Faith Over Fear',
+    'He Makes All Things New',
+    'Amazing Grace',
+    'The True Vine',
+    'More of Him Less of Me',
+    'Need Prayer',
+    'The Lord Is My Light',
+    'He Left the 99',
+  ];
+  aliases.forEach((phrase) => {
+    const matches = products.filter((product) =>
+      product.name.toLowerCase().includes(phrase.toLowerCase())
+    );
+    if (matches.length === 1) {
+      candidates.push({ phrase, href: `/product/${matches[0].slug}` });
+    }
   });
 
   const uniqueCandidates = Array.from(
