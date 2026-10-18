@@ -6,8 +6,80 @@ import { getBlogPostBySlug, getBlogPosts, getProducts, getPageSeo } from '@/lib/
 import { constructMetadata, generateArticleJsonLd } from '@/lib/seo';
 import { ProductCard } from '@/components/product/ProductCard';
 import { BlogComments } from '@/components/blog/BlogComments';
-import { Clock, Calendar, ArrowLeft } from 'lucide-react';
+import { Clock, Calendar, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Metadata } from 'next';
+
+
+/**
+ * Add a small number of contextual internal links to plain-text article content.
+ * Existing links and HTML attributes are left untouched; each destination is linked once.
+ */
+function addContextualInternalLinks(
+  html: string,
+  currentSlug: string,
+  posts: { title: string; slug: string }[],
+  products: { name: string; slug: string }[],
+): string {
+  const candidates: { phrase: string; href: string }[] = [];
+
+  posts
+    .filter((item) => item.slug !== currentSlug && item.title.trim().length > 8)
+    .forEach((item) => candidates.push({ phrase: item.title, href: `/blog/${item.slug}` }));
+
+  products.forEach((product) => {
+    candidates.push({ phrase: product.name, href: `/product/${product.slug}` });
+  });
+
+  // Use short design names only when they identify one product unambiguously.
+  const aliases = [
+    'Faith Over Fear',
+    'He Makes All Things New',
+    'Amazing Grace',
+    'The True Vine',
+    'More of Him Less of Me',
+    'Need Prayer',
+    'The Lord Is My Light',
+    'He Left the 99',
+  ];
+  aliases.forEach((phrase) => {
+    const matches = products.filter((product) =>
+      product.name.toLowerCase().includes(phrase.toLowerCase())
+    );
+    if (matches.length === 1) {
+      candidates.push({ phrase, href: `/product/${matches[0].slug}` });
+    }
+  });
+
+  const uniqueCandidates = Array.from(
+    new Map(candidates.sort((a, b) => b.phrase.length - a.phrase.length)
+      .map((item) => [`${item.phrase.toLowerCase()}|${item.href}`, item])).values(),
+  );
+  const linkedDestinations = new Set<string>();
+  let insideAnchor = false;
+
+  return html.split(/(<[^>]+>)/g).map((part) => {
+    if (part.startsWith('<')) {
+      if (/^<a\b/i.test(part)) insideAnchor = true;
+      if (/^<\/a\s*>/i.test(part)) insideAnchor = false;
+      return part;
+    }
+    if (insideAnchor || !part.trim()) return part;
+
+    let result = part;
+    for (const candidate of uniqueCandidates) {
+      if (linkedDestinations.has(candidate.href)) continue;
+      const escaped = candidate.phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const matcher = new RegExp(`(^|[^\\w])(${escaped})(?![\\w])`, 'i');
+      if (matcher.test(result)) {
+        result = result.replace(matcher, (_match, prefix, phrase) =>
+          `${prefix}<a href="${candidate.href}" class="text-[#00736a] underline underline-offset-4 hover:text-stone-950">${phrase}</a>`,
+        );
+        linkedDestinations.add(candidate.href);
+      }
+    }
+    return result;
+  }).join('');
+}
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
@@ -49,10 +121,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
-  const allProducts = await getProducts();
+  const [allProducts, allPosts] = await Promise.all([getProducts(), getBlogPosts()]);
   const featuredProducts = allProducts.filter((p) =>
     post.featuredProductIds?.includes(p.id)
   ).slice(0, 2);
+
+  // Prefer articles in the same category, then suggest other recent articles.
+  const otherPosts = allPosts.filter((item) => item.slug !== post.slug);
+  const sameCategoryPosts = otherPosts.filter(
+    (item) => item.category && item.category.toLowerCase() === post.category?.toLowerCase()
+  );
+  const otherCategoryPosts = otherPosts.filter(
+    (item) => !sameCategoryPosts.some((related) => related.slug === item.slug)
+  );
+  const relatedPosts = [...sameCategoryPosts, ...otherCategoryPosts].slice(0, 3);
 
   const jsonLd = generateArticleJsonLd(post);
 
@@ -108,7 +190,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       {/* Formatted Article Body (Supports parsed .docx HTML) */}
       <div
         className="max-w-4xl mx-auto prose-article text-stone-800 leading-relaxed font-normal text-lg sm:text-xl space-y-6"
-        dangerouslySetInnerHTML={{ __html: post.contentHtml || `<p>${post.excerpt}</p>` }}
+        dangerouslySetInnerHTML={{ __html: addContextualInternalLinks(post.contentHtml || `<p>${post.excerpt}</p>`, post.slug, allPosts, allProducts) }}
       />
 
       <BlogComments slug={post.slug} />
@@ -128,6 +210,50 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             {featuredProducts.map((prod) => (
               <ProductCard key={prod.id} product={prod} />
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* Related articles create links between relevant blog posts */}
+      {relatedPosts.length > 0 && (
+        <section className="max-w-4xl mx-auto pt-10 border-t border-stone-200 space-y-6" aria-labelledby="related-articles-heading">
+          <div>
+            <span className="text-xs uppercase tracking-[0.25em] text-stone-500 font-bold">
+              Keep Reading
+            </span>
+            <h2 id="related-articles-heading" className="font-serif text-3xl font-bold text-stone-950 mt-1">
+              You Might Also Enjoy
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {relatedPosts.map((related) => (
+              <Link
+                key={related.id}
+                href={`/blog/${related.slug}`}
+                className="group rounded-xl border border-stone-200 p-5 hover:border-[#00736a] hover:shadow-sm transition"
+              >
+                <span className="text-xs font-bold uppercase tracking-wider text-[#00736a]">
+                  {related.category}
+                </span>
+                <h3 className="mt-2 font-serif text-xl font-bold text-stone-950 group-hover:text-[#00736a]">
+                  {related.title}
+                </h3>
+                <p className="mt-2 text-sm text-stone-600 line-clamp-3">
+                  {related.excerpt}
+                </p>
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-stone-900 group-hover:text-[#00736a]">
+                  Read article <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+            ))}
+          </div>
+          <p className="text-sm text-stone-600">
+            New to ADOPTD? <Link href="/about" className="font-semibold text-[#00736a] underline underline-offset-4 hover:text-stone-950">Read our story</Link> or <Link href="/shop" className="font-semibold text-[#00736a] underline underline-offset-4 hover:text-stone-950">explore the collection</Link>.
+          </p>
+          <div className="text-sm">
+            <Link href="/blog" className="inline-flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-950">
+              <ArrowLeft className="w-4 h-4" /> Browse all articles
+            </Link>
           </div>
         </section>
       )}
