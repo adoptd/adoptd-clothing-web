@@ -47,6 +47,26 @@ export default async function AboutPage() {
             dangerouslySetInnerHTML={{ __html: data.contentHtml }}
           />
 
+          {/* Brand purpose and clickable blog link */}
+          <section className="rounded-2xl border border-stone-200 bg-[#f8f7f5] p-6 sm:p-8 space-y-4">
+            <p className="text-stone-800 text-base sm:text-lg leading-relaxed">
+              ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity.
+            </p>
+            <p className="text-stone-800 text-base sm:text-lg leading-relaxed">
+              Want to know how my journey started?{' '}
+              <Link
+                href="/blog"
+                className="font-bold text-[#00736a] underline underline-offset-4 hover:text-stone-950"
+              >
+                Read my story
+              </Link>
+              .
+            </p>
+            <p className="text-stone-800 text-base sm:text-lg leading-relaxed">
+              Every purchase helps a small business keep creating, designing and sharing faith through clothing.
+            </p>
+          </section>
+
           {/* Core Values / Callout Card */}
           <div className="mt-12 bg-[#030303] text-white rounded-3xl p-8 sm:p-12 shadow-md space-y-6">
             <div className="flex items-center space-x-3 text-[#00736a]">
