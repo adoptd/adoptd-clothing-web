@@ -131,9 +131,32 @@ export function ProductDetailClient({
         {/* Product Details & Selection Column */}
         <div className="space-y-8">
           <div>
-            <span className="text-xs uppercase tracking-[0.25em] text-stone-500 font-bold block mb-1">
-              {product.categoryName}
-            </span>
+            <div className="mb-1">
+              {({
+                'tee-shirts': '/shop/tee-shirts',
+                'christian-hoodies-uk': '/shop/christian-hoodies-uk',
+                'christian-bags': '/shop/christian-bags',
+                christmas: '/shop/christmas',
+                'gym-sportswear': '/shop/gym-sportswear',
+              } as Partial<Record<typeof product.category, string>>)[product.category] ? (
+                <Link
+                  href={({
+                    'tee-shirts': '/shop/tee-shirts',
+                    'christian-hoodies-uk': '/shop/christian-hoodies-uk',
+                    'christian-bags': '/shop/christian-bags',
+                    christmas: '/shop/christmas',
+                    'gym-sportswear': '/shop/gym-sportswear',
+                  } as Partial<Record<typeof product.category, string>>)[product.category]!}
+                  className="text-xs uppercase tracking-[0.25em] text-stone-500 font-bold hover:text-[#00736a] underline underline-offset-4"
+                >
+                  {product.categoryName}
+                </Link>
+              ) : (
+                <span className="text-xs uppercase tracking-[0.25em] text-stone-500 font-bold">
+                  {product.categoryName}
+                </span>
+              )}
+            </div>
             <h1 className="font-serif text-3xl sm:text-5xl font-black text-stone-950 leading-tight">
               {product.name}
             </h1>
