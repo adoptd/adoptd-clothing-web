@@ -9,6 +9,74 @@ import { BlogComments } from '@/components/blog/BlogComments';
 import { Clock, Calendar, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Metadata } from 'next';
 
+
+/**
+ * Add a small number of contextual internal links to plain-text article content.
+ * Existing links and HTML attributes are left untouched; each destination is linked once.
+ */
+function addContextualInternalLinks(
+  html: string,
+  currentSlug: string,
+  posts: { title: string; slug: string }[],
+  products: { name: string; slug: string }[],
+): string {
+  const candidates: { phrase: string; href: string }[] = [];
+
+  posts
+    .filter((item) => item.slug !== currentSlug && item.title.trim().length > 8)
+    .forEach((item) => candidates.push({ phrase: item.title, href: `/blog/${item.slug}` }));
+
+  products.forEach((product) => {
+    candidates.push({ phrase: product.name, href: `/product/${product.slug}` });
+    // Product designs are often referred to by their shorter design name in article copy.
+    const aliases = [
+      'Faith Over Fear',
+      'He Makes All Things New',
+      'Amazing Grace',
+      'The True Vine',
+      'More of Him Less of Me',
+      'Need Prayer',
+      'The Lord Is My Light',
+      'He Left the 99',
+    ];
+    aliases.forEach((phrase) => {
+      if (product.name.toLowerCase().includes(phrase.toLowerCase())) {
+        candidates.push({ phrase, href: `/product/${product.slug}` });
+      }
+    });
+  });
+
+  const uniqueCandidates = Array.from(
+    new Map(candidates.sort((a, b) => b.phrase.length - a.phrase.length)
+      .map((item) => [`${item.phrase.toLowerCase()}|${item.href}`, item])).values(),
+  );
+  const linkedDestinations = new Set<string>();
+  let insideAnchor = false;
+
+  return html.split(/(<[^>]+>)/g).map((part) => {
+    if (part.startsWith('<')) {
+      if (/^<a\b/i.test(part)) insideAnchor = true;
+      if (/^<\/a\s*>/i.test(part)) insideAnchor = false;
+      return part;
+    }
+    if (insideAnchor || !part.trim()) return part;
+
+    let result = part;
+    for (const candidate of uniqueCandidates) {
+      if (linkedDestinations.has(candidate.href)) continue;
+      const escaped = candidate.phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\interface BlogPostPageProps {');
+      const matcher = new RegExp(`(^|[^\\w])(${escaped})(?![\\w])`, 'i');
+      if (matcher.test(result)) {
+        result = result.replace(matcher, (_match, prefix, phrase) =>
+          `${prefix}<a href="${candidate.href}" class="text-[#00736a] underline underline-offset-4 hover:text-stone-950">${phrase}</a>`,
+        );
+        linkedDestinations.add(candidate.href);
+      }
+    }
+    return result;
+  }).join('');
+}
+
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -118,7 +186,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       {/* Formatted Article Body (Supports parsed .docx HTML) */}
       <div
         className="max-w-4xl mx-auto prose-article text-stone-800 leading-relaxed font-normal text-lg sm:text-xl space-y-6"
-        dangerouslySetInnerHTML={{ __html: post.contentHtml || `<p>${post.excerpt}</p>` }}
+        dangerouslySetInnerHTML={{ __html: addContextualInternalLinks(post.contentHtml || `<p>${post.excerpt}</p>`, post.slug, allPosts, allProducts) }}
       />
 
       <BlogComments slug={post.slug} />
