@@ -121,6 +121,9 @@ export default async function HomePage() {
               src="/images/gym-sportswear-banner.png"
               alt="Built on Faith — shop Adoptd Christian gym and sportswear"
               className="block h-auto w-full"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
             />
           </picture>
         </Link>
