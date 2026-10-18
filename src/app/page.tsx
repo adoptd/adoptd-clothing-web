@@ -150,7 +150,6 @@ export default async function HomePage() {
                   src="/images/hero-banner.webp"
                   alt="Adoptd Christian Clothing Collection"
                   fill
-                  priority
                   className="object-cover object-center"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
@@ -209,7 +208,6 @@ export default async function HomePage() {
               src="/images/hero-hoodie.webp"
               alt="Featured Adoptd Christian Hoodie Collection"
               fill
-              priority
               className="object-cover object-center group-hover:scale-102 transition-transform duration-500"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
