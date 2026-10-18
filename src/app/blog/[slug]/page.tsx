@@ -64,7 +64,7 @@ function addContextualInternalLinks(
     let result = part;
     for (const candidate of uniqueCandidates) {
       if (linkedDestinations.has(candidate.href)) continue;
-      const escaped = candidate.phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\interface BlogPostPageProps {');
+      const escaped = candidate.phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const matcher = new RegExp(`(^|[^\\w])(${escaped})(?![\\w])`, 'i');
       if (matcher.test(result)) {
         result = result.replace(matcher, (_match, prefix, phrase) =>
