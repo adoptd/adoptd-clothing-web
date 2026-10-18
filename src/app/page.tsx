@@ -148,6 +148,17 @@ export default async function HomePage() {
                 <p className="text-stone-900 text-xs sm:text-sm font-bold">
                   Thank you for choosing to support an independent Christian brand.
                 </p>
+                <nav aria-label="Discover Adoptd" className="flex flex-wrap gap-x-4 gap-y-2 text-sm font-bold">
+                  <Link href="/about" className="text-[#00736a] underline underline-offset-4 hover:text-stone-950">
+                    Our story
+                  </Link>
+                  <Link href="/blog" className="text-[#00736a] underline underline-offset-4 hover:text-stone-950">
+                    Faith &amp; reflections
+                  </Link>
+                  <Link href="/church-print-services" className="text-[#00736a] underline underline-offset-4 hover:text-stone-950">
+                    Church &amp; ministry printing
+                  </Link>
+                </nav>
               </div>
 
               <div className="relative aspect-[16/8] sm:aspect-[16/7] w-full rounded-[18px] overflow-hidden bg-white shadow-sm">
