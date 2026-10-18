@@ -115,12 +115,20 @@ export default async function HomePage() {
           <picture className="block w-full">
             <source
               media="(max-width: 639px)"
-              srcSet="/images/gym-sportswear-banner.png"
+              srcSet="/_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=384&q=75 384w, /_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=640&q=75 640w, /_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=828&q=75 828w"
+              sizes="100vw"
             />
             <img
-              src="/images/gym-sportswear-banner.png"
+              src="/_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=1200&q=75"
+              srcSet="/_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=640&q=75 640w, /_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=1200&q=75 1200w, /_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=1920&q=75 1920w"
+              sizes="100vw"
               alt="Built on Faith — shop Adoptd Christian gym and sportswear"
+              width={2048}
+              height={533}
               className="block h-auto w-full"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
             />
           </picture>
         </Link>
@@ -206,7 +214,6 @@ export default async function HomePage() {
               src="/images/hero-hoodie.webp"
               alt="Featured Adoptd Christian Hoodie Collection"
               fill
-              priority
               className="object-cover object-center group-hover:scale-102 transition-transform duration-500"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
