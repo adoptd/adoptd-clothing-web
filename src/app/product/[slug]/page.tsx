@@ -61,13 +61,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
   ).slice(0, 3);
 
   const jsonLd = generateProductJsonLd(product);
+  // Escape "<" to prevent product data from terminating the JSON-LD script element.
+  const jsonLdString = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
 
   return (
     <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 py-12">
       {/* Inject Google Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString }}
       />
 
       <ProductDetailClient
