@@ -115,10 +115,12 @@ export default async function HomePage() {
           <picture className="block w-full">
             <source
               media="(max-width: 639px)"
-              srcSet="/images/gym-sportswear-banner.png"
+              srcSet="/_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=640&q=75"
             />
             <img
-              src="/images/gym-sportswear-banner.png"
+              src="/_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=1200&q=75"
+              srcSet="/_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=640&q=75 640w, /_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=1200&q=75 1200w, /_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=1920&q=75 1920w"
+              sizes="100vw"
               alt="Built on Faith — shop Adoptd Christian gym and sportswear"
               className="block h-auto w-full"
               loading="eager"
