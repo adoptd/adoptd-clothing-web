@@ -6,7 +6,7 @@ import { getBlogPostBySlug, getBlogPosts, getProducts, getPageSeo } from '@/lib/
 import { constructMetadata, generateArticleJsonLd } from '@/lib/seo';
 import { ProductCard } from '@/components/product/ProductCard';
 import { BlogComments } from '@/components/blog/BlogComments';
-import { Clock, Calendar, ArrowLeft } from 'lucide-react';
+import { Clock, Calendar, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Metadata } from 'next';
 
 interface BlogPostPageProps {
@@ -49,10 +49,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
-  const allProducts = await getProducts();
+  const [allProducts, allPosts] = await Promise.all([getProducts(), getBlogPosts()]);
   const featuredProducts = allProducts.filter((p) =>
     post.featuredProductIds?.includes(p.id)
   ).slice(0, 2);
+
+  // Prefer articles in the same category, then suggest other recent articles.
+  const otherPosts = allPosts.filter((item) => item.slug !== post.slug);
+  const sameCategoryPosts = otherPosts.filter(
+    (item) => item.category && item.category.toLowerCase() === post.category?.toLowerCase()
+  );
+  const otherCategoryPosts = otherPosts.filter(
+    (item) => !sameCategoryPosts.some((related) => related.slug === item.slug)
+  );
+  const relatedPosts = [...sameCategoryPosts, ...otherCategoryPosts].slice(0, 3);
 
   const jsonLd = generateArticleJsonLd(post);
 
@@ -128,6 +138,50 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             {featuredProducts.map((prod) => (
               <ProductCard key={prod.id} product={prod} />
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* Related articles create links between relevant blog posts */}
+      {relatedPosts.length > 0 && (
+        <section className="max-w-4xl mx-auto pt-10 border-t border-stone-200 space-y-6" aria-labelledby="related-articles-heading">
+          <div>
+            <span className="text-xs uppercase tracking-[0.25em] text-stone-500 font-bold">
+              Keep Reading
+            </span>
+            <h2 id="related-articles-heading" className="font-serif text-3xl font-bold text-stone-950 mt-1">
+              You Might Also Enjoy
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {relatedPosts.map((related) => (
+              <Link
+                key={related.id}
+                href={`/blog/${related.slug}`}
+                className="group rounded-xl border border-stone-200 p-5 hover:border-[#00736a] hover:shadow-sm transition"
+              >
+                <span className="text-xs font-bold uppercase tracking-wider text-[#00736a]">
+                  {related.category}
+                </span>
+                <h3 className="mt-2 font-serif text-xl font-bold text-stone-950 group-hover:text-[#00736a]">
+                  {related.title}
+                </h3>
+                <p className="mt-2 text-sm text-stone-600 line-clamp-3">
+                  {related.excerpt}
+                </p>
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-stone-900 group-hover:text-[#00736a]">
+                  Read article <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+            ))}
+          </div>
+          <p className="text-sm text-stone-600">
+            New to ADOPTD? <Link href="/about" className="font-semibold text-[#00736a] underline underline-offset-4 hover:text-stone-950">Read our story</Link> or <Link href="/shop" className="font-semibold text-[#00736a] underline underline-offset-4 hover:text-stone-950">explore the collection</Link>.
+          </p>
+          <div className="text-sm">
+            <Link href="/blog" className="inline-flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-950">
+              <ArrowLeft className="w-4 h-4" /> Browse all articles
+            </Link>
           </div>
         </section>
       )}
