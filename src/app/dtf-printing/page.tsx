@@ -1,4 +1,5 @@
 import React from 'react';
+import DtfQuoteForm from './DtfQuoteForm';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2, Layers3, Palette, Shirt, Zap, ShieldCheck, Truck, Users, MessageCircle, Sparkles } from 'lucide-react';
 import { constructMetadata } from '@/lib/seo';
@@ -163,19 +164,7 @@ export default function DtfPrintingPage() {
       <section id="quote" className="mx-auto max-w-7xl px-5 py-16 sm:py-20">
         <div className="grid gap-10 rounded-[2rem] bg-[#375357] p-6 text-white sm:p-10 lg:grid-cols-[.85fr_1.15fr] lg:p-14">
           <div><p className="text-xs font-bold uppercase tracking-[.22em] text-[#bfe5dc]">Start your enquiry</p><h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Tell us about your order</h2><p className="mt-4 leading-7 text-white/80">For the most useful quote, include the garments, quantity, print positions and your deadline.</p><div className="mt-8 space-y-4 text-sm text-white/90"><p className="flex items-start gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#bfe5dc]" />No obligation to proceed until the quote and details are agreed.</p><p className="flex items-start gap-3"><MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#bfe5dc]" />We can discuss artwork and garment suitability before production.</p></div><a href="mailto:adoptdclothing@gmail.com?subject=Bulk%20printing%20quote" className="mt-8 inline-flex items-center gap-2 font-bold text-white underline underline-offset-4">Or email us directly <ArrowRight className="h-4 w-4" /></a></div>
-          <form action="mailto:adoptdclothing@gmail.com" method="post" encType="text/plain" className="space-y-4 rounded-2xl bg-white p-5 text-stone-900 sm:p-7">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="text-sm font-semibold">Your name *<input required name="Name" autoComplete="name" className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 font-normal outline-none transition focus:border-[#00736a] focus:ring-2 focus:ring-[#00736a]/15" placeholder="Name" /></label>
-              <label className="text-sm font-semibold">Business or organisation<input name="Organisation" className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 font-normal outline-none transition focus:border-[#00736a] focus:ring-2 focus:ring-[#00736a]/15" placeholder="Company, club, school..." /></label>
-              <label className="text-sm font-semibold">Email address *<input type="email" required name="Email" autoComplete="email" className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 font-normal outline-none transition focus:border-[#00736a] focus:ring-2 focus:ring-[#00736a]/15" placeholder="you@example.com" /></label>
-              <label className="text-sm font-semibold">Phone number<input type="tel" name="Phone" autoComplete="tel" className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 font-normal outline-none transition focus:border-[#00736a] focus:ring-2 focus:ring-[#00736a]/15" placeholder="Optional" /></label>
-              <label className="text-sm font-semibold">What are you printing? *<select required name="Product" defaultValue="" className="mt-2 w-full rounded-xl border border-stone-300 bg-white px-4 py-3 font-normal outline-none focus:border-[#00736a]"><option value="" disabled>Select a product</option><option>T-shirts</option><option>Hoodies / sweatshirts</option><option>Workwear / uniforms</option><option>Sportswear / teamwear</option><option>Mixed garments</option><option>Other</option></select></label>
-              <label className="text-sm font-semibold">Approximate quantity *<select required name="Quantity" defaultValue="" className="mt-2 w-full rounded-xl border border-stone-300 bg-white px-4 py-3 font-normal outline-none focus:border-[#00736a]"><option value="" disabled>Select quantity</option><option>10–24</option><option>25–49</option><option>50–99</option><option>100–249</option><option>250+</option><option>Not sure yet</option></select></label>
-              <label className="text-sm font-semibold sm:col-span-2">Print details & deadline<textarea name="Details" rows={4} className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 font-normal outline-none focus:border-[#00736a]" placeholder="Print placement, artwork, garment colours, sizes and date needed..." /></label>
-            </div>
-            <p className="text-xs leading-5 text-stone-500">This opens an email draft in your email app with your enquiry details. Please check the draft and send it to us.</p>
-            <button type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#00736a] px-6 py-3.5 font-bold text-white transition hover:bg-[#005e57]">Prepare my quote request <ArrowRight className="h-4 w-4" /></button>
-          </form>
+          <DtfQuoteForm />
         </div>
       </section>
       <div className="border-t border-stone-200 bg-white px-5 py-8 text-center text-sm text-stone-500">Adoptd Print Co. · Bulk garment printing enquiries · Loughborough, UK</div>
