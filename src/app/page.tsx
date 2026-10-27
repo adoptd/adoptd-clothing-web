@@ -112,25 +112,16 @@ export default async function HomePage() {
           aria-label="Shop the Adoptd gym and sportswear collection"
           className="group block w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00736a]"
         >
-          <picture className="block w-full">
-            <source
-              media="(max-width: 639px)"
-              srcSet="/_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=384&q=75 384w, /_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=640&q=75 640w, /_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=828&q=75 828w"
-              sizes="100vw"
-            />
-            <img
-              src="/_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=1200&q=75"
-              srcSet="/_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=640&q=75 640w, /_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=1200&q=75 1200w, /_next/image?url=%2Fimages%2Fgym-sportswear-banner.png&w=1920&q=75 1920w"
-              sizes="100vw"
-              alt="Built on Faith — shop Adoptd Christian gym and sportswear"
-              width={2048}
-              height={533}
-              className="block h-auto w-full"
-              loading="eager"
-              fetchPriority="high"
-              decoding="async"
-            />
-          </picture>
+          <img
+            src="/images/gym-sportswear-banner.png"
+            alt="Built on Faith — shop Adoptd Christian gym and sportswear"
+            width={2048}
+            height={533}
+            className="block h-auto w-full"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
         </Link>
       </section>
 
