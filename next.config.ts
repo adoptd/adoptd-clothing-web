@@ -41,6 +41,8 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    // Bypass Vercel image transformations so product images still load after the free transformation allowance is exhausted.
+    unoptimized: true,
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days edge caching for optimized images
     remotePatterns: [
