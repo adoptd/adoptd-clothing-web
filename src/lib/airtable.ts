@@ -8,7 +8,28 @@ import { resolveProductImage, getProductFallbackImage, isAirtableUrlExpired } fr
 const apiKey = process.env.AIRTABLE_API_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
 
-const base = apiKey && baseId ? new Airtable({ apiKey }).base(baseId) : null;
+const base = apiKey && baseId ? new Airtable({ apiKey, requestTimeout: 3000 }).base(baseId) : null;
+
+// Clean timeout wrapper to prevent any external query from blocking Vercel serverless functions
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<T>((resolve) => {
+    timer = setTimeout(() => resolve(fallback), timeoutMs);
+  });
+  try {
+    const result = await Promise.race([
+      promise.then((res) => {
+        if (timer) clearTimeout(timer);
+        return res;
+      }),
+      timeoutPromise,
+    ]);
+    return result;
+  } catch {
+    if (timer) clearTimeout(timer);
+    return fallback;
+  }
+}
 
 // ============================================================================
 // HIGH-PERFORMANCE IN-MEMORY CACHING LAYER
@@ -47,13 +68,13 @@ export function toPermanentImageUrl(url?: string): string {
 }
 
 async function getCachedDocx(url: string) {
-  if (!url) return { html: '', rawText: '' };
+  if (!url || isAirtableUrlExpired(url)) return { html: '', rawText: '' };
   if (docxCache.has(url)) {
     return docxCache.get(url)!;
   }
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 4000);
+    const timer = setTimeout(() => controller.abort(), 1500);
     const fileRes = await fetch(url, { signal: controller.signal });
     clearTimeout(timer);
     if (fileRes.ok) {
@@ -63,7 +84,7 @@ async function getCachedDocx(url: string) {
       return parsed;
     }
   } catch (err) {
-    console.error('Error fetching/parsing docx attachment (safe fallback):', err);
+    // Safe fallback without blocking
   }
   return { html: '', rawText: '' };
 }
@@ -77,7 +98,7 @@ export async function getSeoRecords(): Promise<Record<string, { title?: string; 
   if (!base) return {};
 
   try {
-    const records = await base('SEO').select().all();
+    const records = await withTimeout(base('SEO').select().all(), 2000, [] as any[]);
     const map: Record<string, { title?: string; description?: string; keyword?: string }> = {};
 
     records.forEach((r) => {
@@ -117,7 +138,7 @@ export async function getProducts(): Promise<Product[]> {
   }
 
   try {
-    const [records, seoMap] = await Promise.all([
+    const fetchPromise = Promise.all([
       base('Products')
         .select({
           filterByFormula: '{Published} = TRUE()',
@@ -126,6 +147,13 @@ export async function getProducts(): Promise<Product[]> {
         .all(),
       getSeoRecords(),
     ]);
+
+    const result = await withTimeout(fetchPromise, 3000, null);
+    if (!result) {
+      console.warn('[Airtable] Product fetch timed out or hit limits, serving fallback catalog.');
+      return cachedProducts?.data || mockProducts;
+    }
+    const [records, seoMap] = result;
 
     if (!records || records.length === 0) {
       return mockProducts;
@@ -384,10 +412,14 @@ export async function getAboutPageData(): Promise<{
   if (!base) return defaultData;
 
   try {
-    const [records, seoEntry] = await Promise.all([
+    const fetchAbout = Promise.all([
       base('About').select().all(),
       getPageSeo('about'),
     ]);
+
+    const result = await withTimeout(fetchAbout, 2000, null);
+    if (!result) return defaultData;
+    const [records, seoEntry] = result;
 
     if (!records || records.length === 0) {
       return defaultData;
@@ -452,21 +484,28 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
   }
 
   try {
-    let records: readonly any[] = [];
-    
-    const tableCandidates = ['Blog', 'Blog Posts', 'Journal', 'Articles'];
-    for (const tableName of tableCandidates) {
-      try {
-        records = await base(tableName)
-          .select({
-            view: 'Grid view',
-          })
-          .all();
-        if (records && records.length > 0) break;
-      } catch {
-        // Try next candidate
+    const fetchBlog = (async () => {
+      let foundRecords: readonly any[] = [];
+      const tableCandidates = ['Blog', 'Blog Posts', 'Journal', 'Articles'];
+      for (const tableName of tableCandidates) {
+        try {
+          const recs = await base(tableName)
+            .select({
+              view: 'Grid view',
+            })
+            .all();
+          if (recs && recs.length > 0) {
+            foundRecords = recs;
+            break;
+          }
+        } catch {
+          // Try next candidate
+        }
       }
-    }
+      return foundRecords;
+    })();
+
+    const records = await withTimeout(fetchBlog, 2500, []);
 
     if (!records || records.length === 0) {
       return mockBlogPosts;
@@ -589,12 +628,21 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   }
 
   try {
-    let records: readonly any[] = [];
-    try {
-      records = await base('Site Settings').select().all();
-    } catch {
-      records = await base('Site Settings & SEO').select().all();
-    }
+    const fetchSettings = (async () => {
+      let recs: readonly any[] = [];
+      try {
+        recs = await base('Site Settings').select().all();
+      } catch {
+        try {
+          recs = await base('Site Settings & SEO').select().all();
+        } catch {
+          // Fallback to mock
+        }
+      }
+      return recs;
+    })();
+
+    const records = await withTimeout(fetchSettings, 2000, []);
 
     if (!records || records.length === 0) {
       return mockSiteSettings;
