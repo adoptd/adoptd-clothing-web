@@ -1,6 +1,9 @@
 import { MetadataRoute } from 'next';
 import { getProducts, getBlogPosts } from '@/lib/airtable';
 
+// Build the sitemap at request time so Airtable is not queried during deployment.
+export const dynamic = 'force-dynamic';
+
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://adoptdchristianclothing.co.uk';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
