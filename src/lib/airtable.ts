@@ -157,6 +157,7 @@ export async function getProducts(): Promise<Product[]> {
           const colorPrefixLower = cleanColor.split(' ')[0].toLowerCase();
 
           // 1. Try standard keys
+          let matchedFieldKey: string | undefined;
           let attachments: any[] | undefined = 
             (fields[`Colour Images: ${cleanColor}`] as any[]) ||
             (fields[`Color Images: ${cleanColor}`] as any[]) ||
@@ -166,16 +167,19 @@ export async function getProducts(): Promise<Product[]> {
             (fields[`Images - ${cleanColor}`] as any[]) ||
             (fields[cleanColor] as any[]);
 
-          // 2. If not found, search dynamically across all fields for an attachment column containing the color name
-          if (!attachments || !Array.isArray(attachments) || attachments.length === 0) {
-            const matchingKey = allFieldKeys.find((key) => {
+          if (attachments && attachments.length > 0) {
+            matchedFieldKey = `Colour Images: ${cleanColor}`;
+          } else {
+            // 2. If not found, search dynamically across all fields for an attachment column containing the color name
+            const dynamicKey = allFieldKeys.find((key) => {
               const kLower = key.toLowerCase();
               if (kLower.includes('main') || kLower.includes('featured')) return false;
               return kLower.includes(colorLower) || (colorPrefixLower.length > 2 && kLower.includes(colorPrefixLower));
             });
 
-            if (matchingKey && Array.isArray(fields[matchingKey])) {
-              attachments = fields[matchingKey] as any[];
+            if (dynamicKey && Array.isArray(fields[dynamicKey])) {
+              attachments = fields[dynamicKey] as any[];
+              matchedFieldKey = dynamicKey;
             }
           }
 
@@ -185,7 +189,7 @@ export async function getProducts(): Promise<Product[]> {
             : (fields['Main Featured Image'] as any[]) || [];
 
           const images = finalAttachments
-            .map((att: any) => toPermanentImageUrl(att.url, record.id, matchingKey || `Colour Images: ${cleanColor}`, 'Products'))
+            .map((att: any) => toPermanentImageUrl(att.url, record.id, matchedFieldKey || 'Main Featured Image', 'Products'))
             .filter(Boolean);
           
           return {

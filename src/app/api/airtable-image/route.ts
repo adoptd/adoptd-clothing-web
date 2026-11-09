@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
     const contentType = imageRes.headers.get('content-type') || 'image/jpeg';
     const arrayBuffer = await imageRes.arrayBuffer();
 
-    return new NextResponse(Buffer.from(arrayBuffer), {
+    return new NextResponse(arrayBuffer, {
       status: 200,
       headers: {
         'Content-Type': contentType,
