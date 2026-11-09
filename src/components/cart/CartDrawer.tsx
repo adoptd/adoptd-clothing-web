@@ -141,8 +141,9 @@ export function CartDrawer() {
                     </div>
                   </div>
                 </div>
-              ))
-            )}
+              );
+            })
+          )}
           </div>
 
           {/* Footer & Checkout Trigger */}

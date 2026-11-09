@@ -8,9 +8,6 @@ import { constructMetadata, generateOrganizationJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = constructMetadata({});
 
-// Airtable-backed content is loaded at request time, not during Vercel builds.
-export const dynamic = "force-dynamic";
-
 export default async function RootLayout({
   children,
 }: Readonly<{
