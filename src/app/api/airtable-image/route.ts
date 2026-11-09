@@ -43,6 +43,13 @@ export async function GET(request: NextRequest) {
   try {
     const airtableBase = new Airtable({ apiKey }).base(baseId);
     const record = await getCachedAirtableRecord(airtableBase, tableName, recordId);
+    if (tableName === 'Products' && record.fields['Published'] !== true) {
+      return NextResponse.json({ error: 'Image not found.' }, { status: 404 });
+    }
+    if (tableName !== 'Products' && (record.fields['Published'] === false || record.fields['Status'] === 'Draft')) {
+      return NextResponse.json({ error: 'Image not found.' }, { status: 404 });
+    }
+
     const attachment = Object.values(record.fields)
       .flatMap((value: any) => Array.isArray(value) ? value : [])
       .find((item: any) => item?.id === attachmentId);
