@@ -1,8 +1,14 @@
 const Airtable = require('airtable');
 const yoastSeoData = require('../src/data/yoast-seo-data.json');
 
-const apiKey = process.env.AIRTABLE_API_KEY || 'patT3Mnj5qmSwnGWQ.32d265fdbb3a6a90e92da4f13c55051d54bec10373f254f3bd9ebb9047c8cc5c';
-const baseId = process.env.AIRTABLE_BASE_ID || 'app4owLCwssn7Wi3M';
+const apiKey = process.env.AIRTABLE_API_KEY;
+const baseId = process.env.AIRTABLE_BASE_ID;
+
+if (!apiKey || !baseId) {
+  console.error('Error: AIRTABLE_API_KEY and AIRTABLE_BASE_ID environment variables are required.');
+  process.exit(1);
+}
+
 const base = new Airtable({ apiKey }).base(baseId);
 
 async function populateSeoTable() {

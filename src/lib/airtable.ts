@@ -1,9 +1,11 @@
 import Airtable from 'airtable';
 import { Product, BlogPost, SiteSettings } from '@/types';
-import { mockProducts, mockBlogPosts, mockSiteSettings } from '@/data/mockData';
+import { mockBlogPosts, mockSiteSettings } from '@/data/mockData';
 import { parseDocxBuffer } from './docx-parser';
 import yoastSeoData from '@/data/yoast-seo-data.json';
 import { resolveProductImage, getProductFallbackImage, isAirtableUrlExpired } from './images';
+import { unstable_cache } from 'next/cache';
+import { getCachedCatalogueKV, setCachedCatalogueKV, clearCachedCatalogueKV } from './vercel-kv';
 
 const apiKey = process.env.AIRTABLE_API_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
@@ -11,10 +13,13 @@ const baseId = process.env.AIRTABLE_BASE_ID;
 const base = apiKey && baseId
   ? new Airtable({
       apiKey,
-      requestTimeout: 2500,
+      requestTimeout: 7000,
       noRetryIfRateLimited: true,
     }).base(baseId)
   : null;
+
+// Distributed rate-limit circuit breaker: pause outbound Airtable queries when a 429 is encountered
+let airtableRateLimitedUntil = 0;
 
 // Clean timeout wrapper to prevent any external query from blocking Vercel serverless functions
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
@@ -72,6 +77,8 @@ export function clearAirtableCache() {
   cachedAboutData = null;
   cachedSiteSettings = null;
   docxCache.clear();
+  airtableRateLimitedUntil = 0;
+  clearCachedCatalogueKV().catch(() => {});
 }
 
 export function toPermanentImageUrl(url?: string): string {
@@ -101,7 +108,9 @@ async function getCachedDocx(url: string) {
   return { html: '', rawText: '' };
 }
 
-// Fetch all records from dedicated SEO table (Cached)
+// Fetch all records from dedicated SEO table (Cached & Deduplicated)
+let seoRecordsInFlight: Promise<Record<string, { title?: string; description?: string; keyword?: string }>> | null = null;
+
 export async function getSeoRecords(): Promise<Record<string, { title?: string; description?: string; keyword?: string }>> {
   if (cachedSeoRecords && Date.now() - cachedSeoRecords.timestamp < CACHE_TTL_MS) {
     return cachedSeoRecords.data;
@@ -109,27 +118,35 @@ export async function getSeoRecords(): Promise<Record<string, { title?: string; 
 
   if (!base) return {};
 
-  try {
-    const records = await withTimeout(base('SEO').select().all(), 2000, [] as any[]);
-    const map: Record<string, { title?: string; description?: string; keyword?: string }> = {};
+  if (!seoRecordsInFlight) {
+    seoRecordsInFlight = (async () => {
+      try {
+        const records = await withTimeout(base('SEO').select().all(), 4000, [] as any[]);
+        const map: Record<string, { title?: string; description?: string; keyword?: string }> = {};
 
-    records.forEach((r) => {
-      const slug = ((r.fields['Slug'] as string) || '').trim().toLowerCase();
-      const name = ((r.fields['Product Name'] as string) || '').trim().toLowerCase();
-      const title = (r.fields['SEO Meta Title'] as string) || '';
-      const description = (r.fields['SEO Meta Description'] as string) || '';
-      const keyword = (r.fields['Focus Keyword'] as string) || '';
+        records.forEach((r) => {
+          const slug = ((r.fields['Slug'] as string) || '').trim().toLowerCase();
+          const name = ((r.fields['Product Name'] as string) || '').trim().toLowerCase();
+          const title = (r.fields['SEO Meta Title'] as string) || '';
+          const description = (r.fields['SEO Meta Description'] as string) || '';
+          const keyword = (r.fields['Focus Keyword'] as string) || '';
 
-      const seoData = { title, description, keyword };
-      if (slug) map[slug] = seoData;
-      if (name) map[name] = seoData;
+          const seoData = { title, description, keyword };
+          if (slug) map[slug] = seoData;
+          if (name) map[name] = seoData;
+        });
+
+        cachedSeoRecords = { data: map, timestamp: Date.now() };
+        return map;
+      } catch {
+        return cachedSeoRecords?.data || {};
+      }
+    })().finally(() => {
+      seoRecordsInFlight = null;
     });
-
-    cachedSeoRecords = { data: map, timestamp: Date.now() };
-    return map;
-  } catch {
-    return cachedSeoRecords?.data || {};
   }
+
+  return seoRecordsInFlight;
 }
 
 // Fetch single page SEO by slug or path
@@ -193,14 +210,25 @@ function getMainFeaturedAttachments(fields: Record<string, any>): any[] {
   return key && isAttachmentArray(fields[key]) ? fields[key] : [];
 }
 
-// Fetch all active products (Cached)
+// Fetch all active products directly from Airtable (or shared KV fallback if rate-limited)
 async function loadProducts(): Promise<Product[]> {
   if (cachedProducts && Date.now() - cachedProducts.timestamp < CACHE_TTL_MS) {
     return cachedProducts.data;
   }
 
+  // Check rate-limit circuit breaker
+  if (Date.now() < airtableRateLimitedUntil) {
+    const secondsRemaining = Math.ceil((airtableRateLimitedUntil - Date.now()) / 1000);
+    console.warn(`[Airtable] Rate-limit backoff active (${secondsRemaining}s remaining); serving cached catalogue.`);
+    const kvData = await getCachedCatalogueKV();
+    if (kvData && kvData.length > 0) return kvData;
+    return cachedProducts?.data || [];
+  }
+
   if (!base) {
     console.error('[Airtable] Products unavailable: Airtable is not configured.');
+    const kvData = await getCachedCatalogueKV();
+    if (kvData && kvData.length > 0) return kvData;
     return cachedProducts?.data || [];
   }
 
@@ -215,15 +243,19 @@ async function loadProducts(): Promise<Product[]> {
       getSeoRecords(),
     ]);
 
-    const result = await withTimeout(fetchPromise, 3000, null);
+    const result = await withTimeout(fetchPromise, 8000, null);
     if (!result) {
       console.warn('[Airtable] Product fetch timed out or hit limits; retaining last known good Airtable catalogue.');
+      const kvData = await getCachedCatalogueKV();
+      if (kvData && kvData.length > 0) return kvData;
       return cachedProducts?.data || [];
     }
     const [records, seoMap] = result;
 
     if (!records || records.length === 0) {
       console.warn('[Airtable] Products query returned no records; retaining last known good Airtable catalogue.');
+      const kvData = await getCachedCatalogueKV();
+      if (kvData && kvData.length > 0) return kvData;
       return cachedProducts?.data || [];
     }
 
@@ -434,13 +466,40 @@ async function loadProducts(): Promise<Product[]> {
       cachedProductsById.set(p.id, p);
     });
 
+    // Persist to Vercel KV if connected
+    if (products.length > 0) {
+      setCachedCatalogueKV(products).catch((err) => {
+        console.warn('[Airtable] Failed to update KV cache:', err);
+      });
+    }
+
     cachedProducts = { data: products, timestamp: Date.now() };
     return products;
-  } catch (error) {
-    console.error('Error fetching products from Airtable:', error);
+  } catch (error: any) {
+    const errorMsg = String(error?.message || error || '').toLowerCase();
+    if (error?.statusCode === 429 || errorMsg.includes('too many requests') || errorMsg.includes('rate limit')) {
+      airtableRateLimitedUntil = Date.now() + 30000;
+      console.warn('[Airtable] Rate limit (429) received. Activating 30s backoff circuit breaker.');
+    } else {
+      console.error('Error fetching products from Airtable:', error);
+    }
+    const kvData = await getCachedCatalogueKV();
+    if (kvData && kvData.length > 0) return kvData;
     return cachedProducts?.data || [];
   }
 }
+
+// Distributed shared catalogue cache across serverless instances (Next.js Data Cache)
+const getSharedCachedProducts = unstable_cache(
+  async (): Promise<Product[]> => {
+    return loadProducts();
+  },
+  ['airtable-products-catalogue-v1'],
+  {
+    revalidate: 3600, // 1 hour background revalidation
+    tags: ['products'],
+  }
+);
 
 // Deduplicate simultaneous catalogue loads within each warm Vercel instance.
 // This prevents product pages and metadata requests from issuing the same Airtable
@@ -448,12 +507,58 @@ async function loadProducts(): Promise<Product[]> {
 let productsInFlight: Promise<Product[]> | null = null;
 
 export function getProducts(): Promise<Product[]> {
+  // 1. Process in-memory cache hit (fastest, 0ms)
   if (cachedProducts && Date.now() - cachedProducts.timestamp < CACHE_TTL_MS) {
     return Promise.resolve(cachedProducts.data);
   }
 
   if (!productsInFlight) {
-    productsInFlight = loadProducts().finally(() => {
+    productsInFlight = (async () => {
+      try {
+        // 2. Read from Next.js platform shared Data Cache
+        const sharedProducts = await getSharedCachedProducts();
+        if (Array.isArray(sharedProducts) && sharedProducts.length > 0) {
+          cachedProducts = { data: sharedProducts, timestamp: Date.now() };
+          cachedProductsBySlug.clear();
+          cachedProductsById.clear();
+          sharedProducts.forEach((p) => {
+            cachedProductsBySlug.set(p.slug.toLowerCase(), p);
+            cachedProductsById.set(p.id, p);
+          });
+          return sharedProducts;
+        }
+      } catch (cacheErr) {
+        console.warn('[Airtable] Next.js Data Cache read error:', cacheErr);
+      }
+
+      // 3. Fallback to direct loader
+      const directProducts = await loadProducts();
+      if (Array.isArray(directProducts) && directProducts.length > 0) {
+        cachedProducts = { data: directProducts, timestamp: Date.now() };
+        cachedProductsBySlug.clear();
+        cachedProductsById.clear();
+        directProducts.forEach((p) => {
+          cachedProductsBySlug.set(p.slug.toLowerCase(), p);
+          cachedProductsById.set(p.id, p);
+        });
+        return directProducts;
+      }
+
+      // 4. Fallback to Vercel KV
+      const kvFallback = await getCachedCatalogueKV();
+      if (kvFallback && kvFallback.length > 0) {
+        cachedProducts = { data: kvFallback, timestamp: Date.now() };
+        cachedProductsBySlug.clear();
+        cachedProductsById.clear();
+        kvFallback.forEach((p) => {
+          cachedProductsBySlug.set(p.slug.toLowerCase(), p);
+          cachedProductsById.set(p.id, p);
+        });
+        return kvFallback;
+      }
+
+      return cachedProducts?.data || [];
+    })().finally(() => {
       productsInFlight = null;
     });
   }
@@ -709,7 +814,9 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
   return cachedBlogPostsBySlug.get(cleanSlug) || posts.find((p) => p.slug.toLowerCase() === cleanSlug) || null;
 }
 
-// Fetch global site settings (Cached)
+// Fetch global site settings (Cached & Deduplicated)
+let siteSettingsInFlight: Promise<SiteSettings> | null = null;
+
 export async function getSiteSettings(): Promise<SiteSettings> {
   if (cachedSiteSettings && Date.now() - cachedSiteSettings.timestamp < CACHE_TTL_MS) {
     return cachedSiteSettings.data;
@@ -719,55 +826,63 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     return mockSiteSettings;
   }
 
-  try {
-    const fetchSettings = (async () => {
-      let recs: readonly any[] = [];
+  if (!siteSettingsInFlight) {
+    siteSettingsInFlight = (async () => {
       try {
-        recs = await base('Site Settings').select().all();
-      } catch {
-        try {
-          recs = await base('Site Settings & SEO').select().all();
-        } catch {
-          // Fallback to mock
+        const fetchSettings = (async () => {
+          let recs: readonly any[] = [];
+          try {
+            recs = await base('Site Settings').select().all();
+          } catch {
+            try {
+              recs = await base('Site Settings & SEO').select().all();
+            } catch {
+              // Fallback to mock
+            }
+          }
+          return recs;
+        })();
+
+        const records = await withTimeout(fetchSettings, 4000, []);
+
+        if (!records || records.length === 0) {
+          return mockSiteSettings;
         }
+
+        const settingsMap: Record<string, any> = {};
+        records.forEach((r) => {
+          const key = (r.fields['Setting Key'] as string) || (r.fields['Key'] as string);
+          if (key) {
+            settingsMap[key] = r.fields['Setting Value'] || r.fields['Value / Text'] || r.fields['Value'];
+          }
+          if (r.fields['announcement_banner']) settingsMap['announcement_banner'] = r.fields['announcement_banner'];
+          if (r.fields['contact_email']) settingsMap['contact_email'] = r.fields['contact_email'];
+          if (r.fields['free_shipping_threshold']) settingsMap['free_shipping_threshold'] = r.fields['free_shipping_threshold'];
+        });
+
+        const settings: SiteSettings = {
+          announcementBanner: settingsMap['announcement_banner'] || settingsMap['homepage_announcement_banner'] || mockSiteSettings.announcementBanner,
+          announcementActive: settingsMap['announcement_active'] !== 'false',
+          globalMetaTitle: settingsMap['global_meta_title'] || mockSiteSettings.globalMetaTitle,
+          globalMetaDescription: settingsMap['global_meta_description'] || mockSiteSettings.globalMetaDescription,
+          contactEmail: settingsMap['contact_email'] || mockSiteSettings.contactEmail,
+          instagramUrl: settingsMap['instagram_url'] || mockSiteSettings.instagramUrl,
+          facebookUrl: settingsMap['facebook_url'] || mockSiteSettings.facebookUrl,
+          freeShippingThreshold: Number(settingsMap['free_shipping_threshold']) || 40.00,
+        };
+
+        cachedSiteSettings = { data: settings, timestamp: Date.now() };
+        return settings;
+      } catch (error) {
+        console.error('Error fetching site settings from Airtable:', error);
+        return cachedSiteSettings?.data || mockSiteSettings;
       }
-      return recs;
-    })();
-
-    const records = await withTimeout(fetchSettings, 2000, []);
-
-    if (!records || records.length === 0) {
-      return mockSiteSettings;
-    }
-
-    const settingsMap: Record<string, any> = {};
-    records.forEach((r) => {
-      const key = (r.fields['Setting Key'] as string) || (r.fields['Key'] as string);
-      if (key) {
-        settingsMap[key] = r.fields['Setting Value'] || r.fields['Value / Text'] || r.fields['Value'];
-      }
-      if (r.fields['announcement_banner']) settingsMap['announcement_banner'] = r.fields['announcement_banner'];
-      if (r.fields['contact_email']) settingsMap['contact_email'] = r.fields['contact_email'];
-      if (r.fields['free_shipping_threshold']) settingsMap['free_shipping_threshold'] = r.fields['free_shipping_threshold'];
+    })().finally(() => {
+      siteSettingsInFlight = null;
     });
-
-    const settings: SiteSettings = {
-      announcementBanner: settingsMap['announcement_banner'] || settingsMap['homepage_announcement_banner'] || mockSiteSettings.announcementBanner,
-      announcementActive: settingsMap['announcement_active'] !== 'false',
-      globalMetaTitle: settingsMap['global_meta_title'] || mockSiteSettings.globalMetaTitle,
-      globalMetaDescription: settingsMap['global_meta_description'] || mockSiteSettings.globalMetaDescription,
-      contactEmail: settingsMap['contact_email'] || mockSiteSettings.contactEmail,
-      instagramUrl: settingsMap['instagram_url'] || mockSiteSettings.instagramUrl,
-      facebookUrl: settingsMap['facebook_url'] || mockSiteSettings.facebookUrl,
-      freeShippingThreshold: Number(settingsMap['free_shipping_threshold']) || 40.00,
-    };
-
-    cachedSiteSettings = { data: settings, timestamp: Date.now() };
-    return settings;
-  } catch (error) {
-    console.error('Error fetching site settings from Airtable:', error);
-    return cachedSiteSettings?.data || mockSiteSettings;
   }
+
+  return siteSettingsInFlight;
 }
 
 // Record Newsletter Subscriber in Airtable
