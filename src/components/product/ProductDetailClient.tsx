@@ -46,7 +46,7 @@ export function ProductDetailClient({
 
   const rawDisplayImage = currentImages[activeImageIndex] || currentImages[0] || product.featuredImage;
   const currentDisplayImage = imgErrorMap[rawDisplayImage]
-    ? (product.featuredImage || '/images/shop-hoodies-bg.webp')
+    ? '/images/shop-hoodies-bg.webp'
     : rawDisplayImage;
 
   const handleColorChange = (colorName: string) => {

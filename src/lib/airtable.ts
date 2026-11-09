@@ -40,12 +40,35 @@ export function clearAirtableCache() {
   docxCache.clear();
 }
 
+export function toPermanentImageUrl(url?: string, recordId?: string, field?: string, table?: string): string {
+  if (!url) return '';
+  if (url.startsWith('/') || url.startsWith('data:') || url.includes('unsplash.com')) {
+    return url;
+  }
+  if (url.startsWith('/api/airtable-image')) {
+    return url;
+  }
+  if (url.includes('airtableusercontent.com') || url.includes('airtable.com')) {
+    const params = new URLSearchParams();
+    params.set('url', url);
+    if (recordId) params.set('rec', recordId);
+    if (field) params.set('field', field);
+    if (table) params.set('table', table);
+    return `/api/airtable-image?${params.toString()}`;
+  }
+  return url;
+}
+
 async function getCachedDocx(url: string) {
+  if (!url) return { html: '', rawText: '' };
   if (docxCache.has(url)) {
     return docxCache.get(url)!;
   }
   try {
-    const fileRes = await fetch(url);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+    const fileRes = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
     if (fileRes.ok) {
       const arrayBuffer = await fileRes.arrayBuffer();
       const parsed = await parseDocxBuffer(Buffer.from(arrayBuffer));
@@ -53,7 +76,7 @@ async function getCachedDocx(url: string) {
       return parsed;
     }
   } catch (err) {
-    console.error('Error fetching/parsing docx attachment:', err);
+    console.error('Error fetching/parsing docx attachment (safe fallback):', err);
   }
   return { html: '', rawText: '' };
 }
@@ -161,7 +184,9 @@ export async function getProducts(): Promise<Product[]> {
             ? attachments
             : (fields['Main Featured Image'] as any[]) || [];
 
-          const images = finalAttachments.map((att: any) => att.url).filter(Boolean);
+          const images = finalAttachments
+            .map((att: any) => toPermanentImageUrl(att.url, record.id, matchingKey || `Colour Images: ${cleanColor}`, 'Products'))
+            .filter(Boolean);
           
           return {
             name: cleanColor,
@@ -178,7 +203,8 @@ export async function getProducts(): Promise<Product[]> {
           (fields['Category Main Image'] as any[]) ||
           (fields['Category Image'] as any[]) ||
           (fields['Image'] as any[]) || [];
-        const featuredImage = mainImageAtt.length > 0 ? mainImageAtt[0].url : colors[0]?.images[0] || '';
+        const rawFeatured = mainImageAtt.length > 0 ? mainImageAtt[0].url : colors[0]?.images[0] || '';
+        const featuredImage = toPermanentImageUrl(rawFeatured, record.id, 'Main Featured Image', 'Products');
 
         const rawCat = (fields['Category'] as string) || 'tee-shirts';
         const cleanCat = rawCat.toLowerCase().replace(/_/g, '-');
@@ -490,9 +516,10 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         (fields['Picture'] as any[]) ||
         [];
 
-      const coverImage = coverAtt.length > 0 
+      const rawCover = coverAtt.length > 0 
         ? coverAtt[0].url 
         : docxCoverImage || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200';
+      const coverImage = toPermanentImageUrl(rawCover, record.id, 'Cover Image', 'Blog');
 
       const title = (fields['Title'] as string) || (fields['Post Title'] as string) || (fields['Name'] as string) || 'Faith & Devotion';
       

@@ -14,7 +14,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const [imgError, setImgError] = useState(false);
   const activeVariant = selectedColorIndex !== null ? product.colors[selectedColorIndex] : null;
   const displayImage = imgError
-    ? (product.featuredImage || '/images/shop-hoodies-bg.webp')
+    ? '/images/shop-hoodies-bg.webp'
     : (activeVariant?.images[0] || product.featuredImage || product.colors[0]?.images[0] || '/images/shop-hoodies-bg.webp');
 
   return (

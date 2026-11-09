@@ -69,7 +69,7 @@ export default async function HomePage() {
     const fallbacks: Record<string, string> = {
       'tee-shirts': '/images/shop-tshirts-bg.webp',
       'christian-hoodies-uk': '/images/shop-hoodies-bg.webp',
-      'christian-bags': 'https://adoptdchristianclothing.co.uk/wp-content/uploads/2026/09/mockup-of-a-man-with-a-loc-hairstyle-carrying-a-tote-bag-on-his-back-in-a-park-m56958-2-300x300.webp',
+      'christian-bags': '/images/shop-hoodies-bg.webp',
       'christmas': '/images/shop-christmas-bg.webp',
       'gym-sportswear': '/images/shop-hoodies-bg.webp',
     };
