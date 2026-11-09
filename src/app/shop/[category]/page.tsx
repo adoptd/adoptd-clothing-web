@@ -88,7 +88,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   });
 }
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category } = await params;

@@ -3,6 +3,7 @@ import { Product, BlogPost, SiteSettings } from '@/types';
 import { mockProducts, mockBlogPosts, mockSiteSettings } from '@/data/mockData';
 import { parseDocxBuffer } from './docx-parser';
 import yoastSeoData from '@/data/yoast-seo-data.json';
+import { resolveProductImage, getProductFallbackImage, isAirtableUrlExpired } from './images';
 
 const apiKey = process.env.AIRTABLE_API_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
@@ -12,7 +13,7 @@ const base = apiKey && baseId ? new Airtable({ apiKey }).base(baseId) : null;
 // ============================================================================
 // HIGH-PERFORMANCE IN-MEMORY CACHING LAYER
 // ============================================================================
-const CACHE_TTL_MS = 60 * 1000; // 60 seconds TTL
+const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes TTL (use /api/revalidate for instant updates)
 
 let cachedProducts: { data: Product[]; timestamp: number } | null = null;
 const cachedProductsBySlug = new Map<string, Product>();
@@ -49,6 +50,9 @@ export function toPermanentImageUrl(url?: string, recordId?: string, field?: str
     return url;
   }
   if (url.includes('airtableusercontent.com') || url.includes('airtable.com')) {
+    if (isAirtableUrlExpired(url)) {
+      return getProductFallbackImage();
+    }
     const params = new URLSearchParams();
     params.set('url', url);
     if (recordId) params.set('rec', recordId);
@@ -147,6 +151,41 @@ export async function getProducts(): Promise<Product[]> {
     const products: Product[] = await Promise.all(
       records.map(async (record) => {
         const fields = record.fields;
+
+        const rawCat = (fields['Category'] as string) || 'tee-shirts';
+        const cleanCat = rawCat.toLowerCase().replace(/_/g, '-');
+        
+        let categorySlug: any = 'tee-shirts';
+        let categoryName = 'Apparel';
+        if (cleanCat.includes('gym') || cleanCat.includes('sport') || cleanCat.includes('activewear') || cleanCat.includes('active-wear')) {
+          categorySlug = 'gym-sportswear';
+          categoryName = 'Gym & Sportswear';
+        } else if (cleanCat.includes('christmas') || cleanCat.includes('xmas')) {
+          categorySlug = 'christmas';
+          categoryName = 'Christmas';
+        } else if (cleanCat.includes('bag') || cleanCat.includes('tote')) {
+          categorySlug = 'christian-bags';
+          categoryName = 'Tote Bags';
+        } else if (cleanCat.includes('hoodie')) {
+          categorySlug = 'christian-hoodies-uk';
+          categoryName = 'Hoodies';
+        } else if (cleanCat.includes('sweater')) {
+          categorySlug = 'sweaters';
+          categoryName = 'Sweaters';
+        } else if (cleanCat.includes('shirt') || cleanCat.includes('tee')) {
+          categorySlug = 'tee-shirts';
+          categoryName = 'T-Shirts';
+        }
+
+        const rawName = (fields['Product Name'] as string) || (fields['Name'] as string) || 'Untitled Product';
+        const autoSlug = rawName
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)+/g, '');
+        const slug = (fields['Slug'] as string) || autoSlug || record.id;
+
+        const defaultFallbackImage = getProductFallbackImage(categorySlug, slug);
+
         const rawColors = (fields['Available Colours'] as string[]) || (fields['Available Colors'] as string[]) || ['Black'];
         
         // Build color variant object with flexible column matching
@@ -189,13 +228,18 @@ export async function getProducts(): Promise<Product[]> {
             : (fields['Main Featured Image'] as any[]) || [];
 
           const images = finalAttachments
-            .map((att: any) => toPermanentImageUrl(att.url, record.id, matchedFieldKey || 'Main Featured Image', 'Products'))
+            .map((att: any) => {
+              if (isAirtableUrlExpired(att?.url)) {
+                return defaultFallbackImage;
+              }
+              return toPermanentImageUrl(att?.url, record.id, matchedFieldKey || 'Main Featured Image', 'Products');
+            })
             .filter(Boolean);
           
           return {
             name: cleanColor,
             hex: getColorHex(cleanColor),
-            images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800'],
+            images: images.length > 0 ? images : [defaultFallbackImage],
           };
         });
 
@@ -208,39 +252,9 @@ export async function getProducts(): Promise<Product[]> {
           (fields['Category Image'] as any[]) ||
           (fields['Image'] as any[]) || [];
         const rawFeatured = mainImageAtt.length > 0 ? mainImageAtt[0].url : colors[0]?.images[0] || '';
-        const featuredImage = toPermanentImageUrl(rawFeatured, record.id, 'Main Featured Image', 'Products');
-
-        const rawCat = (fields['Category'] as string) || 'tee-shirts';
-        const cleanCat = rawCat.toLowerCase().replace(/_/g, '-');
-        
-        let categorySlug: any = 'tee-shirts';
-        let categoryName = 'Apparel';
-        if (cleanCat.includes('gym') || cleanCat.includes('sport') || cleanCat.includes('activewear') || cleanCat.includes('active-wear')) {
-          categorySlug = 'gym-sportswear';
-          categoryName = 'Gym & Sportswear';
-        } else if (cleanCat.includes('christmas') || cleanCat.includes('xmas')) {
-          categorySlug = 'christmas';
-          categoryName = 'Christmas';
-        } else if (cleanCat.includes('bag') || cleanCat.includes('tote')) {
-          categorySlug = 'christian-bags';
-          categoryName = 'Tote Bags';
-        } else if (cleanCat.includes('hoodie')) {
-          categorySlug = 'christian-hoodies-uk';
-          categoryName = 'Hoodies';
-        } else if (cleanCat.includes('sweater')) {
-          categorySlug = 'sweaters';
-          categoryName = 'Sweaters';
-        } else if (cleanCat.includes('shirt') || cleanCat.includes('tee')) {
-          categorySlug = 'tee-shirts';
-          categoryName = 'T-Shirts';
-        }
-
-        const rawName = (fields['Product Name'] as string) || 'Untitled Product';
-        const autoSlug = rawName
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)+/g, '');
-        const slug = (fields['Slug'] as string) || autoSlug || record.id;
+        const featuredImage = isAirtableUrlExpired(rawFeatured)
+          ? defaultFallbackImage
+          : toPermanentImageUrl(rawFeatured, record.id, 'Main Featured Image', 'Products');
         
         const yoastProducts = (yoastSeoData as any).products || {};
         const yoastMatch = yoastProducts[slug] || Object.values(yoastProducts).find((p: any) => p.liveUrl?.includes(slug));

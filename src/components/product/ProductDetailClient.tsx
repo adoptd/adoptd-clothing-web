@@ -10,6 +10,7 @@ import { SizeSelector } from '@/components/product/SizeSelector';
 import { SizeGuideModal } from '@/components/product/SizeGuideModal';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ShoppingBag, Truck, ShieldCheck, Check, Sparkles, BookOpen } from 'lucide-react';
+import { getProductFallbackImage, resolveProductImage } from '@/lib/images';
 
 interface ProductDetailClientProps {
   product: Product;
@@ -39,15 +40,16 @@ export function ProductDetailClient({
   
   const [imgErrorMap, setImgErrorMap] = useState<Record<string, boolean>>({});
 
+  const fallback = getProductFallbackImage(product.category, product.slug);
+
   const currentImages =
     activeColorVariant && activeColorVariant.images.length > 0
       ? activeColorVariant.images
-      : [product.featuredImage];
+      : [product.featuredImage || fallback];
 
-  const rawDisplayImage = currentImages[activeImageIndex] || currentImages[0] || product.featuredImage;
-  const currentDisplayImage = imgErrorMap[rawDisplayImage]
-    ? '/images/shop-hoodies-bg.webp'
-    : rawDisplayImage;
+  const rawDisplayImage = currentImages[activeImageIndex] || currentImages[0] || product.featuredImage || fallback;
+  const initialDisplay = resolveProductImage(rawDisplayImage, product.category, product.slug);
+  const currentDisplayImage = imgErrorMap[rawDisplayImage] ? fallback : initialDisplay;
 
   const handleColorChange = (colorName: string) => {
     setSelectedColorName(colorName);
@@ -99,7 +101,8 @@ export function ProductDetailClient({
             <div className="grid grid-cols-4 sm:grid-cols-4 gap-3 sm:gap-4 pt-1">
               {currentImages.map((img, idx) => {
                 const isSelected = idx === activeImageIndex;
-                const displayThumb = imgErrorMap[img] ? product.featuredImage : img;
+                const initialThumb = resolveProductImage(img, product.category, product.slug);
+                const displayThumb = imgErrorMap[img] ? fallback : initialThumb;
                 return (
                   <button
                     key={idx}
@@ -116,6 +119,7 @@ export function ProductDetailClient({
                       src={displayThumb}
                       alt={`${product.name} in ${selectedColorName}, product photo ${idx + 1}`}
                       fill
+                      onError={() => setImgErrorMap((prev) => ({ ...prev, [img]: true }))}
                       sizes="(max-width: 640px) 25vw, (max-width: 1024px) 15vw, 120px"
                       className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
                     />

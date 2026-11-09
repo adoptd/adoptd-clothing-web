@@ -93,12 +93,6 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // 4. Return clean SVG placeholder if all attempts fail
-  return new NextResponse(FALLBACK_SVG, {
-    status: 200,
-    headers: {
-      'Content-Type': 'image/svg+xml',
-      'Cache-Control': 'public, max-age=120',
-    },
-  });
+  // 4. Return clean static image fallback if all attempts fail
+  return NextResponse.redirect(new URL('/images/shop-hoodies-bg.webp', req.url));
 }

@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   });
 }
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;

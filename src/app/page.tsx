@@ -7,7 +7,7 @@ import { ProductCard } from '@/components/product/ProductCard';
 import { constructMetadata } from '@/lib/seo';
 import { TestimonialsCarousel } from '@/components/home/TestimonialsCarousel';
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export const metadata = constructMetadata({
   title: 'Christian Clothing UK | Faith-Inspired Apparel',
@@ -61,17 +61,12 @@ export default async function HomePage() {
   }
 
   const getCategoryImage = (slug: string): string => {
-    const categoryProducts = productsByCategory[slug] || [];
-    if (categoryProducts.length > 0) {
-      return categoryProducts[0].featuredImage || '/images/shop-tshirts-bg.webp';
-    }
-
     const fallbacks: Record<string, string> = {
       'tee-shirts': '/images/shop-tshirts-bg.webp',
       'christian-hoodies-uk': '/images/shop-hoodies-bg.webp',
-      'christian-bags': '/images/shop-hoodies-bg.webp',
+      'christian-bags': '/images/products/amazing-grace-tote.webp',
       'christmas': '/images/shop-christmas-bg.webp',
-      'gym-sportswear': '/images/shop-hoodies-bg.webp',
+      'gym-sportswear': '/images/gym-sportswear-banner.png',
     };
     return fallbacks[slug] || '/images/shop-tshirts-bg.webp';
   };

@@ -10,7 +10,7 @@ export const metadata = constructMetadata({
   slug: 'shop',
 });
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export default async function ShopPage() {
   const products = await getProducts();

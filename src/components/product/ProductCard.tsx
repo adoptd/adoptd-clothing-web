@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Product } from '@/types';
+import { getProductFallbackImage, resolveProductImage } from '@/lib/images';
 
 interface ProductCardProps {
   product: Product;
@@ -13,9 +14,10 @@ export function ProductCard({ product }: ProductCardProps) {
   const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(null);
   const [imgError, setImgError] = useState(false);
   const activeVariant = selectedColorIndex !== null ? product.colors[selectedColorIndex] : null;
-  const displayImage = imgError
-    ? '/images/shop-hoodies-bg.webp'
-    : (activeVariant?.images[0] || product.featuredImage || product.colors[0]?.images[0] || '/images/shop-hoodies-bg.webp');
+  const fallback = getProductFallbackImage(product.category, product.slug);
+  const preferredImage = activeVariant?.images[0] || product.featuredImage || product.colors[0]?.images[0];
+  const initialDisplay = resolveProductImage(preferredImage, product.category, product.slug);
+  const displayImage = imgError ? fallback : initialDisplay;
 
   return (
     <div className="group flex flex-col bg-[#00736a] rounded-xl overflow-hidden border border-[#00736a]/30 hover:border-[#00736a] transition-all duration-300 hover:shadow-md">

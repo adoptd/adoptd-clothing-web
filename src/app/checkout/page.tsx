@@ -1,14 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCartStore } from '@/store/useCartStore';
 import { StripeEmbeddedCheckout } from '@/components/checkout/StripeEmbeddedCheckout';
 import { ArrowLeft, ShoppingBag, ShieldCheck, Lock, Truck } from 'lucide-react';
+import { getProductFallbackImage, resolveProductImage } from '@/lib/images';
 
 export default function CheckoutPage() {
   const { items, getSubtotal } = useCartStore();
+  const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
   const subtotal = getSubtotal();
   const shippingFee = items.length === 0 ? 0 : 3.95;
   const total = subtotal + shippingFee;
@@ -53,28 +55,36 @@ export default function CheckoutPage() {
 
               {/* Items List */}
               <div className="space-y-4 max-h-80 overflow-y-auto pr-2 divide-y divide-stone-100">
-                {items.map((item) => (
-                  <div key={item.id} className="pt-3 first:pt-0 flex space-x-3 items-center">
-                    <div className="relative w-16 h-18 rounded-md overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        className="object-cover"
-                        sizes="64px"
-                      />
+                {items.map((item) => {
+                  const itemFallback = getProductFallbackImage(undefined, item.slug);
+                  const displayImg = imgErrors[item.id]
+                    ? itemFallback
+                    : resolveProductImage(item.image, undefined, item.slug);
+
+                  return (
+                    <div key={item.id} className="pt-3 first:pt-0 flex space-x-3 items-center">
+                      <div className="relative w-16 h-18 rounded-md overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200">
+                        <Image
+                          src={displayImg}
+                          alt={item.name}
+                          fill
+                          onError={() => setImgErrors((prev) => ({ ...prev, [item.id]: true }))}
+                          className="object-cover"
+                          sizes="64px"
+                        />
+                      </div>
+                      <div className="flex-1 text-sm">
+                        <p className="font-semibold text-stone-900 line-clamp-1">{item.name}</p>
+                        <p className="text-stone-500 text-xs mt-0.5">
+                          {item.color} • Size {item.size} • Qty {item.quantity}
+                        </p>
+                      </div>
+                      <span className="font-bold text-sm text-stone-900">
+                        £{(item.price * item.quantity).toFixed(2)}
+                      </span>
                     </div>
-                    <div className="flex-1 text-sm">
-                      <p className="font-semibold text-stone-900 line-clamp-1">{item.name}</p>
-                      <p className="text-stone-500 text-xs mt-0.5">
-                        {item.color} • Size {item.size} • Qty {item.quantity}
-                      </p>
-                    </div>
-                    <span className="font-bold text-sm text-stone-900">
-                      £{(item.price * item.quantity).toFixed(2)}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Cost Totals */}

@@ -1,13 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight, Truck } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { getProductFallbackImage, resolveProductImage } from '@/lib/images';
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, updateQuantity, removeItem, getSubtotal, getTotalItems } = useCartStore();
+  const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
 
   if (!isOpen) return null;
 
@@ -70,17 +72,24 @@ export function CartDrawer() {
                 </button>
               </div>
             ) : (
-              items.map((item) => (
-                <div key={item.id} className="flex space-x-4 pb-6 border-b border-stone-100">
-                  <div className="w-20 h-24 relative rounded-md overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200">
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      fill
-                      className="object-cover"
-                      sizes="80px"
-                    />
-                  </div>
+              items.map((item) => {
+                const itemFallback = getProductFallbackImage(undefined, item.slug);
+                const displayImg = imgErrors[item.id]
+                  ? itemFallback
+                  : resolveProductImage(item.image, undefined, item.slug);
+
+                return (
+                  <div key={item.id} className="flex space-x-4 pb-6 border-b border-stone-100">
+                    <div className="w-20 h-24 relative rounded-md overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200">
+                      <Image
+                        src={displayImg}
+                        alt={item.name}
+                        fill
+                        onError={() => setImgErrors((prev) => ({ ...prev, [item.id]: true }))}
+                        className="object-cover"
+                        sizes="80px"
+                      />
+                    </div>
 
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
