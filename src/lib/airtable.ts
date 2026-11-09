@@ -3,6 +3,7 @@ import { Product, BlogPost, SiteSettings } from '@/types';
 import { mockProducts, mockBlogPosts, mockSiteSettings } from '@/data/mockData';
 import { parseDocxBuffer } from './docx-parser';
 import yoastSeoData from '@/data/yoast-seo-data.json';
+import { persistAirtableImage } from './vercel-blob';
 
 const apiKey = process.env.AIRTABLE_API_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
@@ -128,7 +129,7 @@ export async function getProducts(): Promise<Product[]> {
         
         // Build color variant object with flexible column matching
         const allFieldKeys = Object.keys(fields);
-        const colors = rawColors.map((colorName) => {
+        const colors = await Promise.all(rawColors.map(async (colorName) => {
           const cleanColor = colorName.trim();
           const colorLower = cleanColor.toLowerCase();
           const colorPrefixLower = cleanColor.split(' ')[0].toLowerCase();
@@ -161,14 +162,23 @@ export async function getProducts(): Promise<Product[]> {
             ? attachments
             : (fields['Main Featured Image'] as any[]) || [];
 
-          const images = finalAttachments.map((att: any) => att.url).filter(Boolean);
+          const images = (await Promise.all(finalAttachments.map((att: any, index: number) => {
+            if (!att.url) return Promise.resolve(null);
+            return persistAirtableImage({
+              url: att.url,
+              recordId: record.id,
+              attachmentId: att.id || `${colorLower}-${index}`,
+              filename: att.filename,
+              contentType: att.type,
+            });
+          }))).filter((image): image is string => Boolean(image));
           
           return {
             name: cleanColor,
             hex: getColorHex(cleanColor),
             images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800'],
           };
-        });
+        }));
 
         const mainImageAtt = 
           (fields['Main Featured Image'] as any[]) ||
@@ -178,7 +188,15 @@ export async function getProducts(): Promise<Product[]> {
           (fields['Category Main Image'] as any[]) ||
           (fields['Category Image'] as any[]) ||
           (fields['Image'] as any[]) || [];
-        const featuredImage = mainImageAtt.length > 0 ? mainImageAtt[0].url : colors[0]?.images[0] || '';
+        const featuredImage = mainImageAtt.length > 0 && mainImageAtt[0].url
+          ? await persistAirtableImage({
+              url: mainImageAtt[0].url,
+              recordId: record.id,
+              attachmentId: mainImageAtt[0].id || 'featured',
+              filename: mainImageAtt[0].filename,
+              contentType: mainImageAtt[0].type,
+            })
+          : colors[0]?.images[0] || '';
 
         const rawCat = (fields['Category'] as string) || 'tee-shirts';
         const cleanCat = rawCat.toLowerCase().replace(/_/g, '-');
@@ -490,8 +508,14 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         (fields['Picture'] as any[]) ||
         [];
 
-      const coverImage = coverAtt.length > 0 
-        ? coverAtt[0].url 
+      const coverImage = coverAtt.length > 0 && coverAtt[0].url
+        ? await persistAirtableImage({
+            url: coverAtt[0].url,
+            recordId: record.id,
+            attachmentId: coverAtt[0].id || 'cover',
+            filename: coverAtt[0].filename,
+            contentType: coverAtt[0].type,
+          })
         : docxCoverImage || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200';
 
       const title = (fields['Title'] as string) || (fields['Post Title'] as string) || (fields['Name'] as string) || 'Faith & Devotion';
