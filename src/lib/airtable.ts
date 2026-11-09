@@ -150,7 +150,7 @@ function isAttachmentArray(val: any): val is any[] {
   );
 }
 
-// Robust color attachment extraction supporting case-insensitivity, prefixes, and aliases
+// Robust color attachment extraction supporting case-insensitivity, prefixes, and exact color synonyms only
 function getColorAttachments(fields: Record<string, any>, colorName: string): any[] {
   const cleanColor = colorName.trim();
   const colorLower = cleanColor.toLowerCase();
@@ -170,13 +170,16 @@ function getColorAttachments(fields: Record<string, any>, colorName: string): an
     `${colorLower} images`,
     `images (${colorLower})`,
     `images - ${colorLower}`,
+    `colour: ${colorLower}`,
+    `color: ${colorLower}`,
   ];
   const standardKey = allKeys.find((k) => standardPatterns.includes(k.trim().toLowerCase()));
   if (standardKey && isAttachmentArray(fields[standardKey])) {
     return fields[standardKey];
   }
 
-  // 3. Color aliases / variations
+  // 3. Strict spelling synonyms for the EXACT SAME color only (never cross-color!)
+  // E.g. gray <-> grey, sand <-> natural. Never map lilac to purple or blue to sapphire blue.
   const colorAliases: Record<string, string[]> = {
     sand: ['natural', 'sand / natural', 'natural canvas'],
     natural: ['sand', 'sand / natural', 'natural canvas'],
@@ -184,16 +187,8 @@ function getColorAttachments(fields: Record<string, any>, colorName: string): an
     grey: ['gray', 'heather grey'],
     gray: ['grey', 'heather grey'],
     'heather grey': ['grey', 'gray'],
-    'sapphire blue': ['blue', 'royal blue', 'sapphire'],
-    'light blue': ['blue', 'sky blue'],
-    blue: ['sapphire blue', 'navy', 'royal blue'],
-    green: ['teal', 'forest green', 'olive'],
-    teal: ['green', 'forest green'],
-    burgundy: ['maroon'],
-    maroon: ['burgundy'],
-    purple: ['lilac'],
-    lilac: ['purple'],
-    jade: ['green', 'teal'],
+    'sapphire blue': ['sapphire'],
+    sapphire: ['sapphire blue'],
   };
 
   const aliases = colorAliases[colorLower] || [];
@@ -204,19 +199,7 @@ function getColorAttachments(fields: Record<string, any>, colorName: string): an
     }
   }
 
-  // 4. Fuzzy search across any attachment column containing the color name
-  const dynamicKey = allKeys.find((k) => {
-    const kl = k.trim().toLowerCase();
-    if (kl.includes('main') || kl.includes('featured') || kl.includes('available') || kl.includes('category') || kl.includes('overview')) {
-      return false;
-    }
-    return isAttachmentArray(fields[k]) && (kl.includes(colorLower) || colorLower.includes(kl));
-  });
-
-  if (dynamicKey && isAttachmentArray(fields[dynamicKey])) {
-    return fields[dynamicKey];
-  }
-
+  // Strictly no fuzzy cross-color substring matching. If this color's column does not exist or has no attachments, return empty.
   return [];
 }
 
@@ -343,25 +326,38 @@ export async function getProducts(): Promise<Product[]> {
             rawColors = colorsVal.split(',').map((c) => c.trim()).filter(Boolean);
           }
 
-          // Build color variants with real Airtable attachments
+          // Build color variants with real Airtable attachments strictly mapped to that color's field
           const colors = rawColors.map((colorName) => {
             const cleanColor = colorName.trim();
             const colorAttachments = getColorAttachments(fields, cleanColor);
-            const finalAttachments = colorAttachments.length > 0 ? colorAttachments : mainImageAtt;
+            const hasSpecificImage = colorAttachments.length > 0;
 
-            const images = finalAttachments
+            if (!hasSpecificImage) {
+              console.warn(
+                `[Airtable Missing Image] Product "${rawName}" (${slug}) lists colour "${cleanColor}" but has no image attachment in field "${cleanColor}".`
+              );
+            }
+
+            const images = colorAttachments
               .map((att: any) => resolveProductImage(att?.url, categorySlug, slug))
               .filter(Boolean);
             
             return {
               name: cleanColor,
               hex: getColorHex(cleanColor),
-              images: images.length > 0 ? images : [defaultFallbackImage],
+              images,
+              hasSpecificImage,
             };
           });
 
           // Primary featured image for cards and catalog
-          const featuredImage = resolveProductImage(rawFeatured || colors[0]?.images[0] || '', categorySlug, slug);
+          // Always prioritise Airtable Main Featured Image attachment field
+          const firstAvailableColorImage = colors.find((c) => c.images.length > 0)?.images[0];
+          const featuredImage = resolveProductImage(
+            rawFeatured || firstAvailableColorImage || defaultFallbackImage,
+            categorySlug,
+            slug
+          );
         
         const yoastProducts = (yoastSeoData as any).products || {};
         const yoastMatch = yoastProducts[slug] || Object.values(yoastProducts).find((p: any) => p.liveUrl?.includes(slug));

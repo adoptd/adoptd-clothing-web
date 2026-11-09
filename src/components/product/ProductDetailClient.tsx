@@ -27,68 +27,58 @@ export function ProductDetailClient({
   product,
   relatedProducts,
 }: ProductDetailClientProps) {
-  const [selectedColorName, setSelectedColorName] = useState(
-    product.colors[0]?.name || 'Default'
+  const hasMultipleColors = product.colors.length > 1;
+
+  // Initial load: Main Featured Image is displayed; do NOT automatically select a color photograph
+  const [selectedColorName, setSelectedColorName] = useState<string | null>(
+    hasMultipleColors ? null : (product.colors[0]?.name || null)
   );
-  const [selectedSize, setSelectedSize] = useState(
+  const [selectedSize, setSelectedSize] = useState<string>(
     product.availableSizes[0] || 'M'
   );
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
-  const [isAddedAnimation, setIsAddedAnimation] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
+  const [colorSelectionError, setColorSelectionError] = useState<boolean>(false);
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState<boolean>(false);
+  const [isAddedAnimation, setIsAddedAnimation] = useState<boolean>(false);
 
   const addItem = useCartStore((state) => state.addItem);
   const [imgErrorMap, setImgErrorMap] = useState<Record<string, boolean>>({});
   const fallback = getProductFallbackImage(product.category, product.slug);
 
-  // Build aggregated gallery of all available photographs (colors + featured)
+  // Build aggregated gallery of all available photographs:
+  // Requirement: Main Featured Image must ALWAYS be position 0 in the gallery
   const galleryItems: GalleryItem[] = [];
   const seenUrls = new Set<string>();
 
-  // 1. First add images from the active colorway so they appear first
-  const activeColor = product.colors.find((c) => c.name === selectedColorName);
-  if (activeColor) {
-    activeColor.images.forEach((imgUrl, i) => {
-      if (imgUrl && !seenUrls.has(imgUrl)) {
-        seenUrls.add(imgUrl);
-        galleryItems.push({
-          url: imgUrl,
-          colorName: activeColor.name,
-          label: `${activeColor.name}${i > 0 ? ` (${i + 1})` : ''}`,
-        });
-      }
-    });
-  }
-
-  // 2. Add other color variants
-  product.colors.forEach((color) => {
-    if (color.name !== selectedColorName) {
-      color.images.forEach((imgUrl, i) => {
-        if (imgUrl && !seenUrls.has(imgUrl)) {
-          seenUrls.add(imgUrl);
-          galleryItems.push({
-            url: imgUrl,
-            colorName: color.name,
-            label: `${color.name}${i > 0 ? ` (${i + 1})` : ''}`,
-          });
-        }
-      });
-    }
-  });
-
-  // 3. Add main featured image if not already included
-  if (product.featuredImage && !seenUrls.has(product.featuredImage)) {
-    seenUrls.add(product.featuredImage);
+  // 1. Position 0: Main Featured Image from Airtable (default product photograph)
+  const resolvedMainImage = resolveProductImage(product.featuredImage, product.category, product.slug);
+  if (resolvedMainImage) {
+    seenUrls.add(resolvedMainImage);
     galleryItems.push({
-      url: product.featuredImage,
+      url: resolvedMainImage,
       label: 'Main Featured',
     });
   }
 
+  // 2. Subsequent positions: Specific photographs for each color variant
+  product.colors.forEach((color) => {
+    color.images.forEach((imgUrl, i) => {
+      const resolved = resolveProductImage(imgUrl, product.category, product.slug);
+      if (resolved && !seenUrls.has(resolved)) {
+        seenUrls.add(resolved);
+        galleryItems.push({
+          url: resolved,
+          colorName: color.name,
+          label: `${color.name}${i > 0 ? ` (${i + 1})` : ''}`,
+        });
+      }
+    });
+  });
+
   if (galleryItems.length === 0) {
     galleryItems.push({
       url: fallback,
-      label: 'Product',
+      label: 'Main Featured',
     });
   }
 
@@ -97,23 +87,66 @@ export function ProductDetailClient({
   const initialDisplay = resolveProductImage(rawDisplayImage, product.category, product.slug);
   const currentDisplayImage = imgErrorMap[rawDisplayImage] ? fallback : initialDisplay;
 
+  // Selected color variant lookup
+  const selectedColorVariant = product.colors.find(
+    (c) => c.name.toLowerCase() === selectedColorName?.toLowerCase()
+  );
+
   const handleColorChange = (colorName: string) => {
     setSelectedColorName(colorName);
-    // Find the first gallery item matching this color
-    const matchIdx = galleryItems.findIndex((item) => item.colorName?.toLowerCase() === colorName.toLowerCase());
+    setColorSelectionError(false);
+
+    // Find the gallery item matching this exact color
+    const matchIdx = galleryItems.findIndex(
+      (item) => item.colorName?.toLowerCase() === colorName.toLowerCase()
+    );
+
     if (matchIdx !== -1) {
+      // Switch immediately to this color's photograph
       setActiveImageIndex(matchIdx);
+    } else {
+      // If this color has no photograph in Airtable, retain Main Featured Image (position 0)
+      // Never substitute an unrelated color photograph
+      setActiveImageIndex(0);
+    }
+  };
+
+  const handleResetColor = () => {
+    setSelectedColorName(null);
+    setColorSelectionError(false);
+    // Restore original Main Featured Image
+    setActiveImageIndex(0);
+  };
+
+  const handleGalleryClick = (idx: number) => {
+    setActiveImageIndex(idx);
+    const item = galleryItems[idx];
+    if (item?.colorName) {
+      setSelectedColorName(item.colorName);
+      setColorSelectionError(false);
+    } else if (idx === 0 && hasMultipleColors) {
+      // Clicking the Main Featured Image thumbnail resets active color
+      setSelectedColorName(null);
+      setColorSelectionError(false);
     }
   };
 
   const handleAddToCart = () => {
+    // If multi-color product and no color is selected, prompt user
+    if (hasMultipleColors && !selectedColorName) {
+      setColorSelectionError(true);
+      return;
+    }
+
+    const effectiveColor = selectedColorName || product.colors[0]?.name || 'Default';
+
     addItem({
       productId: product.id,
       name: product.name,
       slug: product.slug,
       price: product.price,
       size: selectedSize,
-      color: selectedColorName,
+      color: effectiveColor,
       image: currentDisplayImage,
       quantity: 1,
     });
@@ -132,7 +165,7 @@ export function ProductDetailClient({
           <div className="relative aspect-[4/5] sm:aspect-square w-full bg-stone-50 rounded-2xl overflow-hidden border border-stone-200 shadow-sm p-4 sm:p-6 flex items-center justify-center">
             <Image
               src={currentDisplayImage}
-              alt={`${product.name} in ${selectedColorName} - Christian ${product.categoryName.toLowerCase()} from Adoptd`}
+              alt={`${product.name}${selectedColorName ? ` in ${selectedColorName}` : ''} - Christian ${product.categoryName.toLowerCase()} from Adoptd`}
               fill
               priority
               onError={() => setImgErrorMap((prev) => ({ ...prev, [rawDisplayImage]: true }))}
@@ -161,12 +194,7 @@ export function ProductDetailClient({
                   <button
                     key={`${item.url}-${idx}`}
                     type="button"
-                    onClick={() => {
-                      setActiveImageIndex(idx);
-                      if (item.colorName) {
-                        setSelectedColorName(item.colorName);
-                      }
-                    }}
+                    onClick={() => handleGalleryClick(idx)}
                     className={`group relative aspect-square w-full rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer focus:outline-none p-1.5 bg-stone-50 ${
                       isSelected
                         ? 'border-[#00736a] ring-2 ring-[#00736a]/30 shadow-md opacity-100'
@@ -182,11 +210,9 @@ export function ProductDetailClient({
                       sizes="(max-width: 640px) 25vw, (max-width: 1024px) 15vw, 120px"
                       className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
                     />
-                    {item.colorName && (
-                      <span className="absolute bottom-1 right-1 bg-stone-900/80 text-[9px] text-white px-1 py-0.5 rounded font-medium">
-                        {item.colorName}
-                      </span>
-                    )}
+                    <span className="absolute bottom-1 right-1 bg-stone-900/80 text-[9px] text-white px-1 py-0.5 rounded font-medium max-w-[90%] truncate">
+                      {item.label || (item.colorName ? item.colorName : 'Main')}
+                    </span>
                   </button>
                 );
               })}
@@ -253,11 +279,24 @@ export function ProductDetailClient({
 
           {/* Color Swatch Picker */}
           {product.colors.length > 0 && (
-            <ColorSwatchPicker
-              colors={product.colors}
-              selectedColor={selectedColorName}
-              onSelectColor={handleColorChange}
-            />
+            <div className="space-y-1.5">
+              <ColorSwatchPicker
+                colors={product.colors}
+                selectedColor={selectedColorName}
+                onSelectColor={handleColorChange}
+                onResetColor={hasMultipleColors && selectedColorName ? handleResetColor : undefined}
+              />
+              {colorSelectionError && (
+                <p className="text-xs font-semibold text-rose-600 animate-pulse pt-1">
+                  Please select a colour before adding to your bag.
+                </p>
+              )}
+              {selectedColorName && !selectedColorVariant?.hasSpecificImage && selectedColorVariant?.images.length === 0 && (
+                <p className="text-xs text-stone-600 bg-stone-100 border border-stone-200 rounded-lg p-2.5 mt-2">
+                  Showing Main Featured Image. Your order will be prepared in <strong>{selectedColorName}</strong>.
+                </p>
+              )}
+            </div>
           )}
 
           {/* Size Selector */}

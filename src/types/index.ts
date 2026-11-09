@@ -12,6 +12,7 @@ export interface ProductColorVariant {
   name: string;
   hex: string;
   images: string[];
+  hasSpecificImage?: boolean;
 }
 
 export interface Product {

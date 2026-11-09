@@ -67,7 +67,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 key={color.name}
                 onClick={(e) => {
                   e.preventDefault();
-                  setSelectedColorIndex(idx);
+                  setSelectedColorIndex(idx === selectedColorIndex ? null : idx);
                 }}
                 className={`w-4 h-4 rounded-full border transition-all ${
                   idx === selectedColorIndex

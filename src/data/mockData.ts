@@ -773,11 +773,36 @@ export const mockProducts: Product[] = [
     ],
     "colors": [
       {
-        "name": "Grey",
-        "hex": "#C0C0C0",
+        "name": "Natural",
+        "hex": "#D8C7B5",
         "images": [
-          "/images/products/amazing-grace-christian-t-shirt-grey.webp"
-        ]
+          "/images/products/amazing-grace-christian-t-shirt.webp"
+        ],
+        "hasSpecificImage": true
+      },
+      {
+        "name": "White",
+        "hex": "#FFFFFF",
+        "images": [
+          "/images/products/amazing-grace-christian-t-shirt.webp"
+        ],
+        "hasSpecificImage": true
+      },
+      {
+        "name": "Green",
+        "hex": "#2D4A3E",
+        "images": [
+          "/images/products/amazing-grace-christian-t-shirt-green.webp"
+        ],
+        "hasSpecificImage": true
+      },
+      {
+        "name": "Lilac",
+        "hex": "#C8A2C8",
+        "images": [
+          "/images/products/amazing-grace-christian-t-shirt-lilac.webp"
+        ],
+        "hasSpecificImage": true
       }
     ],
     "description": "Wear the eternal song of redemption and unearned grace. Soft, breathable cotton tee with clean typography.",
