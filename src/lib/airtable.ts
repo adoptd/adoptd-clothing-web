@@ -194,13 +194,14 @@ function getMainFeaturedAttachments(fields: Record<string, any>): any[] {
 }
 
 // Fetch all active products (Cached)
-export async function getProducts(): Promise<Product[]> {
+async function loadProducts(): Promise<Product[]> {
   if (cachedProducts && Date.now() - cachedProducts.timestamp < CACHE_TTL_MS) {
     return cachedProducts.data;
   }
 
   if (!base) {
-    return mockProducts;
+    console.error('[Airtable] Products unavailable: Airtable is not configured.');
+    return cachedProducts?.data || [];
   }
 
   try {
@@ -216,13 +217,14 @@ export async function getProducts(): Promise<Product[]> {
 
     const result = await withTimeout(fetchPromise, 3000, null);
     if (!result) {
-      console.warn('[Airtable] Product fetch timed out or hit limits, serving fallback catalog.');
-      return cachedProducts?.data || mockProducts;
+      console.warn('[Airtable] Product fetch timed out or hit limits; retaining last known good Airtable catalogue.');
+      return cachedProducts?.data || [];
     }
     const [records, seoMap] = result;
 
     if (!records || records.length === 0) {
-      return mockProducts;
+      console.warn('[Airtable] Products query returned no records; retaining last known good Airtable catalogue.');
+      return cachedProducts?.data || [];
     }
 
     const products: Product[] = await Promise.all(
@@ -436,8 +438,27 @@ export async function getProducts(): Promise<Product[]> {
     return products;
   } catch (error) {
     console.error('Error fetching products from Airtable:', error);
-    return cachedProducts?.data || mockProducts;
+    return cachedProducts?.data || [];
   }
+}
+
+// Deduplicate simultaneous catalogue loads within each warm Vercel instance.
+// This prevents product pages and metadata requests from issuing the same Airtable
+// catalogue query concurrently when a deployment receives a burst of traffic.
+let productsInFlight: Promise<Product[]> | null = null;
+
+export function getProducts(): Promise<Product[]> {
+  if (cachedProducts && Date.now() - cachedProducts.timestamp < CACHE_TTL_MS) {
+    return Promise.resolve(cachedProducts.data);
+  }
+
+  if (!productsInFlight) {
+    productsInFlight = loadProducts().finally(() => {
+      productsInFlight = null;
+    });
+  }
+
+  return productsInFlight;
 }
 
 // Fetch single product by slug (Instant O(1) Memory Lookup)
