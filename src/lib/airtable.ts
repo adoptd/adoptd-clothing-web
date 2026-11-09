@@ -30,7 +30,19 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: 
 
   // Attach .catch immediately so that promise rejection in background NEVER causes ERR_UNHANDLED_REJECTION
   const safePromise = promise.catch((err) => {
-    console.warn('[Airtable] Query failed gracefully (serving safe fallback):', err?.message || err);
+    const errorMsg = String(err?.message || err || '').toLowerCase();
+    if (
+      err?.statusCode === 429 ||
+      errorMsg.includes('too many requests') ||
+      errorMsg.includes('rate limit') ||
+      errorMsg.includes('billing limit exceeded') ||
+      errorMsg.includes('public_api_billing_limit_exceeded')
+    ) {
+      airtableRateLimitedUntil = Date.now() + 30000;
+      console.warn('[Airtable] Rate limit / billing plan limit (429) received. Activating 30s circuit breaker.');
+    } else {
+      console.warn('[Airtable] Query failed gracefully (serving safe fallback):', err?.message || err);
+    }
     return fallback;
   });
 
@@ -492,7 +504,11 @@ async function loadProducts(): Promise<Product[]> {
 // Distributed shared catalogue cache across serverless instances (Next.js Data Cache)
 const getSharedCachedProducts = unstable_cache(
   async (): Promise<Product[]> => {
-    return loadProducts();
+    const products = await loadProducts();
+    if (!products || products.length === 0) {
+      throw new Error('[Airtable] No products loaded (query error, rate limit, or empty); skipping Data Cache storage.');
+    }
+    return products;
   },
   ['airtable-products-catalogue-v1'],
   {

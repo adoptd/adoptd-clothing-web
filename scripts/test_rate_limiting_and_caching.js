@@ -292,7 +292,9 @@ async function runTestSuite() {
   // --------------------------------------------------------------------------
   console.log('Test 12: Verifying no mock product data is substituted...');
   const fs = require('fs');
-  const mockFile = fs.readFileSync('src/data/mockData.ts', 'utf8');
+  const path = require('path');
+  const mockPath = path.resolve(__dirname, '../src/data/mockData.ts');
+  const mockFile = fs.readFileSync(mockPath, 'utf8');
   assert(mockFile.includes('prod_bag_1'), 'Mock data file contains prod_bag_1');
   // Ensure the catalogue loader NEVER returns mockProducts IDs
   assert(!res1.some(p => p.id === 'prod_bag_1'), 'Mock product IDs (prod_bag_1) must not appear in real catalogue');

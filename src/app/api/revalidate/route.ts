@@ -19,44 +19,9 @@ async function handleRevalidation(req: NextRequest) {
     }
     revalidatePath('/', 'layout');
 
-    let productsCount = 0;
-    let sampleProductName = null;
-    let loadError = null;
-    let directAirtableError = null;
-    let directAirtableCount = 0;
-
-    const apiKey = process.env.AIRTABLE_API_KEY;
-    const baseId = process.env.AIRTABLE_BASE_ID;
-    if (apiKey && baseId) {
-      try {
-        const Airtable = require('airtable');
-        const testBase = new Airtable({ apiKey }).base(baseId);
-        const testRecords = await testBase('Products').select({ maxRecords: 2 }).all();
-        directAirtableCount = testRecords.length;
-      } catch (e: any) {
-        directAirtableError = {
-          message: e?.message || String(e),
-          statusCode: e?.statusCode || null,
-        };
-      }
-    }
-
-    try {
-      const prods = await getProducts();
-      productsCount = prods.length;
-      sampleProductName = prods[0]?.name || null;
-    } catch (e: any) {
-      loadError = e?.message || String(e);
-    }
-
     return NextResponse.json({
       revalidated: true,
       tag: 'products',
-      productsCount,
-      sampleProductName,
-      directAirtableCount,
-      directAirtableError,
-      loadError,
       hasAirtableKey: Boolean(process.env.AIRTABLE_API_KEY),
       hasBaseId: Boolean(process.env.AIRTABLE_BASE_ID),
       hasKvUrl: Boolean(process.env.KV_REST_API_URL),

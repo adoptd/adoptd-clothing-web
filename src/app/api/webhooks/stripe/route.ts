@@ -35,7 +35,11 @@ export async function POST(req: NextRequest) {
     // 1. PRIMARY: Write order directly to Airtable 'Orders' table for the website manager
     if (process.env.AIRTABLE_API_KEY && process.env.AIRTABLE_BASE_ID) {
       try {
-        const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+        const base = new Airtable({
+          apiKey: process.env.AIRTABLE_API_KEY,
+          requestTimeout: 5000,
+          noRetryIfRateLimited: true,
+        }).base(process.env.AIRTABLE_BASE_ID);
         await base('Orders').create([
           {
             fields: {
