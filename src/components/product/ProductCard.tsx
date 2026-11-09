@@ -11,11 +11,10 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(null);
   const [imgError, setImgError] = useState(false);
-  const activeVariant = selectedColorIndex !== null ? product.colors[selectedColorIndex] : null;
   const fallback = getProductFallbackImage(product.category, product.slug);
-  const preferredImage = activeVariant?.images[0] || product.featuredImage || product.colors[0]?.images[0];
+  // Listing cards always use the designated Main Featured Image; colour selection belongs on the product page.
+  const preferredImage = product.featuredImage || fallback;
   const initialDisplay = resolveProductImage(preferredImage, product.category, product.slug);
   const displayImage = imgError ? fallback : initialDisplay;
 
@@ -62,21 +61,13 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Color Swatch Previews */}
         {product.colors.length > 1 && (
           <div className="flex items-center space-x-1.5 pt-1">
-            {product.colors.map((color, idx) => (
-              <button
+            {product.colors.map((color) => (
+              <span
                 key={color.name}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setSelectedColorIndex(idx === selectedColorIndex ? null : idx);
-                }}
-                className={`w-4 h-4 rounded-full border transition-all ${
-                  idx === selectedColorIndex
-                    ? 'ring-2 ring-white ring-offset-1 ring-offset-[#00736a] scale-110'
-                    : 'border-white/50 opacity-80 hover:opacity-100'
-                }`}
+                className="w-4 h-4 rounded-full border border-white/50 opacity-80"
                 style={{ backgroundColor: color.hex }}
                 title={color.name}
-                aria-label={`View ${color.name} variant`}
+                aria-label={color.name}
               />
             ))}
             <span className="text-xs text-white/80 pl-1.5 font-medium">
