@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath, revalidateTag } from 'next/cache';
-import { clearAirtableCache } from '@/lib/airtable';
+import { clearAirtableCache, getProducts } from '@/lib/airtable';
 
 async function handleRevalidation(req: NextRequest) {
   const secret = req.nextUrl.searchParams.get('secret');
@@ -18,9 +18,24 @@ async function handleRevalidation(req: NextRequest) {
       console.warn('[Revalidate] revalidateTag warning:', tagErr);
     }
     revalidatePath('/', 'layout');
+
+    let productsCount = 0;
+    let sampleProductName = null;
+    let loadError = null;
+    try {
+      const prods = await getProducts();
+      productsCount = prods.length;
+      sampleProductName = prods[0]?.name || null;
+    } catch (e: any) {
+      loadError = e?.message || String(e);
+    }
+
     return NextResponse.json({
       revalidated: true,
       tag: 'products',
+      productsCount,
+      sampleProductName,
+      loadError,
       hasAirtableKey: Boolean(process.env.AIRTABLE_API_KEY),
       hasBaseId: Boolean(process.env.AIRTABLE_BASE_ID),
       hasKvUrl: Boolean(process.env.KV_REST_API_URL),
