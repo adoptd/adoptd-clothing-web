@@ -8,7 +8,13 @@ import { resolveProductImage, getProductFallbackImage, isAirtableUrlExpired } fr
 const apiKey = process.env.AIRTABLE_API_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
 
-const base = apiKey && baseId ? new Airtable({ apiKey, requestTimeout: 3000 }).base(baseId) : null;
+const base = apiKey && baseId
+  ? new Airtable({
+      apiKey,
+      requestTimeout: 2500,
+      noRetryIfRateLimited: true,
+    }).base(baseId)
+  : null;
 
 // Clean timeout wrapper to prevent any external query from blocking Vercel serverless functions
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
@@ -16,18 +22,24 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: 
   const timeoutPromise = new Promise<T>((resolve) => {
     timer = setTimeout(() => resolve(fallback), timeoutMs);
   });
+
+  // Attach .catch immediately so that promise rejection in background NEVER causes ERR_UNHANDLED_REJECTION
+  const safePromise = promise.catch((err) => {
+    console.warn('[Airtable] Query failed gracefully (serving safe fallback):', err?.message || err);
+    return fallback;
+  });
+
   try {
     const result = await Promise.race([
-      promise.then((res) => {
+      safePromise.then((res) => {
         if (timer) clearTimeout(timer);
         return res;
       }),
       timeoutPromise,
     ]);
     return result;
-  } catch {
+  } finally {
     if (timer) clearTimeout(timer);
-    return fallback;
   }
 }
 
