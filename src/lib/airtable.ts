@@ -41,25 +41,8 @@ export function clearAirtableCache() {
   docxCache.clear();
 }
 
-export function toPermanentImageUrl(url?: string, recordId?: string, field?: string, table?: string): string {
+export function toPermanentImageUrl(url?: string): string {
   if (!url) return '';
-  if (url.startsWith('/') || url.startsWith('data:') || url.includes('unsplash.com')) {
-    return url;
-  }
-  if (url.startsWith('/api/airtable-image')) {
-    return url;
-  }
-  if (url.includes('airtableusercontent.com') || url.includes('airtable.com')) {
-    if (isAirtableUrlExpired(url)) {
-      return getProductFallbackImage();
-    }
-    const params = new URLSearchParams();
-    params.set('url', url);
-    if (recordId) params.set('rec', recordId);
-    if (field) params.set('field', field);
-    if (table) params.set('table', table);
-    return `/api/airtable-image?${params.toString()}`;
-  }
   return url;
 }
 
@@ -228,12 +211,7 @@ export async function getProducts(): Promise<Product[]> {
             : (fields['Main Featured Image'] as any[]) || [];
 
           const images = finalAttachments
-            .map((att: any) => {
-              if (isAirtableUrlExpired(att?.url)) {
-                return defaultFallbackImage;
-              }
-              return toPermanentImageUrl(att?.url, record.id, matchedFieldKey || 'Main Featured Image', 'Products');
-            })
+            .map((att: any) => resolveProductImage(att?.url, categorySlug, slug))
             .filter(Boolean);
           
           return {
@@ -252,9 +230,7 @@ export async function getProducts(): Promise<Product[]> {
           (fields['Category Image'] as any[]) ||
           (fields['Image'] as any[]) || [];
         const rawFeatured = mainImageAtt.length > 0 ? mainImageAtt[0].url : colors[0]?.images[0] || '';
-        const featuredImage = isAirtableUrlExpired(rawFeatured)
-          ? defaultFallbackImage
-          : toPermanentImageUrl(rawFeatured, record.id, 'Main Featured Image', 'Products');
+        const featuredImage = resolveProductImage(rawFeatured, categorySlug, slug);
         
         const yoastProducts = (yoastSeoData as any).products || {};
         const yoastMatch = yoastProducts[slug] || Object.values(yoastProducts).find((p: any) => p.liveUrl?.includes(slug));
@@ -537,7 +513,9 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       const rawCover = coverAtt.length > 0 
         ? coverAtt[0].url 
         : docxCoverImage || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200';
-      const coverImage = toPermanentImageUrl(rawCover, record.id, 'Cover Image', 'Blog');
+      const coverImage = isAirtableUrlExpired(rawCover)
+        ? (docxCoverImage || '/images/hero-banner.webp')
+        : rawCover;
 
       const title = (fields['Title'] as string) || (fields['Post Title'] as string) || (fields['Name'] as string) || 'Faith & Devotion';
       
