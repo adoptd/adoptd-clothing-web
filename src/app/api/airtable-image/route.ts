@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 const ALLOWED_TABLES = new Set(['Products', 'Blog', 'Blog Posts', 'Journal', 'Articles']);
 const recordCache = new Map<string, { expiresAt: number; promise: Promise<any> }>();
 
-async function getCachedAirtableRecord(airtableBase: Airtable.Base, tableName: string, recordId: string) {
+async function getCachedAirtableRecord(airtableBase: any, tableName: string, recordId: string) {
   const key = `${tableName}:${recordId}`;
   const cached = recordCache.get(key);
   if (cached && cached.expiresAt > Date.now()) {
