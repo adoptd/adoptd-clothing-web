@@ -17,6 +17,12 @@ interface ProductDetailClientProps {
   relatedProducts: Product[];
 }
 
+interface GalleryItem {
+  url: string;
+  colorName?: string;
+  label?: string;
+}
+
 export function ProductDetailClient({
   product,
   relatedProducts,
@@ -32,28 +38,72 @@ export function ProductDetailClient({
   const [isAddedAnimation, setIsAddedAnimation] = useState(false);
 
   const addItem = useCartStore((state) => state.addItem);
-
-  // Find images for the active colorway
-  const activeColorVariant =
-    product.colors.find((c) => c.name === selectedColorName) ||
-    product.colors[0];
-  
   const [imgErrorMap, setImgErrorMap] = useState<Record<string, boolean>>({});
-
   const fallback = getProductFallbackImage(product.category, product.slug);
 
-  const currentImages =
-    activeColorVariant && activeColorVariant.images.length > 0
-      ? activeColorVariant.images
-      : [product.featuredImage || fallback];
+  // Build aggregated gallery of all available photographs (colors + featured)
+  const galleryItems: GalleryItem[] = [];
+  const seenUrls = new Set<string>();
 
-  const rawDisplayImage = currentImages[activeImageIndex] || currentImages[0] || product.featuredImage || fallback;
+  // 1. First add images from the active colorway so they appear first
+  const activeColor = product.colors.find((c) => c.name === selectedColorName);
+  if (activeColor) {
+    activeColor.images.forEach((imgUrl, i) => {
+      if (imgUrl && !seenUrls.has(imgUrl)) {
+        seenUrls.add(imgUrl);
+        galleryItems.push({
+          url: imgUrl,
+          colorName: activeColor.name,
+          label: `${activeColor.name}${i > 0 ? ` (${i + 1})` : ''}`,
+        });
+      }
+    });
+  }
+
+  // 2. Add other color variants
+  product.colors.forEach((color) => {
+    if (color.name !== selectedColorName) {
+      color.images.forEach((imgUrl, i) => {
+        if (imgUrl && !seenUrls.has(imgUrl)) {
+          seenUrls.add(imgUrl);
+          galleryItems.push({
+            url: imgUrl,
+            colorName: color.name,
+            label: `${color.name}${i > 0 ? ` (${i + 1})` : ''}`,
+          });
+        }
+      });
+    }
+  });
+
+  // 3. Add main featured image if not already included
+  if (product.featuredImage && !seenUrls.has(product.featuredImage)) {
+    seenUrls.add(product.featuredImage);
+    galleryItems.push({
+      url: product.featuredImage,
+      label: 'Main Featured',
+    });
+  }
+
+  if (galleryItems.length === 0) {
+    galleryItems.push({
+      url: fallback,
+      label: 'Product',
+    });
+  }
+
+  const currentGalleryItem = galleryItems[activeImageIndex] || galleryItems[0];
+  const rawDisplayImage = currentGalleryItem?.url || fallback;
   const initialDisplay = resolveProductImage(rawDisplayImage, product.category, product.slug);
   const currentDisplayImage = imgErrorMap[rawDisplayImage] ? fallback : initialDisplay;
 
   const handleColorChange = (colorName: string) => {
     setSelectedColorName(colorName);
-    setActiveImageIndex(0); // Reset to first photo of new color
+    // Find the first gallery item matching this color
+    const matchIdx = galleryItems.findIndex((item) => item.colorName?.toLowerCase() === colorName.toLowerCase());
+    if (matchIdx !== -1) {
+      setActiveImageIndex(matchIdx);
+    }
   };
 
   const handleAddToCart = () => {
@@ -79,7 +129,7 @@ export function ProductDetailClient({
         
         {/* Gallery / Images Column */}
         <div className="space-y-4">
-          <div className="relative aspect-square w-full bg-stone-100 rounded-2xl overflow-hidden border border-stone-200 shadow-sm">
+          <div className="relative aspect-[4/5] sm:aspect-square w-full bg-stone-50 rounded-2xl overflow-hidden border border-stone-200 shadow-sm p-4 sm:p-6 flex items-center justify-center">
             <Image
               src={currentDisplayImage}
               alt={`${product.name} in ${selectedColorName} - Christian ${product.categoryName.toLowerCase()} from Adoptd`}
@@ -87,44 +137,55 @@ export function ProductDetailClient({
               priority
               onError={() => setImgErrorMap((prev) => ({ ...prev, [rawDisplayImage]: true }))}
               sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover object-center transition-all duration-300"
+              className="object-contain object-center transition-all duration-300"
             />
-            {product.compareAtPrice && product.compareAtPrice > product.price && (
-              <span className="absolute top-4 left-4 bg-stone-900 text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-md">
+            {!product.inStock ? (
+              <span className="absolute top-4 left-4 bg-stone-900/90 text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-md shadow-sm">
+                Out of Stock
+              </span>
+            ) : product.compareAtPrice && product.compareAtPrice > product.price ? (
+              <span className="absolute top-4 left-4 bg-[#00736a] text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-md">
                 Special Offer
               </span>
-            )}
+            ) : null}
           </div>
 
-          {/* Grid-Style Image Gallery Below Main Hero Photo (shown if > 1 image) */}
-          {currentImages.length > 1 && (
-            <div className="grid grid-cols-4 sm:grid-cols-4 gap-3 sm:gap-4 pt-1">
-              {currentImages.map((img, idx) => {
+          {/* Grid-Style Image Gallery Below Main Hero Photo */}
+          {galleryItems.length > 1 && (
+            <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 pt-2">
+              {galleryItems.map((item, idx) => {
                 const isSelected = idx === activeImageIndex;
-                const initialThumb = resolveProductImage(img, product.category, product.slug);
-                const displayThumb = imgErrorMap[img] ? fallback : initialThumb;
+                const initialThumb = resolveProductImage(item.url, product.category, product.slug);
+                const displayThumb = imgErrorMap[item.url] ? fallback : initialThumb;
                 return (
                   <button
-                    key={idx}
+                    key={`${item.url}-${idx}`}
                     type="button"
-                    onClick={() => setActiveImageIndex(idx)}
-                    className={`group relative aspect-square w-full rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer focus:outline-none ${
+                    onClick={() => {
+                      setActiveImageIndex(idx);
+                      if (item.colorName) {
+                        setSelectedColorName(item.colorName);
+                      }
+                    }}
+                    className={`group relative aspect-square w-full rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer focus:outline-none p-1.5 bg-stone-50 ${
                       isSelected
-                        ? 'border-stone-950 ring-2 ring-stone-950/20 shadow-md opacity-100'
-                        : 'border-stone-200/90 opacity-70 hover:opacity-100 hover:border-stone-400 bg-stone-50'
+                        ? 'border-[#00736a] ring-2 ring-[#00736a]/30 shadow-md opacity-100'
+                        : 'border-stone-200/90 opacity-70 hover:opacity-100 hover:border-stone-400'
                     }`}
-                    aria-label={`View ${product.name} photo ${idx + 1} in ${selectedColorName}`}
+                    aria-label={`View ${product.name} ${item.label || ''}`}
                   >
                     <Image
                       src={displayThumb}
-                      alt={`${product.name} in ${selectedColorName}, product photo ${idx + 1}`}
+                      alt={`${product.name} ${item.label || ''}`}
                       fill
-                      onError={() => setImgErrorMap((prev) => ({ ...prev, [img]: true }))}
+                      onError={() => setImgErrorMap((prev) => ({ ...prev, [item.url]: true }))}
                       sizes="(max-width: 640px) 25vw, (max-width: 1024px) 15vw, 120px"
-                      className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                      className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
                     />
-                    {isSelected && (
-                      <span className="absolute inset-0 bg-stone-900/5 pointer-events-none" />
+                    {item.colorName && (
+                      <span className="absolute bottom-1 right-1 bg-stone-900/80 text-[9px] text-white px-1 py-0.5 rounded font-medium">
+                        {item.colorName}
+                      </span>
                     )}
                   </button>
                 );
@@ -209,14 +270,23 @@ export function ProductDetailClient({
             />
           )}
 
+          {/* Out of Stock Notice */}
+          {!product.inStock && (
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-sm font-medium">
+              This item is currently out of stock. Please check back soon or contact us for restock dates.
+            </div>
+          )}
+
           {/* Add to Bag Button */}
           <div className="pt-2 space-y-3">
             <button
               onClick={handleAddToCart}
               disabled={!product.inStock}
-              className="w-full py-5 px-8 bg-stone-950 text-white rounded-xl font-black text-base tracking-wider uppercase hover:bg-stone-800 transition-all flex items-center justify-center space-x-2 shadow-xl disabled:opacity-50"
+              className="w-full py-5 px-8 bg-stone-950 text-white rounded-xl font-black text-base tracking-wider uppercase hover:bg-stone-800 transition-all flex items-center justify-center space-x-2 shadow-xl disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {isAddedAnimation ? (
+              {!product.inStock ? (
+                <span>Out of Stock</span>
+              ) : isAddedAnimation ? (
                 <>
                   <Check className="w-6 h-6 text-emerald-400" />
                   <span>Added to Your Bag!</span>

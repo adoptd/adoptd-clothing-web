@@ -139,6 +139,118 @@ export async function getPageSeo(slugOrPath: string) {
   return seoMap[cleanKey] || seoMap[slugOrPath.trim().toLowerCase()] || null;
 }
 
+// Helper to verify Airtable attachment arrays
+function isAttachmentArray(val: any): val is any[] {
+  return (
+    Array.isArray(val) &&
+    val.length > 0 &&
+    typeof val[0] === 'object' &&
+    val[0] !== null &&
+    Boolean(val[0].url)
+  );
+}
+
+// Robust color attachment extraction supporting case-insensitivity, prefixes, and aliases
+function getColorAttachments(fields: Record<string, any>, colorName: string): any[] {
+  const cleanColor = colorName.trim();
+  const colorLower = cleanColor.toLowerCase();
+  const allKeys = Object.keys(fields);
+
+  // 1. Exact case-insensitive match for the color name (e.g. column 'Purple' matches color 'purple')
+  const directKey = allKeys.find((k) => k.trim().toLowerCase() === colorLower);
+  if (directKey && isAttachmentArray(fields[directKey])) {
+    return fields[directKey];
+  }
+
+  // 2. Standard prefixed/suffixed column patterns
+  const standardPatterns = [
+    `colour images: ${colorLower}`,
+    `color images: ${colorLower}`,
+    `images: ${colorLower}`,
+    `${colorLower} images`,
+    `images (${colorLower})`,
+    `images - ${colorLower}`,
+  ];
+  const standardKey = allKeys.find((k) => standardPatterns.includes(k.trim().toLowerCase()));
+  if (standardKey && isAttachmentArray(fields[standardKey])) {
+    return fields[standardKey];
+  }
+
+  // 3. Color aliases / variations
+  const colorAliases: Record<string, string[]> = {
+    sand: ['natural', 'sand / natural', 'natural canvas'],
+    natural: ['sand', 'sand / natural', 'natural canvas'],
+    'sand / natural': ['natural', 'sand', 'natural canvas'],
+    grey: ['gray', 'heather grey'],
+    gray: ['grey', 'heather grey'],
+    'heather grey': ['grey', 'gray'],
+    'sapphire blue': ['blue', 'royal blue', 'sapphire'],
+    'light blue': ['blue', 'sky blue'],
+    blue: ['sapphire blue', 'navy', 'royal blue'],
+    green: ['teal', 'forest green', 'olive'],
+    teal: ['green', 'forest green'],
+    burgundy: ['maroon'],
+    maroon: ['burgundy'],
+    purple: ['lilac'],
+    lilac: ['purple'],
+    jade: ['green', 'teal'],
+  };
+
+  const aliases = colorAliases[colorLower] || [];
+  for (const alias of aliases) {
+    const aliasKey = allKeys.find((k) => k.trim().toLowerCase() === alias);
+    if (aliasKey && isAttachmentArray(fields[aliasKey])) {
+      return fields[aliasKey];
+    }
+  }
+
+  // 4. Fuzzy search across any attachment column containing the color name
+  const dynamicKey = allKeys.find((k) => {
+    const kl = k.trim().toLowerCase();
+    if (kl.includes('main') || kl.includes('featured') || kl.includes('available') || kl.includes('category') || kl.includes('overview')) {
+      return false;
+    }
+    return isAttachmentArray(fields[k]) && (kl.includes(colorLower) || colorLower.includes(kl));
+  });
+
+  if (dynamicKey && isAttachmentArray(fields[dynamicKey])) {
+    return fields[dynamicKey];
+  }
+
+  return [];
+}
+
+// Robust Main Featured Image attachment extraction
+function getMainFeaturedAttachments(fields: Record<string, any>): any[] {
+  const allKeys = Object.keys(fields);
+  const mainPatterns = [
+    'main featured image',
+    'featured image',
+    'main image',
+    'main category image',
+    'category main image',
+    'category image',
+    'image',
+  ];
+
+  for (const pattern of mainPatterns) {
+    const key = allKeys.find((k) => k.trim().toLowerCase() === pattern);
+    if (key && isAttachmentArray(fields[key])) {
+      return fields[key];
+    }
+  }
+
+  const dynamicMainKey = allKeys.find((k) => {
+    const kl = k.trim().toLowerCase();
+    return (kl.includes('featured') || kl.includes('main')) && isAttachmentArray(fields[k]);
+  });
+  if (dynamicMainKey && isAttachmentArray(fields[dynamicMainKey])) {
+    return fields[dynamicMainKey];
+  }
+
+  return [];
+}
+
 // Fetch all active products (Cached)
 export async function getProducts(): Promise<Product[]> {
   if (cachedProducts && Date.now() - cachedProducts.timestamp < CACHE_TTL_MS) {
@@ -153,7 +265,7 @@ export async function getProducts(): Promise<Product[]> {
     const fetchPromise = Promise.all([
       base('Products')
         .select({
-          filterByFormula: '{Published} = TRUE()',
+          filterByFormula: 'OR({Published} = 1, {Published} = TRUE(), {Published})',
           view: 'Grid view',
         })
         .all(),
@@ -172,105 +284,84 @@ export async function getProducts(): Promise<Product[]> {
     }
 
     const products: Product[] = await Promise.all(
-      records.map(async (record) => {
-        const fields = record.fields;
+      records
+        .filter((record) => {
+          // Double-check Published status to ensure unpublished items are excluded
+          const pub = record.fields['Published'];
+          return pub !== false && pub !== 0 && pub !== 'false';
+        })
+        .map(async (record) => {
+          const fields = record.fields;
 
-        const rawCat = (fields['Category'] as string) || 'tee-shirts';
-        const cleanCat = rawCat.toLowerCase().replace(/_/g, '-');
-        
-        let categorySlug: any = 'tee-shirts';
-        let categoryName = 'Apparel';
-        if (cleanCat.includes('gym') || cleanCat.includes('sport') || cleanCat.includes('activewear') || cleanCat.includes('active-wear')) {
-          categorySlug = 'gym-sportswear';
-          categoryName = 'Gym & Sportswear';
-        } else if (cleanCat.includes('christmas') || cleanCat.includes('xmas')) {
-          categorySlug = 'christmas';
-          categoryName = 'Christmas';
-        } else if (cleanCat.includes('bag') || cleanCat.includes('tote')) {
-          categorySlug = 'christian-bags';
-          categoryName = 'Tote Bags';
-        } else if (cleanCat.includes('hoodie')) {
-          categorySlug = 'christian-hoodies-uk';
-          categoryName = 'Hoodies';
-        } else if (cleanCat.includes('sweater')) {
-          categorySlug = 'sweaters';
-          categoryName = 'Sweaters';
-        } else if (cleanCat.includes('shirt') || cleanCat.includes('tee')) {
-          categorySlug = 'tee-shirts';
-          categoryName = 'T-Shirts';
-        }
-
-        const rawName = (fields['Product Name'] as string) || (fields['Name'] as string) || 'Untitled Product';
-        const autoSlug = rawName
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)+/g, '');
-        const slug = (fields['Slug'] as string) || autoSlug || record.id;
-
-        const defaultFallbackImage = getProductFallbackImage(categorySlug, slug);
-
-        const rawColors = (fields['Available Colours'] as string[]) || (fields['Available Colors'] as string[]) || ['Black'];
-        
-        // Build color variant object with flexible column matching
-        const allFieldKeys = Object.keys(fields);
-        const colors = rawColors.map((colorName) => {
-          const cleanColor = colorName.trim();
-          const colorLower = cleanColor.toLowerCase();
-          const colorPrefixLower = cleanColor.split(' ')[0].toLowerCase();
-
-          // 1. Try standard keys
-          let matchedFieldKey: string | undefined;
-          let attachments: any[] | undefined = 
-            (fields[`Colour Images: ${cleanColor}`] as any[]) ||
-            (fields[`Color Images: ${cleanColor}`] as any[]) ||
-            (fields[`Images: ${cleanColor}`] as any[]) ||
-            (fields[`${cleanColor} Images`] as any[]) ||
-            (fields[`Images (${cleanColor})`] as any[]) ||
-            (fields[`Images - ${cleanColor}`] as any[]) ||
-            (fields[cleanColor] as any[]);
-
-          if (attachments && attachments.length > 0) {
-            matchedFieldKey = `Colour Images: ${cleanColor}`;
-          } else {
-            // 2. If not found, search dynamically across all fields for an attachment column containing the color name
-            const dynamicKey = allFieldKeys.find((key) => {
-              const kLower = key.toLowerCase();
-              if (kLower.includes('main') || kLower.includes('featured')) return false;
-              return kLower.includes(colorLower) || (colorPrefixLower.length > 2 && kLower.includes(colorPrefixLower));
-            });
-
-            if (dynamicKey && Array.isArray(fields[dynamicKey])) {
-              attachments = fields[dynamicKey] as any[];
-              matchedFieldKey = dynamicKey;
-            }
+          const rawCatVal = fields['Category'] || fields['category'];
+          const rawCat = Array.isArray(rawCatVal)
+            ? rawCatVal.join(' ')
+            : (typeof rawCatVal === 'string' ? rawCatVal : 'tee-shirts');
+          const cleanCat = rawCat.toLowerCase().replace(/_/g, '-');
+          
+          let categorySlug: any = 'tee-shirts';
+          let categoryName = 'T-Shirts';
+          if (cleanCat.includes('gym') || cleanCat.includes('sport') || cleanCat.includes('activewear') || cleanCat.includes('active-wear')) {
+            categorySlug = 'gym-sportswear';
+            categoryName = 'Gym & Sportswear';
+          } else if (cleanCat.includes('christmas') || cleanCat.includes('xmas')) {
+            categorySlug = 'christmas';
+            categoryName = 'Christmas';
+          } else if (cleanCat.includes('bag') || cleanCat.includes('tote')) {
+            categorySlug = 'christian-bags';
+            categoryName = 'Tote Bags';
+          } else if (cleanCat.includes('hoodie')) {
+            categorySlug = 'christian-hoodies-uk';
+            categoryName = 'Hoodies';
+          } else if (cleanCat.includes('sweater')) {
+            categorySlug = 'sweaters';
+            categoryName = 'Sweaters';
+          } else if (cleanCat.includes('shirt') || cleanCat.includes('tee')) {
+            categorySlug = 'tee-shirts';
+            categoryName = 'T-Shirts';
           }
 
-          // 3. Fallback to Main Featured Image or empty
-          const finalAttachments = (attachments && attachments.length > 0)
-            ? attachments
-            : (fields['Main Featured Image'] as any[]) || [];
+          const rawName = (fields['Product Name'] as string) || (fields['Name'] as string) || 'Untitled Product';
+          const autoSlug = rawName
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)+/g, '');
+          const slug = (fields['Slug'] as string) || autoSlug || record.id;
 
-          const images = finalAttachments
-            .map((att: any) => resolveProductImage(att?.url, categorySlug, slug))
-            .filter(Boolean);
-          
-          return {
-            name: cleanColor,
-            hex: getColorHex(cleanColor),
-            images: images.length > 0 ? images : [defaultFallbackImage],
-          };
-        });
+          const defaultFallbackImage = getProductFallbackImage(categorySlug, slug);
 
-        const mainImageAtt = 
-          (fields['Main Featured Image'] as any[]) ||
-          (fields['Main Image'] as any[]) ||
-          (fields['Featured Image'] as any[]) ||
-          (fields['Main Category Image'] as any[]) ||
-          (fields['Category Main Image'] as any[]) ||
-          (fields['Category Image'] as any[]) ||
-          (fields['Image'] as any[]) || [];
-        const rawFeatured = mainImageAtt.length > 0 ? mainImageAtt[0].url : colors[0]?.images[0] || '';
-        const featuredImage = resolveProductImage(rawFeatured, categorySlug, slug);
+          // Extract Main Featured Image attachments
+          const mainImageAtt = getMainFeaturedAttachments(fields);
+          const rawFeatured = mainImageAtt.length > 0 ? mainImageAtt[0].url : '';
+
+          // Parse Available Colours
+          let rawColors: string[] = ['Black'];
+          const colorsVal = fields['Available Colours'] || fields['Available Colors'] || fields['Colours'] || fields['Colors'];
+          if (Array.isArray(colorsVal) && colorsVal.length > 0) {
+            rawColors = colorsVal.map(String).map((c) => c.trim()).filter(Boolean);
+          } else if (typeof colorsVal === 'string' && colorsVal.trim()) {
+            rawColors = colorsVal.split(',').map((c) => c.trim()).filter(Boolean);
+          }
+
+          // Build color variants with real Airtable attachments
+          const colors = rawColors.map((colorName) => {
+            const cleanColor = colorName.trim();
+            const colorAttachments = getColorAttachments(fields, cleanColor);
+            const finalAttachments = colorAttachments.length > 0 ? colorAttachments : mainImageAtt;
+
+            const images = finalAttachments
+              .map((att: any) => resolveProductImage(att?.url, categorySlug, slug))
+              .filter(Boolean);
+            
+            return {
+              name: cleanColor,
+              hex: getColorHex(cleanColor),
+              images: images.length > 0 ? images : [defaultFallbackImage],
+            };
+          });
+
+          // Primary featured image for cards and catalog
+          const featuredImage = resolveProductImage(rawFeatured || colors[0]?.images[0] || '', categorySlug, slug);
         
         const yoastProducts = (yoastSeoData as any).products || {};
         const yoastMatch = yoastProducts[slug] || Object.values(yoastProducts).find((p: any) => p.liveUrl?.includes(slug));
@@ -334,21 +425,35 @@ export async function getProducts(): Promise<Product[]> {
           categoryOverview = rawCategoryOverview;
         }
 
+        let availableSizes: string[] = ['S', 'M', 'L', 'XL'];
+        const rawSizes = fields['Sizes'] || fields['Available Sizes'];
+        if (Array.isArray(rawSizes)) {
+          availableSizes = rawSizes.map(String).map((s) => s.trim()).filter(Boolean);
+        } else if (typeof rawSizes === 'string' && rawSizes.trim()) {
+          availableSizes = rawSizes.split(',').map((s) => s.trim()).filter(Boolean);
+        }
+
+        const price = Number(fields['Price (£)']) || Number(fields['Price']) || 0;
+        const compareAt = fields['Compare at Price (£)'] ?? fields['Compare at Price'];
+        const compareAtPrice = compareAt !== undefined && compareAt !== null && compareAt !== '' ? Number(compareAt) : undefined;
+        const inStock = fields['In Stock'] === undefined ? true : Boolean(fields['In Stock']);
+        const scriptureReference = (fields['Scripture Reference'] as string) || (fields['Scripture'] as string) || undefined;
+
         return {
           id: record.id,
           name: rawName,
           slug,
           category: categorySlug,
           categoryName,
-          price: Number(fields['Price (£)']) || 0,
-          compareAtPrice: fields['Compare at Price (£)'] ? Number(fields['Compare at Price (£)']) : undefined,
-          inStock: Boolean(fields['In Stock'] ?? true),
-          availableSizes: (fields['Sizes'] as string[]) || ['S', 'M', 'L', 'XL'],
+          price,
+          compareAtPrice,
+          inStock,
+          availableSizes,
           colors,
           description: finalDescription,
           shortDescription: finalShortDescription || undefined,
           longDescription: finalLongDescription || undefined,
-          scriptureReference: fields['Scripture Reference'] as string,
+          scriptureReference,
           careInstructions: fields['Care Instructions'] as string,
           sizeGuideType: (fields['Size Guide Type'] as any) || (
             categorySlug === 'tee-shirts' ? 'unisex-tshirt' :
@@ -812,13 +917,18 @@ export async function createBlogComment(data: {
 
 // Helper for color hex values
 function getColorHex(colorName: string): string {
-  const normalized = colorName.toLowerCase();
+  const normalized = colorName.toLowerCase().trim();
   if (normalized.includes('black')) return '#111111';
   if (normalized.includes('grey') || normalized.includes('gray')) return '#C0C0C0';
   if (normalized.includes('sand') || normalized.includes('natural')) return '#D8C7B5';
-  if (normalized.includes('navy') || normalized.includes('blue')) return '#1B2A4A';
+  if (normalized.includes('sapphire')) return '#0F52BA';
+  if (normalized.includes('navy')) return '#1B2A4A';
+  if (normalized.includes('blue')) return '#2B4C6F';
   if (normalized.includes('white')) return '#FFFFFF';
   if (normalized.includes('burgundy') || normalized.includes('maroon')) return '#6A1A24';
-  if (normalized.includes('green') || normalized.includes('forest')) return '#2D4A3E';
+  if (normalized.includes('jade')) return '#00A86B';
+  if (normalized.includes('green') || normalized.includes('forest') || normalized.includes('teal')) return '#2D4A3E';
+  if (normalized.includes('purple')) return '#5B2C6F';
+  if (normalized.includes('lilac')) return '#C8A2C8';
   return '#444444';
 }

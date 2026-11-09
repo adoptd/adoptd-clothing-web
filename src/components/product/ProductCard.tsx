@@ -22,20 +22,24 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="group flex flex-col bg-[#00736a] rounded-xl overflow-hidden border border-[#00736a]/30 hover:border-[#00736a] transition-all duration-300 hover:shadow-md">
       {/* Product Image Container */}
-      <Link href={`/product/${product.slug}`} className="relative aspect-square w-full bg-stone-100 overflow-hidden block">
+      <Link href={`/product/${product.slug}`} className="relative aspect-square w-full bg-stone-50 overflow-hidden block">
         <Image
           src={displayImage}
           alt={product.name}
           fill
           onError={() => setImgError(true)}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+          className="object-contain object-center p-2.5 group-hover:scale-105 transition-transform duration-500 ease-out"
         />
-        {product.compareAtPrice && product.compareAtPrice > product.price && (
+        {!product.inStock ? (
+          <span className="absolute top-3 left-3 bg-stone-900/90 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded shadow-sm">
+            Out of Stock
+          </span>
+        ) : product.compareAtPrice && product.compareAtPrice > product.price ? (
           <span className="absolute top-3 left-3 bg-stone-900 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">
             Sale
           </span>
-        )}
+        ) : null}
       </Link>
 
       {/* Product Info (Brand Green #00736a with White Typography) */}
