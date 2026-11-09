@@ -178,28 +178,8 @@ function getColorAttachments(fields: Record<string, any>, colorName: string): an
     return fields[standardKey];
   }
 
-  // 3. Strict spelling synonyms for the EXACT SAME color only (never cross-color!)
-  // E.g. gray <-> grey, sand <-> natural. Never map lilac to purple or blue to sapphire blue.
-  const colorAliases: Record<string, string[]> = {
-    sand: ['natural', 'sand / natural', 'natural canvas'],
-    natural: ['sand', 'sand / natural', 'natural canvas'],
-    'sand / natural': ['natural', 'sand', 'natural canvas'],
-    grey: ['gray', 'heather grey'],
-    gray: ['grey', 'heather grey'],
-    'heather grey': ['grey', 'gray'],
-    'sapphire blue': ['sapphire'],
-    sapphire: ['sapphire blue'],
-  };
-
-  const aliases = colorAliases[colorLower] || [];
-  for (const alias of aliases) {
-    const aliasKey = allKeys.find((k) => k.trim().toLowerCase() === alias);
-    if (aliasKey && isAttachmentArray(fields[aliasKey])) {
-      return fields[aliasKey];
-    }
-  }
-
-  // Strictly no fuzzy cross-color substring matching. If this color's column does not exist or has no attachments, return empty.
+  // Do not infer aliases: only the exact Airtable colour field may supply this colour's image.
+  // Similar names (for example Natural/Natural Canvas or Blue/Sapphire Blue) remain distinct.
   return [];
 }
 
@@ -350,11 +330,10 @@ export async function getProducts(): Promise<Product[]> {
             };
           });
 
-          // Primary featured image for cards and catalog
-          // Always prioritise Airtable Main Featured Image attachment field
-          const firstAvailableColorImage = colors.find((c) => c.images.length > 0)?.images[0];
+          // The featured image is a separate, stable product default.
+          // Never substitute a colour-variant photograph when the Airtable featured image is absent.
           const featuredImage = resolveProductImage(
-            rawFeatured || firstAvailableColorImage || defaultFallbackImage,
+            rawFeatured || defaultFallbackImage,
             categorySlug,
             slug
           );
