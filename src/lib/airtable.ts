@@ -185,33 +185,12 @@ function getColorAttachments(fields: Record<string, any>, colorName: string): an
 
 // Robust Main Featured Image attachment extraction
 function getMainFeaturedAttachments(fields: Record<string, any>): any[] {
-  const allKeys = Object.keys(fields);
-  const mainPatterns = [
-    'main featured image',
-    'featured image',
-    'main image',
-    'main category image',
-    'category main image',
-    'category image',
-    'image',
-  ];
-
-  for (const pattern of mainPatterns) {
-    const key = allKeys.find((k) => k.trim().toLowerCase() === pattern);
-    if (key && isAttachmentArray(fields[key])) {
-      return fields[key];
-    }
-  }
-
-  const dynamicMainKey = allKeys.find((k) => {
-    const kl = k.trim().toLowerCase();
-    return (kl.includes('featured') || kl.includes('main')) && isAttachmentArray(fields[k]);
-  });
-  if (dynamicMainKey && isAttachmentArray(fields[dynamicMainKey])) {
-    return fields[dynamicMainKey];
-  }
-
-  return [];
+  // Only the explicitly designated Airtable field is the product's main image.
+  // Other attachment fields must never be silently promoted to the featured image.
+  const key = Object.keys(fields).find(
+    (fieldName) => fieldName.trim().toLowerCase() === 'main featured image'
+  );
+  return key && isAttachmentArray(fields[key]) ? fields[key] : [];
 }
 
 // Fetch all active products (Cached)
