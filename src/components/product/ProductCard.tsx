@@ -13,9 +13,9 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(null);
   const [imgError, setImgError] = useState(false);
-  const activeVariant = selectedColorIndex !== null ? product.colors[selectedColorIndex] : null;
   const fallback = getProductFallbackImage(product.category, product.slug);
-  const preferredImage = activeVariant?.images[0] || product.featuredImage || product.colors[0]?.images[0];
+  // Category and product-listing cards always use the stable Main Featured Image.
+  const preferredImage = product.featuredImage || fallback;
   const initialDisplay = resolveProductImage(preferredImage, product.category, product.slug);
   const displayImage = imgError ? fallback : initialDisplay;
 

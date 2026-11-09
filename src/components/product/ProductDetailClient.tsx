@@ -30,9 +30,7 @@ export function ProductDetailClient({
   const hasMultipleColors = product.colors.length > 1;
 
   // Initial load: Main Featured Image is displayed; do NOT automatically select a color photograph
-  const [selectedColorName, setSelectedColorName] = useState<string | null>(
-    hasMultipleColors ? null : (product.colors[0]?.name || null)
-  );
+  const [selectedColorName, setSelectedColorName] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string>(
     product.availableSizes[0] || 'M'
   );
@@ -64,7 +62,9 @@ export function ProductDetailClient({
   product.colors.forEach((color) => {
     color.images.forEach((imgUrl, i) => {
       const resolved = resolveProductImage(imgUrl, product.category, product.slug);
-      if (resolved && !seenUrls.has(resolved)) {
+      if (resolved) {
+        // Keep a gallery entry per colour association, even when two Airtable
+        // fields happen to contain the same URL. Selection must resolve by colour.
         seenUrls.add(resolved);
         galleryItems.push({
           url: resolved,

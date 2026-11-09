@@ -178,70 +178,30 @@ function getColorAttachments(fields: Record<string, any>, colorName: string): an
     return fields[standardKey];
   }
 
-  // 3. Strict spelling synonyms for the EXACT SAME color only (never cross-color!)
-  // E.g. gray <-> grey, sand <-> natural. Never map lilac to purple or blue to sapphire blue.
-  const colorAliases: Record<string, string[]> = {
-    sand: ['natural', 'sand / natural', 'natural canvas'],
-    natural: ['sand', 'sand / natural', 'natural canvas'],
-    'sand / natural': ['natural', 'sand', 'natural canvas'],
-    grey: ['gray', 'heather grey'],
-    gray: ['grey', 'heather grey'],
-    'heather grey': ['grey', 'gray'],
-    'sapphire blue': ['sapphire'],
-    sapphire: ['sapphire blue'],
-  };
-
-  const aliases = colorAliases[colorLower] || [];
-  for (const alias of aliases) {
-    const aliasKey = allKeys.find((k) => k.trim().toLowerCase() === alias);
-    if (aliasKey && isAttachmentArray(fields[aliasKey])) {
-      return fields[aliasKey];
-    }
-  }
-
-  // Strictly no fuzzy cross-color substring matching. If this color's column does not exist or has no attachments, return empty.
+  // Do not infer aliases: only the exact Airtable colour field may supply this colour's image.
+  // Similar names (for example Natural/Natural Canvas or Blue/Sapphire Blue) remain distinct.
   return [];
 }
 
 // Robust Main Featured Image attachment extraction
 function getMainFeaturedAttachments(fields: Record<string, any>): any[] {
-  const allKeys = Object.keys(fields);
-  const mainPatterns = [
-    'main featured image',
-    'featured image',
-    'main image',
-    'main category image',
-    'category main image',
-    'category image',
-    'image',
-  ];
-
-  for (const pattern of mainPatterns) {
-    const key = allKeys.find((k) => k.trim().toLowerCase() === pattern);
-    if (key && isAttachmentArray(fields[key])) {
-      return fields[key];
-    }
-  }
-
-  const dynamicMainKey = allKeys.find((k) => {
-    const kl = k.trim().toLowerCase();
-    return (kl.includes('featured') || kl.includes('main')) && isAttachmentArray(fields[k]);
-  });
-  if (dynamicMainKey && isAttachmentArray(fields[dynamicMainKey])) {
-    return fields[dynamicMainKey];
-  }
-
-  return [];
+  // Only the explicitly designated Airtable field is the product's main image.
+  // Other attachment fields must never be silently promoted to the featured image.
+  const key = Object.keys(fields).find(
+    (fieldName) => fieldName.trim().toLowerCase() === 'main featured image'
+  );
+  return key && isAttachmentArray(fields[key]) ? fields[key] : [];
 }
 
 // Fetch all active products (Cached)
-export async function getProducts(): Promise<Product[]> {
+async function loadProducts(): Promise<Product[]> {
   if (cachedProducts && Date.now() - cachedProducts.timestamp < CACHE_TTL_MS) {
     return cachedProducts.data;
   }
 
   if (!base) {
-    return mockProducts;
+    console.error('[Airtable] Products unavailable: Airtable is not configured.');
+    return cachedProducts?.data || [];
   }
 
   try {
@@ -257,13 +217,14 @@ export async function getProducts(): Promise<Product[]> {
 
     const result = await withTimeout(fetchPromise, 3000, null);
     if (!result) {
-      console.warn('[Airtable] Product fetch timed out or hit limits, serving fallback catalog.');
-      return cachedProducts?.data || mockProducts;
+      console.warn('[Airtable] Product fetch timed out or hit limits; retaining last known good Airtable catalogue.');
+      return cachedProducts?.data || [];
     }
     const [records, seoMap] = result;
 
     if (!records || records.length === 0) {
-      return mockProducts;
+      console.warn('[Airtable] Products query returned no records; retaining last known good Airtable catalogue.');
+      return cachedProducts?.data || [];
     }
 
     const products: Product[] = await Promise.all(
@@ -350,11 +311,10 @@ export async function getProducts(): Promise<Product[]> {
             };
           });
 
-          // Primary featured image for cards and catalog
-          // Always prioritise Airtable Main Featured Image attachment field
-          const firstAvailableColorImage = colors.find((c) => c.images.length > 0)?.images[0];
+          // The featured image is a separate, stable product default.
+          // Never substitute a colour-variant photograph when the Airtable featured image is absent.
           const featuredImage = resolveProductImage(
-            rawFeatured || firstAvailableColorImage || defaultFallbackImage,
+            rawFeatured || defaultFallbackImage,
             categorySlug,
             slug
           );
@@ -478,8 +438,27 @@ export async function getProducts(): Promise<Product[]> {
     return products;
   } catch (error) {
     console.error('Error fetching products from Airtable:', error);
-    return cachedProducts?.data || mockProducts;
+    return cachedProducts?.data || [];
   }
+}
+
+// Deduplicate simultaneous catalogue loads within each warm Vercel instance.
+// This prevents product pages and metadata requests from issuing the same Airtable
+// catalogue query concurrently when a deployment receives a burst of traffic.
+let productsInFlight: Promise<Product[]> | null = null;
+
+export function getProducts(): Promise<Product[]> {
+  if (cachedProducts && Date.now() - cachedProducts.timestamp < CACHE_TTL_MS) {
+    return Promise.resolve(cachedProducts.data);
+  }
+
+  if (!productsInFlight) {
+    productsInFlight = loadProducts().finally(() => {
+      productsInFlight = null;
+    });
+  }
+
+  return productsInFlight;
 }
 
 // Fetch single product by slug (Instant O(1) Memory Lookup)
