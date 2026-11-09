@@ -429,9 +429,9 @@ export async function getAboutPageData(): Promise<{
       getPageSeo('about'),
     ]);
 
-    const result = await withTimeout(fetchAbout, 2000, null);
-    if (!result) return defaultData;
-    const [records, seoEntry] = result;
+    const aboutData = await withTimeout(fetchAbout, 2000, null);
+    if (!aboutData) return defaultData;
+    const [records, seoEntry] = aboutData;
 
     if (!records || records.length === 0) {
       return defaultData;
