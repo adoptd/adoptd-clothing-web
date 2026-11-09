@@ -21,6 +21,11 @@ async function handleRevalidation(req: NextRequest) {
     return NextResponse.json({
       revalidated: true,
       tag: 'products',
+      hasAirtableKey: Boolean(process.env.AIRTABLE_API_KEY),
+      hasBaseId: Boolean(process.env.AIRTABLE_BASE_ID),
+      hasKvUrl: Boolean(process.env.KV_REST_API_URL),
+      hasKvToken: Boolean(process.env.KV_REST_API_TOKEN),
+      vercelEnv: process.env.VERCEL_ENV || process.env.NODE_ENV,
       timestamp: Date.now(),
     });
   } catch (err: any) {
