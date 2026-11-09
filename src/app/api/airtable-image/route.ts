@@ -5,6 +5,24 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const ALLOWED_TABLES = new Set(['Products', 'Blog', 'Blog Posts', 'Journal', 'Articles']);
+const recordCache = new Map<string, { expiresAt: number; promise: Promise<any> }>();
+
+async function getCachedAirtableRecord(airtableBase: Airtable.Base, tableName: string, recordId: string) {
+  const key = `${tableName}:${recordId}`;
+  const cached = recordCache.get(key);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.promise;
+  }
+
+  const promise = airtableBase(tableName).find(recordId);
+  recordCache.set(key, { expiresAt: Date.now() + 30_000, promise });
+  try {
+    return await promise;
+  } catch (error) {
+    recordCache.delete(key);
+    throw error;
+  }
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -24,7 +42,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const airtableBase = new Airtable({ apiKey }).base(baseId);
-    const record = await airtableBase(tableName).find(recordId);
+    const record = await getCachedAirtableRecord(airtableBase, tableName, recordId);
     const attachment = Object.values(record.fields)
       .flatMap((value: any) => Array.isArray(value) ? value : [])
       .find((item: any) => item?.id === attachmentId);
