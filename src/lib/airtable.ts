@@ -178,60 +178,17 @@ function getColorAttachments(fields: Record<string, any>, colorName: string): an
     return fields[standardKey];
   }
 
-  // 3. Strict spelling synonyms for the EXACT SAME color only (never cross-color!)
-  // E.g. gray <-> grey, sand <-> natural. Never map lilac to purple or blue to sapphire blue.
-  const colorAliases: Record<string, string[]> = {
-    sand: ['natural', 'sand / natural', 'natural canvas'],
-    natural: ['sand', 'sand / natural', 'natural canvas'],
-    'sand / natural': ['natural', 'sand', 'natural canvas'],
-    grey: ['gray', 'heather grey'],
-    gray: ['grey', 'heather grey'],
-    'heather grey': ['grey', 'gray'],
-    'sapphire blue': ['sapphire'],
-    sapphire: ['sapphire blue'],
-  };
-
-  const aliases = colorAliases[colorLower] || [];
-  for (const alias of aliases) {
-    const aliasKey = allKeys.find((k) => k.trim().toLowerCase() === alias);
-    if (aliasKey && isAttachmentArray(fields[aliasKey])) {
-      return fields[aliasKey];
-    }
-  }
-
-  // Strictly no fuzzy cross-color substring matching. If this color's column does not exist or has no attachments, return empty.
+  // Only an exact Airtable field match is allowed. Similar colour names must never be substituted.
   return [];
 }
 
 // Robust Main Featured Image attachment extraction
 function getMainFeaturedAttachments(fields: Record<string, any>): any[] {
-  const allKeys = Object.keys(fields);
-  const mainPatterns = [
-    'main featured image',
-    'featured image',
-    'main image',
-    'main category image',
-    'category main image',
-    'category image',
-    'image',
-  ];
-
-  for (const pattern of mainPatterns) {
-    const key = allKeys.find((k) => k.trim().toLowerCase() === pattern);
-    if (key && isAttachmentArray(fields[key])) {
-      return fields[key];
-    }
-  }
-
-  const dynamicMainKey = allKeys.find((k) => {
-    const kl = k.trim().toLowerCase();
-    return (kl.includes('featured') || kl.includes('main')) && isAttachmentArray(fields[k]);
-  });
-  if (dynamicMainKey && isAttachmentArray(fields[dynamicMainKey])) {
-    return fields[dynamicMainKey];
-  }
-
-  return [];
+  // Only the explicitly designated Airtable field is the product's main image.
+  const key = Object.keys(fields).find(
+    (fieldName) => fieldName.trim().toLowerCase() === 'main featured image'
+  );
+  return key && isAttachmentArray(fields[key]) ? fields[key] : [];
 }
 
 // Fetch all active products (Cached)
@@ -352,9 +309,9 @@ export async function getProducts(): Promise<Product[]> {
 
           // Primary featured image for cards and catalog
           // Always prioritise Airtable Main Featured Image attachment field
-          const firstAvailableColorImage = colors.find((c) => c.images.length > 0)?.images[0];
+          // Keep the main image separate from colour-variant photographs.
           const featuredImage = resolveProductImage(
-            rawFeatured || firstAvailableColorImage || defaultFallbackImage,
+            rawFeatured || defaultFallbackImage,
             categorySlug,
             slug
           );
