@@ -25,6 +25,7 @@ export function constructMetadata({
   const ogImage = image || `${siteUrl}/images/hero-banner.webp`;
 
   return {
+    metadataBase: new URL(siteUrl),
     title: fullTitle,
     description: fullDescription,
     icons: {
