@@ -92,12 +92,20 @@ export function mapRowToProduct(row: any): Product {
   const publicProductsDir = path.join(process.cwd(), 'public', 'images', 'products');
 
   // Build colors directly from Supabase database columns!
+  const dbHasColors = COLOR_COLUMNS.some((c) => {
+    const val = row[c.key];
+    return val && typeof val === 'string' && val.trim() && !val.includes('airtable.com');
+  });
+
   const colors: ProductColorVariant[] = [];
 
   for (const c of COLOR_COLUMNS) {
     const dbVal = row[c.key];
     // A color is available if its image column in Supabase is not null / not empty
     const hasDbColor = dbVal && typeof dbVal === 'string' && dbVal.trim() && !dbVal.includes('airtable.com');
+
+    // If database explicitly defines which colors exist for this product, follow the database
+    if (dbHasColors && !hasDbColor) continue;
 
     // Also check if local pre-rendered images exist for this color
     let localFileMatch = '';
