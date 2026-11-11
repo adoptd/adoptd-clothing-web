@@ -3,11 +3,82 @@ import { Product, ProductColorVariant, ProductCategory } from '@/types';
 import { mockProducts } from '@/data/mockData';
 import fs from 'fs';
 import path from 'path';
+import { parseDocxBuffer } from './docx-parser';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'https://twpnniihnevlkxnuysjj.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'sb_publishable_JX1R7a8qmTADZzcKlcSVXA_YD7FZtQ7';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// In-memory cache for parsed Word document descriptions
+const docxHtmlCache = new Map<string, string>();
+
+function extractDocxName(raw?: string): string {
+  if (!raw) return '';
+  const match = raw.match(/([a-zA-Z0-9_\-.]+\.docx)/i);
+  return match ? match[1] : '';
+}
+
+export async function fetchAndParseDocx(rawField?: string): Promise<string> {
+  if (!rawField) return '';
+  const cleanInput = rawField.trim();
+  const docxName = extractDocxName(cleanInput);
+
+  // If already cached, return immediately in 0ms
+  const cacheKey = docxName || cleanInput;
+  if (docxHtmlCache.has(cacheKey)) {
+    return docxHtmlCache.get(cacheKey)!;
+  }
+
+  // If input contains no .docx and is not a URL, it's direct rich text/HTML
+  if (!docxName && !cleanInput.toLowerCase().includes('.docx') && !cleanInput.startsWith('http')) {
+    return cleanInput;
+  }
+
+  const candidateUrls: string[] = [];
+
+  // 1. Direct URL (excluding dead airtable login URLs)
+  if (cleanInput.startsWith('http://') || cleanInput.startsWith('https://')) {
+    if (!cleanInput.includes('airtable.com')) {
+      candidateUrls.push(cleanInput);
+    }
+  }
+
+  // 2. Candidate Supabase Storage locations
+  const filename = docxName || cleanInput;
+  if (filename && filename.toLowerCase().endsWith('.docx')) {
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/products/${filename}`);
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/products/descriptions/${filename}`);
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/descriptions/${filename}`);
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/documents/${filename}`);
+  }
+
+  for (const url of candidateUrls) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timer);
+
+      if (res.ok) {
+        const arrayBuf = await res.arrayBuffer();
+        const buf = Buffer.from(arrayBuf);
+        // Verify ZIP / docx header signature (PK.. or 0x50 0x4B)
+        if (buf.length > 4 && buf[0] === 0x50 && buf[1] === 0x4b) {
+          const parsed = await parseDocxBuffer(buf);
+          if (parsed && parsed.html) {
+            docxHtmlCache.set(cacheKey, parsed.html);
+            return parsed.html;
+          }
+        }
+      }
+    } catch {
+      // Safe timeout fallback
+    }
+  }
+
+  return '';
+}
 
 const mockBySlug = new Map<string, Product>();
 mockProducts.forEach((p) => {
@@ -47,7 +118,7 @@ const COLOR_COLUMNS = [
   { key: 'image_sapphire', name: 'Sapphire', aliases: ['sapphire', 'sapphireblue'] },
 ];
 
-export function mapRowToProduct(row: any): Product {
+export async function mapRowToProduct(row: any): Promise<Product> {
   const rawName = (row.product_name || 'Untitled Product').trim();
   const slug = rawName
     .toLowerCase()
@@ -177,13 +248,21 @@ export function mapRowToProduct(row: any): Product {
   else if (categorySlug === 'sweaters') sizeGuideType = 'sweater';
   else if (categorySlug === 'christian-bags') sizeGuideType = 'tote-bag';
 
-  // Clean descriptions (filter out .docx attachment links from Airtable)
-  const isDocxOrUrl = (str?: string) => 
-    Boolean(str && (str.includes('.docx') || str.includes('http://') || str.includes('https://')));
+  // Parse descriptions: support both docx in Supabase Storage and direct rich text/HTML
+  let docxHtml = '';
+  if (row.long_description) {
+    docxHtml = await fetchAndParseDocx(row.long_description);
+  }
 
-  const cleanLongDescription = isDocxOrUrl(row.long_description) ? '' : (row.long_description || '').trim();
-  const cleanShortDescription = isDocxOrUrl(row.short_description) ? '' : (row.short_description || '').trim();
-  const finalDescription = cleanLongDescription || cleanShortDescription || (mockMatch?.description || '');
+  // Fallback to plain text if not docx/url
+  const isDocxOrUrl = (str?: string) => 
+    Boolean(str && (str.toLowerCase().includes('.docx') || str.includes('http://') || str.includes('https://')));
+
+  const rawCleanLong = isDocxOrUrl(row.long_description) ? '' : (row.long_description || '').trim();
+  const rawCleanShort = isDocxOrUrl(row.short_description) ? '' : (row.short_description || '').trim();
+
+  const finalLongDescription = docxHtml || rawCleanLong || '';
+  const finalDescription = finalLongDescription || rawCleanShort || (mockMatch?.description || '');
 
   return {
     id: String(row.id),
@@ -197,8 +276,8 @@ export function mapRowToProduct(row: any): Product {
     availableSizes: availableSizes.length > 0 ? availableSizes : (mockMatch?.availableSizes || ['M', 'L', 'XL']),
     colors,
     description: finalDescription,
-    shortDescription: cleanShortDescription || undefined,
-    longDescription: cleanLongDescription || undefined,
+    shortDescription: rawCleanShort || undefined,
+    longDescription: finalLongDescription || undefined,
     scriptureReference: row.scripture_reference || mockMatch?.scriptureReference || undefined,
     sizeGuideType: mockMatch?.sizeGuideType || sizeGuideType,
     featuredImage,
@@ -226,7 +305,7 @@ export async function getSupabaseProducts(): Promise<Product[]> {
     return cachedProducts || mockProducts;
   }
 
-  const products = (data || []).map(mapRowToProduct);
+  const products = await Promise.all((data || []).map(mapRowToProduct));
   cachedProducts = products;
   lastFetchTime = Date.now();
   return products;
