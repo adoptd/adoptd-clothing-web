@@ -21,8 +21,8 @@ export default async function RootLayout({
   const organizationJsonLd = JSON.stringify(generateOrganizationJsonLd(settings)).replace(/</g, '\\u003c');
 
   return (
-    <html lang="en-GB" className="scroll-smooth">
-      <body className="min-h-screen flex flex-col antialiased bg-white text-stone-900 selection:bg-stone-900 selection:text-white">
+    <html lang="en-GB" className="scroll-smooth" suppressHydrationWarning>
+      <body className="min-h-screen flex flex-col antialiased bg-white text-stone-900 selection:bg-stone-900 selection:text-white" suppressHydrationWarning>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: organizationJsonLd }}
