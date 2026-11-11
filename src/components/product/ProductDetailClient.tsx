@@ -60,19 +60,20 @@ export function ProductDetailClient({
     });
   }
 
-  // 2. Subsequent positions: Specific photographs for each color variant
+  // 2. Subsequent positions: One specific photograph for each color variant
   product.colors.forEach((color) => {
-    color.images.forEach((imgUrl, i) => {
-      const resolved = resolveProductImage(imgUrl, product.category, product.slug);
+    const primaryImg = color.images[0];
+    if (primaryImg) {
+      const resolved = resolveProductImage(primaryImg, product.category, product.slug);
       if (resolved && !seenUrls.has(resolved)) {
         seenUrls.add(resolved);
         galleryItems.push({
           url: resolved,
           colorName: color.name,
-          label: `${color.name}${i > 0 ? ` (${i + 1})` : ''}`,
+          label: color.name,
         });
       }
-    });
+    }
   });
 
   if (galleryItems.length === 0) {

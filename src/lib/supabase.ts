@@ -123,33 +123,15 @@ export function mapRowToProduct(row: any): Product {
       // 1. Prefer verified local high-res WebP if present
       if (localFileMatch) {
         colorImages.push(localFileMatch);
-      }
-
-      // 2. Add Supabase storage URL if clean filename provided
-      if (hasDbColor) {
+      } else if (hasDbColor) {
+        // 2. Otherwise use Supabase storage URL (primary image only)
         const filenames = dbVal.split(',').map((f: string) => f.trim()).filter(Boolean);
-        filenames.forEach((fname: string) => {
-          if (!fname.includes('airtable.com')) {
-            const url = fname.startsWith('/') || fname.startsWith('http')
-              ? fname
-              : `${supabaseUrl}/storage/v1/object/public/products/${fname}`;
-            if (!colorImages.includes(url)) {
-              colorImages.push(url);
-            }
-          }
-        });
-      }
-
-      // 3. Attach lifestyle images to the primary color so they appear in gallery
-      if (c.aliases.includes('black') || colors.length === 0) {
-        for (let i = 1; i <= 3; i++) {
-          const lifeCandidate = `${slug}-lifestyle-${i}.webp`;
-          if (fs.existsSync(path.join(publicProductsDir, lifeCandidate))) {
-            const lifeUrl = `/images/products/${lifeCandidate}`;
-            if (!colorImages.includes(lifeUrl)) {
-              colorImages.push(lifeUrl);
-            }
-          }
+        const primaryFile = filenames.find((f: string) => !f.includes('airtable.com'));
+        if (primaryFile) {
+          const url = primaryFile.startsWith('/') || primaryFile.startsWith('http')
+            ? primaryFile
+            : `${supabaseUrl}/storage/v1/object/public/products/${primaryFile}`;
+          colorImages.push(url);
         }
       }
 
