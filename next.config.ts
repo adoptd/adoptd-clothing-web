@@ -54,6 +54,14 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "twpnniihnevlkxnuysjj.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "**.supabase.co",
+      },
+      {
+        protocol: "https",
         hostname: "**.airtableusercontent.com",
       },
       {

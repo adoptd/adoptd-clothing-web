@@ -4,6 +4,7 @@ import { mockProducts, mockBlogPosts, mockSiteSettings } from '@/data/mockData';
 import { parseDocxBuffer } from './docx-parser';
 import yoastSeoData from '@/data/yoast-seo-data.json';
 import { resolveProductImage, getProductFallbackImage, isAirtableUrlExpired } from './images';
+import { getSupabaseProducts } from './supabase';
 
 const apiKey = process.env.AIRTABLE_API_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
@@ -191,8 +192,22 @@ function getMainFeaturedAttachments(fields: Record<string, any>): any[] {
   return key && isAttachmentArray(fields[key]) ? fields[key] : [];
 }
 
-// Fetch all active products (Cached)
+// Fetch all active products (Powered by Supabase)
 export async function getProducts(): Promise<Product[]> {
+  try {
+    const supabaseProducts = await getSupabaseProducts();
+    if (supabaseProducts && supabaseProducts.length > 0) {
+      cachedProducts = { data: supabaseProducts, timestamp: Date.now() };
+      supabaseProducts.forEach((p) => {
+        cachedProductsBySlug.set(p.slug.toLowerCase(), p);
+        cachedProductsById.set(p.id, p);
+      });
+      return supabaseProducts;
+    }
+  } catch (err) {
+    console.warn('[Supabase] Failed to fetch products, attempting fallback:', err);
+  }
+
   if (cachedProducts && Date.now() - cachedProducts.timestamp < CACHE_TTL_MS) {
     return cachedProducts.data;
   }
