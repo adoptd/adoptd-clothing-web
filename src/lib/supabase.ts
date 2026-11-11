@@ -120,10 +120,13 @@ const COLOR_COLUMNS = [
 
 export async function mapRowToProduct(row: any): Promise<Product> {
   const rawName = (row.product_name || 'Untitled Product').trim();
-  const slug = rawName
+  const autoSlug = rawName
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)+/g, '');
+
+  const mockMatch = mockBySlug.get(autoSlug) || mockBySlug.get(rawName.toLowerCase());
+  const slug = mockMatch?.slug || autoSlug;
 
   const rawCat = (row.category || '').toLowerCase();
   let categorySlug: ProductCategory = 'tee-shirts';
@@ -159,7 +162,6 @@ export async function mapRowToProduct(row: any): Promise<Product> {
     }
   }
 
-  const mockMatch = mockBySlug.get(slug) || mockBySlug.get(rawName.toLowerCase());
   const publicProductsDir = path.join(process.cwd(), 'public', 'images', 'products');
 
   // Build colors directly from Supabase database columns!
@@ -314,5 +316,15 @@ export async function getSupabaseProducts(): Promise<Product[]> {
 export async function getSupabaseProductBySlug(slug: string): Promise<Product | null> {
   const products = await getSupabaseProducts();
   const cleanSlug = (slug || '').trim().toLowerCase();
-  return products.find((p) => p.slug === cleanSlug || p.id === cleanSlug) || null;
+  const altSlug = cleanSlug.replace(/-s\b/g, 's');
+  const altSlug2 = cleanSlug.replace(/\b(men|women)s\b/g, '$1-s');
+  return (
+    products.find(
+      (p) =>
+        p.slug === cleanSlug ||
+        p.slug === altSlug ||
+        p.slug === altSlug2 ||
+        p.id === cleanSlug
+    ) || null
+  );
 }
