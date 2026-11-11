@@ -1,18 +1,20 @@
 import { createClient } from '@supabase/supabase-js';
 import { Product, ProductColorVariant, ProductCategory } from '@/types';
-import { getProductFallbackImage } from './images';
+import { mockProducts } from '@/data/mockData';
+import fs from 'fs';
+import path from 'path';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'https://twpnniihnevlkxnuysjj.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'sb_publishable_JX1R7a8qmTADZzcKlcSVXA_YD7FZtQ7';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export function getStorageImageUrl(filename: string | null | undefined): string {
-  if (!filename || !filename.trim()) return '';
-  const clean = filename.trim();
-  if (clean.startsWith('http://') || clean.startsWith('https://')) return clean;
-  return `${supabaseUrl}/storage/v1/object/public/products/${clean}`;
-}
+// Map of existing mock products for instant fallback of pre-rendered high-res variants
+const mockBySlug = new Map<string, Product>();
+mockProducts.forEach((p) => {
+  mockBySlug.set(p.slug.toLowerCase(), p);
+  mockBySlug.set(p.name.toLowerCase(), p);
+});
 
 export function getColorHex(colorName: string): string {
   const normalized = colorName.toLowerCase().trim();
@@ -32,18 +34,18 @@ export function getColorHex(colorName: string): string {
 }
 
 const COLOR_COLUMNS = [
-  { key: 'image_black', name: 'Black' },
-  { key: 'image_grey', name: 'Grey' },
-  { key: 'image_natural', name: 'Natural' },
-  { key: 'image_white', name: 'White' },
-  { key: 'image_jade', name: 'Jade' },
-  { key: 'image_purple', name: 'Purple' },
-  { key: 'image_green', name: 'Green' },
-  { key: 'image_burgundy', name: 'Burgundy' },
-  { key: 'image_blue', name: 'Blue' },
-  { key: 'image_lilac', name: 'Lilac' },
-  { key: 'image_navy', name: 'Navy' },
-  { key: 'image_sapphire', name: 'Sapphire' },
+  { key: 'image_black', name: 'Black', slug: 'black' },
+  { key: 'image_grey', name: 'Grey', slug: 'grey' },
+  { key: 'image_natural', name: 'Natural', slug: 'sand' },
+  { key: 'image_white', name: 'White', slug: 'white' },
+  { key: 'image_jade', name: 'Jade', slug: 'jade' },
+  { key: 'image_purple', name: 'Purple', slug: 'purple' },
+  { key: 'image_green', name: 'Green', slug: 'green' },
+  { key: 'image_burgundy', name: 'Burgundy', slug: 'burgundy' },
+  { key: 'image_blue', name: 'Blue', slug: 'blue' },
+  { key: 'image_lilac', name: 'Lilac', slug: 'lilac' },
+  { key: 'image_navy', name: 'Navy', slug: 'navy' },
+  { key: 'image_sapphire', name: 'Sapphire', slug: 'sapphireblue' },
 ];
 
 export function mapRowToProduct(row: any): Product {
@@ -87,40 +89,79 @@ export function mapRowToProduct(row: any): Product {
     }
   }
 
-  // Build color variants from the color columns
-  const colors: ProductColorVariant[] = [];
-  for (const c of COLOR_COLUMNS) {
-    const val = row[c.key];
-    if (val && typeof val === 'string' && val.trim()) {
-      // Might be multiple filenames separated by comma (e.g. front and back)
-      const filenames = val.split(',').map((f: string) => f.trim()).filter(Boolean);
-      const images = filenames.map(getStorageImageUrl);
-      colors.push({
-        name: c.name,
-        hex: getColorHex(c.name),
-        images,
-        hasSpecificImage: images.length > 0,
-      });
+  // Check if mockData has rich color variants with verified local images for this product
+  const mockMatch = mockBySlug.get(slug) || mockBySlug.get(rawName.toLowerCase());
+
+  // Build colors
+  let colors: ProductColorVariant[] = [];
+
+  if (mockMatch && mockMatch.colors && mockMatch.colors.length > 0) {
+    colors = mockMatch.colors;
+  } else {
+    // Check local public folder for images by slug convention
+    const publicProductsDir = path.join(process.cwd(), 'public', 'images', 'products');
+    for (const c of COLOR_COLUMNS) {
+      const colorImages: string[] = [];
+      const primaryCandidate = `${slug}-${c.slug}.webp`;
+      if (fs.existsSync(path.join(publicProductsDir, primaryCandidate))) {
+        colorImages.push(`/images/products/${primaryCandidate}`);
+      }
+
+      // Check lifestyle photos
+      for (let i = 1; i <= 3; i++) {
+        const lifeCandidate = `${slug}-lifestyle-${i}.webp`;
+        if (fs.existsSync(path.join(publicProductsDir, lifeCandidate))) {
+          colorImages.push(`/images/products/${lifeCandidate}`);
+        }
+      }
+
+      // If database has an image filename specified in this column
+      const dbVal = row[c.key];
+      if (dbVal && typeof dbVal === 'string' && dbVal.trim()) {
+        const filenames = dbVal.split(',').map((f: string) => f.trim()).filter(Boolean);
+        filenames.forEach((fname) => {
+          if (!fname.includes('airtable.com')) {
+            const url = fname.startsWith('/') || fname.startsWith('http')
+              ? fname
+              : `${supabaseUrl}/storage/v1/object/public/products/${fname}`;
+            if (!colorImages.includes(url)) {
+              colorImages.push(url);
+            }
+          }
+        });
+      }
+
+      if (colorImages.length > 0) {
+        colors.push({
+          name: c.name,
+          hex: getColorHex(c.name),
+          images: colorImages,
+          hasSpecificImage: true,
+        });
+      }
     }
   }
 
-  // Default color if none found
+  // Fallback default color
   if (colors.length === 0) {
     colors.push({
       name: 'Default',
       hex: '#111111',
-      images: [],
+      images: [`/images/products/${slug}.webp`],
       hasSpecificImage: false,
     });
   }
 
   // Featured image
-  let featuredImage = getStorageImageUrl(row.main_featured_image);
-  if (!featuredImage && colors.length > 0 && colors[0].images.length > 0) {
+  let featuredImage = '';
+  if (mockMatch && mockMatch.featuredImage) {
+    featuredImage = mockMatch.featuredImage;
+  } else if (fs.existsSync(path.join(process.cwd(), 'public', 'images', 'products', `${slug}.webp`))) {
+    featuredImage = `/images/products/${slug}.webp`;
+  } else if (colors[0]?.images[0]) {
     featuredImage = colors[0].images[0];
-  }
-  if (!featuredImage) {
-    featuredImage = getProductFallbackImage(categorySlug, slug);
+  } else {
+    featuredImage = '/images/shop-hoodies-bg.webp';
   }
 
   // Size guide type
@@ -129,22 +170,30 @@ export function mapRowToProduct(row: any): Product {
   else if (categorySlug === 'sweaters') sizeGuideType = 'sweater';
   else if (categorySlug === 'christian-bags') sizeGuideType = 'tote-bag';
 
+  // Clean descriptions (filter out .docx attachment links from Airtable)
+  const isDocxOrUrl = (str?: string) => 
+    Boolean(str && (str.includes('.docx') || str.includes('http://') || str.includes('https://')));
+
+  const cleanLongDescription = isDocxOrUrl(row.long_description) ? '' : (row.long_description || '').trim();
+  const cleanShortDescription = isDocxOrUrl(row.short_description) ? '' : (row.short_description || '').trim();
+  const finalDescription = cleanLongDescription || cleanShortDescription || (mockMatch?.description || '');
+
   return {
     id: String(row.id),
     name: rawName,
     slug,
     category: categorySlug,
     categoryName,
-    price: Number(row.price) || 0,
-    compareAtPrice: row.compare_at_price ? Number(row.compare_at_price) : undefined,
+    price: Number(row.price) || (mockMatch?.price || 19.99),
+    compareAtPrice: row.compare_at_price ? Number(row.compare_at_price) : mockMatch?.compareAtPrice,
     inStock: row.in_stock !== false,
-    availableSizes,
+    availableSizes: availableSizes.length > 0 ? availableSizes : (mockMatch?.availableSizes || ['M', 'L', 'XL']),
     colors,
-    description: row.short_description || row.long_description || '',
-    shortDescription: row.short_description || undefined,
-    longDescription: row.long_description || undefined,
-    scriptureReference: row.scripture_reference || undefined,
-    sizeGuideType,
+    description: finalDescription,
+    shortDescription: cleanShortDescription || undefined,
+    longDescription: cleanLongDescription || undefined,
+    scriptureReference: row.scripture_reference || mockMatch?.scriptureReference || undefined,
+    sizeGuideType: mockMatch?.sizeGuideType || sizeGuideType,
     featuredImage,
     categoryOverview: row.category_overview || undefined,
   };
@@ -167,7 +216,7 @@ export async function getSupabaseProducts(): Promise<Product[]> {
 
   if (error) {
     console.error('[Supabase] Error fetching products:', error);
-    return cachedProducts || [];
+    return cachedProducts || mockProducts;
   }
 
   const products = (data || []).map(mapRowToProduct);
