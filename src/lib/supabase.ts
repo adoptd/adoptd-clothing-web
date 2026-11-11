@@ -9,7 +9,6 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Map of existing mock products for instant fallback of pre-rendered high-res variants
 const mockBySlug = new Map<string, Product>();
 mockProducts.forEach((p) => {
   mockBySlug.set(p.slug.toLowerCase(), p);
@@ -34,18 +33,18 @@ export function getColorHex(colorName: string): string {
 }
 
 const COLOR_COLUMNS = [
-  { key: 'image_black', name: 'Black', slug: 'black' },
-  { key: 'image_grey', name: 'Grey', slug: 'grey' },
-  { key: 'image_natural', name: 'Natural', slug: 'sand' },
-  { key: 'image_white', name: 'White', slug: 'white' },
-  { key: 'image_jade', name: 'Jade', slug: 'jade' },
-  { key: 'image_purple', name: 'Purple', slug: 'purple' },
-  { key: 'image_green', name: 'Green', slug: 'green' },
-  { key: 'image_burgundy', name: 'Burgundy', slug: 'burgundy' },
-  { key: 'image_blue', name: 'Blue', slug: 'blue' },
-  { key: 'image_lilac', name: 'Lilac', slug: 'lilac' },
-  { key: 'image_navy', name: 'Navy', slug: 'navy' },
-  { key: 'image_sapphire', name: 'Sapphire', slug: 'sapphireblue' },
+  { key: 'image_black', name: 'Black', aliases: ['black'] },
+  { key: 'image_grey', name: 'Grey', aliases: ['grey', 'gray'] },
+  { key: 'image_natural', name: 'Natural', aliases: ['natural', 'sand'] },
+  { key: 'image_white', name: 'White', aliases: ['white'] },
+  { key: 'image_jade', name: 'Jade', aliases: ['jade'] },
+  { key: 'image_purple', name: 'Purple', aliases: ['purple'] },
+  { key: 'image_green', name: 'Green', aliases: ['green', 'olive'] },
+  { key: 'image_burgundy', name: 'Burgundy', aliases: ['burgundy', 'maroon'] },
+  { key: 'image_blue', name: 'Blue', aliases: ['blue'] },
+  { key: 'image_lilac', name: 'Lilac', aliases: ['lilac'] },
+  { key: 'image_navy', name: 'Navy', aliases: ['navy'] },
+  { key: 'image_sapphire', name: 'Sapphire', aliases: ['sapphire', 'sapphireblue'] },
 ];
 
 export function mapRowToProduct(row: any): Product {
@@ -89,37 +88,39 @@ export function mapRowToProduct(row: any): Product {
     }
   }
 
-  // Check if mockData has rich color variants with verified local images for this product
   const mockMatch = mockBySlug.get(slug) || mockBySlug.get(rawName.toLowerCase());
+  const publicProductsDir = path.join(process.cwd(), 'public', 'images', 'products');
 
-  // Build colors
-  let colors: ProductColorVariant[] = [];
+  // Build colors directly from Supabase database columns!
+  const colors: ProductColorVariant[] = [];
 
-  if (mockMatch && mockMatch.colors && mockMatch.colors.length > 0) {
-    colors = mockMatch.colors;
-  } else {
-    // Check local public folder for images by slug convention
-    const publicProductsDir = path.join(process.cwd(), 'public', 'images', 'products');
-    for (const c of COLOR_COLUMNS) {
+  for (const c of COLOR_COLUMNS) {
+    const dbVal = row[c.key];
+    // A color is available if its image column in Supabase is not null / not empty
+    const hasDbColor = dbVal && typeof dbVal === 'string' && dbVal.trim() && !dbVal.includes('airtable.com');
+
+    // Also check if local pre-rendered images exist for this color
+    let localFileMatch = '';
+    for (const alias of c.aliases) {
+      const candidate = `${slug}-${alias}.webp`;
+      if (fs.existsSync(path.join(publicProductsDir, candidate))) {
+        localFileMatch = `/images/products/${candidate}`;
+        break;
+      }
+    }
+
+    if (hasDbColor || localFileMatch) {
       const colorImages: string[] = [];
-      const primaryCandidate = `${slug}-${c.slug}.webp`;
-      if (fs.existsSync(path.join(publicProductsDir, primaryCandidate))) {
-        colorImages.push(`/images/products/${primaryCandidate}`);
+
+      // 1. Prefer verified local high-res WebP if present
+      if (localFileMatch) {
+        colorImages.push(localFileMatch);
       }
 
-      // Check lifestyle photos
-      for (let i = 1; i <= 3; i++) {
-        const lifeCandidate = `${slug}-lifestyle-${i}.webp`;
-        if (fs.existsSync(path.join(publicProductsDir, lifeCandidate))) {
-          colorImages.push(`/images/products/${lifeCandidate}`);
-        }
-      }
-
-      // If database has an image filename specified in this column
-      const dbVal = row[c.key];
-      if (dbVal && typeof dbVal === 'string' && dbVal.trim()) {
+      // 2. Add Supabase storage URL if clean filename provided
+      if (hasDbColor) {
         const filenames = dbVal.split(',').map((f: string) => f.trim()).filter(Boolean);
-        filenames.forEach((fname) => {
+        filenames.forEach((fname: string) => {
           if (!fname.includes('airtable.com')) {
             const url = fname.startsWith('/') || fname.startsWith('http')
               ? fname
@@ -131,15 +132,31 @@ export function mapRowToProduct(row: any): Product {
         });
       }
 
-      if (colorImages.length > 0) {
-        colors.push({
-          name: c.name,
-          hex: getColorHex(c.name),
-          images: colorImages,
-          hasSpecificImage: true,
-        });
+      // 3. Attach lifestyle images to the primary color so they appear in gallery
+      if (c.aliases.includes('black') || colors.length === 0) {
+        for (let i = 1; i <= 3; i++) {
+          const lifeCandidate = `${slug}-lifestyle-${i}.webp`;
+          if (fs.existsSync(path.join(publicProductsDir, lifeCandidate))) {
+            const lifeUrl = `/images/products/${lifeCandidate}`;
+            if (!colorImages.includes(lifeUrl)) {
+              colorImages.push(lifeUrl);
+            }
+          }
+        }
       }
+
+      colors.push({
+        name: c.name,
+        hex: getColorHex(c.name),
+        images: colorImages,
+        hasSpecificImage: colorImages.length > 0,
+      });
     }
+  }
+
+  // Fallback to mock colors if database has zero colors defined
+  if (colors.length === 0 && mockMatch && mockMatch.colors && mockMatch.colors.length > 0) {
+    colors.push(...mockMatch.colors);
   }
 
   // Fallback default color
@@ -154,10 +171,10 @@ export function mapRowToProduct(row: any): Product {
 
   // Featured image
   let featuredImage = '';
-  if (mockMatch && mockMatch.featuredImage) {
-    featuredImage = mockMatch.featuredImage;
-  } else if (fs.existsSync(path.join(process.cwd(), 'public', 'images', 'products', `${slug}.webp`))) {
+  if (fs.existsSync(path.join(publicProductsDir, `${slug}.webp`))) {
     featuredImage = `/images/products/${slug}.webp`;
+  } else if (mockMatch && mockMatch.featuredImage) {
+    featuredImage = mockMatch.featuredImage;
   } else if (colors[0]?.images[0]) {
     featuredImage = colors[0].images[0];
   } else {
