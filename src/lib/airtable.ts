@@ -4,7 +4,7 @@ import { mockProducts, mockBlogPosts, mockSiteSettings } from '@/data/mockData';
 import { parseDocxBuffer } from './docx-parser';
 import yoastSeoData from '@/data/yoast-seo-data.json';
 import { resolveProductImage, getProductFallbackImage, isAirtableUrlExpired } from './images';
-import { getSupabaseProducts } from './supabase';
+import { getSupabaseProducts, getSupabaseBlogPosts, getSupabaseBlogPostBySlug } from './supabase';
 
 const apiKey = process.env.AIRTABLE_API_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
@@ -565,7 +565,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
   }
 
   if (!base) {
-    return mockBlogPosts;
+    return getSupabaseBlogPosts();
   }
 
   try {
@@ -593,7 +593,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     const records = await withTimeout(fetchBlog, 2500, []);
 
     if (!records || records.length === 0) {
-      return mockBlogPosts;
+      return getSupabaseBlogPosts();
     }
 
     const posts: BlogPost[] = [];
@@ -688,7 +688,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     return posts;
   } catch (error) {
     console.error('Error fetching blog posts from Airtable:', error);
-    return cachedBlogPosts?.data || mockBlogPosts;
+    return cachedBlogPosts?.data || (await getSupabaseBlogPosts());
   }
 }
 
@@ -699,7 +699,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
     return cachedBlogPostsBySlug.get(cleanSlug)!;
   }
   const posts = await getBlogPosts();
-  return cachedBlogPostsBySlug.get(cleanSlug) || posts.find((p) => p.slug.toLowerCase() === cleanSlug) || null;
+  return cachedBlogPostsBySlug.get(cleanSlug) || posts.find((p) => p.slug.toLowerCase() === cleanSlug) || (await getSupabaseBlogPostBySlug(slug));
 }
 
 // Fetch global site settings (Cached)

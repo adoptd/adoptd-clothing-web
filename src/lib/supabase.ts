@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { Product, ProductColorVariant, ProductCategory } from '@/types';
-import { mockProducts } from '@/data/mockData';
+import { Product, ProductColorVariant, ProductCategory, BlogPost } from '@/types';
+import { mockProducts, mockBlogPosts } from '@/data/mockData';
 import fs from 'fs';
 import path from 'path';
 import { parseDocxBuffer } from './docx-parser';
@@ -52,6 +52,9 @@ export async function fetchAndParseDocx(rawField?: string): Promise<string> {
     // Direct in Descriptions bucket (case-insensitive checks)
     candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/Descriptions/${encodeURI(filename)}`);
     candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/descriptions/${encodeURI(filename)}`);
+    // Direct in Blog bucket
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/Blog/${encodeURI(filename)}`);
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/blog/${encodeURI(filename)}`);
     // In products bucket
     candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/products/${encodeURI(filename)}`);
     candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/products/Descriptions/${encodeURI(filename)}`);
@@ -335,6 +338,141 @@ export async function getSupabaseProductBySlug(slug: string): Promise<Product | 
         p.slug === cleanSlug ||
         p.slug === altSlug ||
         p.slug === altSlug2 ||
+        p.id === cleanSlug
+    ) || null
+  );
+}
+
+// ==========================================
+// SUPABASE BLOG FUNCTIONS
+// ==========================================
+
+export function resolveBlogCoverImage(raw?: string): string {
+  if (!raw || !raw.trim()) {
+    return 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200';
+  }
+  const clean = raw.trim();
+  if (clean.startsWith('http://') || clean.startsWith('https://')) {
+    return clean;
+  }
+  // User entered filename from storage 'Blog' bucket
+  return `${supabaseUrl}/storage/v1/object/public/Blog/${encodeURI(clean)}`;
+}
+
+export async function mapRowToBlogPost(row: any): Promise<BlogPost> {
+  const title = (row.title || 'Faith & Devotion').trim();
+  const autoSlug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+  const slug = (row.slug || autoSlug || String(row.id)).trim();
+
+  const coverImage = resolveBlogCoverImage(row.cover_image || row.image_cover);
+  const category = (row.category || 'Faith & Encouragement').trim();
+
+  let contentHtml = row.content || row.body || '';
+  let rawText = '';
+
+  // Check for Word document attachment in docx / word_document column or inside content
+  const docxCandidate =
+    row.docx ||
+    row.word_document ||
+    row.document ||
+    (typeof contentHtml === 'string' && contentHtml.toLowerCase().endsWith('.docx') ? contentHtml : null);
+
+  if (docxCandidate) {
+    const parsedHtml = await fetchAndParseDocx(docxCandidate);
+    if (parsedHtml) {
+      contentHtml = parsedHtml;
+      rawText = parsedHtml.replace(/<[^>]*>/g, '');
+    }
+  }
+
+  let excerpt = (row.excerpt || row.summary || '').trim();
+  if (!excerpt && rawText) {
+    excerpt = rawText.slice(0, 160).trim() + '...';
+  } else if (!excerpt) {
+    excerpt = 'A biblical reflection and devotional from the ADOPTD journal.';
+  }
+
+  const wordCount = (rawText || contentHtml.replace(/<[^>]*>/g, '')).split(/\s+/).length;
+  const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 200));
+
+  const publishDate =
+    row.publish_date ||
+    (row.created_at ? new Date(row.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+
+  return {
+    id: String(row.id),
+    title,
+    slug,
+    coverImage,
+    category,
+    excerpt,
+    contentHtml,
+    publishDate,
+    author: row.author || 'ADOPTD Team',
+    readingTimeMinutes,
+    seoTitle: row.seo_title || `${title} | ADOPTD Journal`,
+    seoDescription: row.seo_description || excerpt,
+    published: row.published !== false,
+  };
+}
+
+let cachedBlogPosts: BlogPost[] | null = null;
+let lastBlogFetchTime = 0;
+
+export async function getSupabaseBlogPosts(): Promise<BlogPost[]> {
+  if (cachedBlogPosts && Date.now() - lastBlogFetchTime < CACHE_TTL_MS) {
+    return cachedBlogPosts;
+  }
+
+  // Support both "Blog" and "blog" table casing
+  let data: any[] | null = null;
+  let fetchError: any = null;
+
+  const res1 = await supabase
+    .from('Blog')
+    .select('*')
+    .eq('published', true)
+    .order('id', { ascending: false });
+
+  if (!res1.error && res1.data) {
+    data = res1.data;
+  } else {
+    const res2 = await supabase
+      .from('blog')
+      .select('*')
+      .eq('published', true)
+      .order('id', { ascending: false });
+    if (!res2.error && res2.data) {
+      data = res2.data;
+    } else {
+      fetchError = res1.error || res2.error;
+    }
+  }
+
+  if (fetchError || !data || data.length === 0) {
+    if (fetchError) {
+      console.error('[Supabase] Error fetching Blog posts:', fetchError);
+    }
+    // Return mock blog posts if table is empty or error
+    return cachedBlogPosts || mockBlogPosts;
+  }
+
+  const posts = await Promise.all(data.map(mapRowToBlogPost));
+  cachedBlogPosts = posts;
+  lastBlogFetchTime = Date.now();
+  return posts;
+}
+
+export async function getSupabaseBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  const posts = await getSupabaseBlogPosts();
+  const cleanSlug = (slug || '').trim().toLowerCase();
+  return (
+    posts.find(
+      (p) =>
+        p.slug.toLowerCase() === cleanSlug ||
         p.id === cleanSlug
     ) || null
   );

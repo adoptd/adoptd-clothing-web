@@ -1,15 +1,15 @@
 import { MetadataRoute } from 'next';
-import { getProducts, getBlogPosts } from '@/lib/airtable';
+import { getSupabaseProducts, getSupabaseBlogPosts } from '@/lib/supabase';
 
-// Build the sitemap at request time so Airtable is not queried during deployment.
+// Build the sitemap at request time so dynamic database routes are always up to date.
 export const dynamic = 'force-dynamic';
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://adoptdchristianclothing.co.uk';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [products, posts] = await Promise.all([
-    getProducts(),
-    getBlogPosts(),
+    getSupabaseProducts(),
+    getSupabaseBlogPosts(),
   ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
