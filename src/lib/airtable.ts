@@ -6,16 +6,9 @@ import yoastSeoData from '@/data/yoast-seo-data.json';
 import { resolveProductImage, getProductFallbackImage, isAirtableUrlExpired } from './images';
 import { getSupabaseProducts, getSupabaseBlogPosts, getSupabaseBlogPostBySlug } from './supabase';
 
-const apiKey = process.env.AIRTABLE_API_KEY;
-const baseId = process.env.AIRTABLE_BASE_ID;
-
-const base = apiKey && baseId
-  ? new Airtable({
-      apiKey,
-      requestTimeout: 2500,
-      noRetryIfRateLimited: true,
-    }).base(baseId)
-  : null;
+// AIRTABLE PERMANENTLY DISCONNECTED (Migrated 100% to Supabase)
+// Setting base = null ensures zero queries ever reach Airtable, completely eliminating billing errors and timeouts.
+const base: any = null;
 
 // Clean timeout wrapper to prevent any external query from blocking Vercel serverless functions
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {

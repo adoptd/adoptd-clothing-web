@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
-import { getProducts } from '@/lib/airtable';
+import { getSupabaseProducts } from '@/lib/supabase';
 import { ProductCard } from '@/components/product/ProductCard';
 import { constructMetadata } from '@/lib/seo';
 import { TestimonialsCarousel } from '@/components/home/TestimonialsCarousel';
@@ -16,7 +16,7 @@ export const metadata = constructMetadata({
 });
 
 export default async function HomePage() {
-  const products = await getProducts();
+  const products = await getSupabaseProducts();
 
   const categoryOrder = ['tee-shirts', 'christian-hoodies-uk', 'christian-bags', 'christmas', 'gym-sportswear'];
   const featuredProducts: typeof products = [];

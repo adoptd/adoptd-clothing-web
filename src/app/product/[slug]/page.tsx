@@ -1,6 +1,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { getProductBySlug, getProducts } from '@/lib/airtable';
+import { getSupabaseProductBySlug, getSupabaseProducts } from '@/lib/supabase';
 import { constructMetadata, generateProductJsonLd } from '@/lib/seo';
 import { ProductDetailClient } from '@/components/product/ProductDetailClient';
 import { Metadata } from 'next';
@@ -11,7 +11,7 @@ interface ProductPageProps {
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const product = await getSupabaseProductBySlug(slug);
 
   if (!product) {
     return constructMetadata({ title: 'Product Not Found' });
@@ -40,13 +40,13 @@ export const revalidate = 3600;
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const product = await getSupabaseProductBySlug(slug);
 
   if (!product) {
     notFound();
   }
 
-  const allProducts = await getProducts();
+  const allProducts = await getSupabaseProducts();
   const relatedProducts = allProducts.filter(
     (p) =>
       p.id !== product.id &&

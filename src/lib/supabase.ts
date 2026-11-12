@@ -473,6 +473,14 @@ export async function getSupabaseBlogPosts(): Promise<BlogPost[]> {
   return posts;
 }
 
+export function clearSupabaseCache(): void {
+  cachedProducts = null;
+  lastFetchTime = 0;
+  cachedBlogPosts = null;
+  lastBlogFetchTime = 0;
+  docxHtmlCache.clear();
+}
+
 export async function getSupabaseBlogPostBySlug(slug: string): Promise<BlogPost | null> {
   const posts = await getSupabaseBlogPosts();
   const cleanSlug = (slug || '').trim().toLowerCase();

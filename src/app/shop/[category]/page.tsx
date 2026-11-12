@@ -1,7 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getProducts, getPageSeo } from '@/lib/airtable';
+import { getPageSeo } from '@/lib/airtable';
+import { getSupabaseProducts } from '@/lib/supabase';
 import { ProductCard } from '@/components/product/ProductCard';
 import { constructMetadata } from '@/lib/seo';
 import { Metadata } from 'next';
@@ -92,7 +93,7 @@ export const revalidate = 3600;
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category } = await params;
-  const allProducts = await getProducts();
+  const allProducts = await getSupabaseProducts();
   const products = allProducts.filter((p) => p.category === category);
   const info = categoryInfoMap[category];
   const categoryOverview = products.find((p) => p.categoryOverview)?.categoryOverview;

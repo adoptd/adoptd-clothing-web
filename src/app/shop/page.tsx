@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { getProducts } from '@/lib/airtable';
+import { getSupabaseProducts } from '@/lib/supabase';
 import { ProductCard } from '@/components/product/ProductCard';
 import { constructMetadata } from '@/lib/seo';
 
@@ -13,7 +13,7 @@ export const metadata = constructMetadata({
 export const revalidate = 3600;
 
 export default async function ShopPage() {
-  const products = await getProducts();
+  const products = await getSupabaseProducts();
 
   const categories = [
     { name: 'All Products', slug: 'all', href: '/shop' },

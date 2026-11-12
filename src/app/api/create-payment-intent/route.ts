@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { getProducts } from '@/lib/airtable';
+import { getSupabaseProducts } from '@/lib/supabase';
 
 export async function POST(req: Request) {
   try {
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     }
 
     // Fetch verified products from server to prevent client-side price tampering
-    const allProducts = await getProducts();
+    const allProducts = await getSupabaseProducts();
     const productMap = new Map(allProducts.map((p) => [p.id, p]));
 
     let totalAmountPence = 0;
