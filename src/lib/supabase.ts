@@ -355,6 +355,9 @@ export function resolveBlogCoverImage(raw?: string): string {
   if (clean.startsWith('http://') || clean.startsWith('https://')) {
     return clean;
   }
+  if (clean.toLowerCase().startsWith('blog/')) {
+    return `${supabaseUrl}/storage/v1/object/public/${encodeURI(clean)}`;
+  }
   // User entered filename from storage 'Blog' bucket
   return `${supabaseUrl}/storage/v1/object/public/Blog/${encodeURI(clean)}`;
 }
@@ -373,12 +376,16 @@ export async function mapRowToBlogPost(row: any): Promise<BlogPost> {
   let contentHtml = row.content || row.body || '';
   let rawText = '';
 
-  // Check for Word document attachment in docx / word_document column or inside content
+  // Check for Word document attachment in docx / word_document column or inside content/body
   const docxCandidate =
     row.docx ||
     row.word_document ||
     row.document ||
-    (typeof contentHtml === 'string' && contentHtml.toLowerCase().endsWith('.docx') ? contentHtml : null);
+    row.file ||
+    row.article ||
+    extractDocxName(row.content) ||
+    extractDocxName(row.body) ||
+    (typeof contentHtml === 'string' && contentHtml.toLowerCase().includes('.docx') ? contentHtml : null);
 
   if (docxCandidate) {
     const parsedHtml = await fetchAndParseDocx(docxCandidate);
