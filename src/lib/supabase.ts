@@ -193,11 +193,8 @@ export async function mapRowToProduct(row: any): Promise<Product> {
     if (hasDbColor || localFileMatch) {
       const colorImages: string[] = [];
 
-      // 1. Prefer verified local high-res WebP if present
-      if (localFileMatch) {
-        colorImages.push(localFileMatch);
-      } else if (hasDbColor) {
-        // 2. Otherwise use Supabase storage URL (primary image only)
+      // 1. Prefer database filename in Supabase Storage if present
+      if (hasDbColor) {
         const filenames = dbVal.split(',').map((f: string) => f.trim()).filter(Boolean);
         const primaryFile = filenames.find((f: string) => !f.includes('airtable.com'));
         if (primaryFile) {
@@ -206,6 +203,9 @@ export async function mapRowToProduct(row: any): Promise<Product> {
             : `${supabaseUrl}/storage/v1/object/public/products/${primaryFile}`;
           colorImages.push(url);
         }
+      } else if (localFileMatch) {
+        // 2. Otherwise fall back to local pre-rendered image
+        colorImages.push(localFileMatch);
       }
 
       colors.push({
@@ -234,7 +234,12 @@ export async function mapRowToProduct(row: any): Promise<Product> {
 
   // Featured image
   let featuredImage = '';
-  if (fs.existsSync(path.join(publicProductsDir, `${slug}.webp`))) {
+  if (row.main_featured_image && typeof row.main_featured_image === 'string' && row.main_featured_image.trim() && !row.main_featured_image.includes('airtable.com')) {
+    const cleanMain = row.main_featured_image.trim();
+    featuredImage = cleanMain.startsWith('/') || cleanMain.startsWith('http')
+      ? cleanMain
+      : `${supabaseUrl}/storage/v1/object/public/products/${cleanMain}`;
+  } else if (fs.existsSync(path.join(publicProductsDir, `${slug}.webp`))) {
     featuredImage = `/images/products/${slug}.webp`;
   } else if (mockMatch && mockMatch.featuredImage) {
     featuredImage = mockMatch.featuredImage;
