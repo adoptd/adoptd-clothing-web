@@ -65,7 +65,7 @@ export default async function HomePage() {
       'tee-shirts': '/images/shop-tshirts-bg.webp',
       'christian-hoodies-uk': '/images/shop-hoodies-bg.webp',
       'christian-bags': '/images/products/christian-TOTE_amazing-grace(main).webp',
-      'christmas': '/images/shop-christmas-bg.webp',
+      'christmas': '/images/products/christian-CHRISTMAS_o-holy-night(blue).webp',
       'gym-sportswear': '/images/gym-sportswear-banner.png',
     };
     return fallbacks[slug] || '/images/shop-tshirts-bg.webp';
