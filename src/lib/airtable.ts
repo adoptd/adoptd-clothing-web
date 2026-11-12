@@ -233,12 +233,12 @@ export async function getProducts(): Promise<Product[]> {
 
     const products: Product[] = await Promise.all(
       records
-        .filter((record) => {
+        .filter((record: any) => {
           // Double-check Published status to ensure unpublished items are excluded
           const pub = record.fields['Published'];
           return pub !== false && pub !== 0 && pub !== 'false';
         })
-        .map(async (record) => {
+        .map(async (record: any) => {
           const fields = record.fields;
 
           const rawCatVal = fields['Category'] || fields['category'];
@@ -503,7 +503,7 @@ export async function getAboutPageData(): Promise<{
       return defaultData;
     }
 
-    const record = records.find(r => r.fields['Title'] || r.fields['Content'] || r.fields['content']) || records[0];
+    const record = records.find((r: any) => r.fields['Title'] || r.fields['Content'] || r.fields['content']) || records[0];
     const fields = record.fields;
 
     const title = (fields['Title'] as string) || (fields['title'] as string) || defaultData.title;
@@ -843,12 +843,12 @@ export async function getApprovedBlogComments(slug: string): Promise<BlogComment
       sort: [{ field: 'Submitted At', direction: 'asc' }],
       maxRecords: 100,
     }).all();
-    return records.map((record) => ({
+    return records.map((record: any) => ({
       id: record.id,
       name: String(record.fields['Name'] || 'Reader'),
       comment: String(record.fields['Comment'] || ''),
       submittedAt: String(record.fields['Submitted At'] || record.fields['Created'] || ''),
-    })).filter((item) => item.comment.trim());
+    })).filter((item: any) => item.comment.trim());
   } catch (error) {
     console.error('Error fetching approved blog comments from Airtable:', error);
     return [];

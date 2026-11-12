@@ -64,7 +64,7 @@ export default async function HomePage() {
     const fallbacks: Record<string, string> = {
       'tee-shirts': '/images/shop-tshirts-bg.webp',
       'christian-hoodies-uk': '/images/shop-hoodies-bg.webp',
-      'christian-bags': '/images/products/amazing-grace-tote.webp',
+      'christian-bags': '/images/products/christian-TOTE_amazing-grace(main).webp',
       'christmas': '/images/shop-christmas-bg.webp',
       'gym-sportswear': '/images/gym-sportswear-banner.png',
     };

@@ -122,16 +122,16 @@ export function getProductFallbackImage(category?: string, slug?: string): strin
     return '/images/products/more-of-him-tote.webp';
   }
   if (s.includes('amazing-grace') && (s.includes('tote') || s.includes('bag'))) {
-    return '/images/products/amazing-grace-tote.webp';
+    return '/images/products/christian-TOTE_amazing-grace(main).webp';
   }
 
   // 2. Category-based high-resolution static fallbacks
   const cat = (category || '').toLowerCase();
   if (cat.includes('bag') || cat.includes('tote')) {
-    return '/images/products/amazing-grace-tote.webp';
+    return '/images/products/christian-TOTE_amazing-grace(main).webp';
   }
   if (cat.includes('hoodie') || cat.includes('sweater')) {
-    return '/images/products/amazing-grace-hoodie.webp';
+    return '/images/products/christian-HOODIE_amazing-grace(main).webp';
   }
   if (cat.includes('shirt') || cat.includes('tee')) {
     return '/images/shop-tshirts-bg.webp';
