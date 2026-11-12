@@ -264,21 +264,24 @@ export async function mapRowToProduct(row: any): Promise<Product> {
   else if (categorySlug === 'sweaters') sizeGuideType = 'sweater';
   else if (categorySlug === 'christian-bags') sizeGuideType = 'tote-bag';
 
-  // Parse descriptions: support both docx in Supabase Storage and direct rich text/HTML
+  // Parse descriptions: on catalog/list views, do not block with 35 parallel docx downloads.
+  // If already in RAM cache, use it immediately in 0ms; otherwise lazy-load on product detail page.
   let docxHtml = '';
-  if (row.long_description) {
-    docxHtml = await fetchAndParseDocx(row.long_description);
+  const cleanLongDesc = (row.long_description || '').trim();
+  const docxName = extractDocxName(cleanLongDesc);
+  if (docxName && docxHtmlCache.has(docxName)) {
+    docxHtml = docxHtmlCache.get(docxName)!;
   }
 
   // Fallback to plain text if not docx/url
   const isDocxOrUrl = (str?: string) => 
     Boolean(str && (str.toLowerCase().includes('.docx') || str.includes('http://') || str.includes('https://')));
 
-  const rawCleanLong = isDocxOrUrl(row.long_description) ? '' : (row.long_description || '').trim();
+  const rawCleanLong = isDocxOrUrl(cleanLongDesc) ? '' : cleanLongDesc;
   const rawCleanShort = isDocxOrUrl(row.short_description) ? '' : (row.short_description || '').trim();
 
-  const finalLongDescription = docxHtml || rawCleanLong || '';
-  const finalDescription = finalLongDescription || rawCleanShort || (mockMatch?.description || '');
+  const finalLongDescription = docxHtml || cleanLongDesc || rawCleanLong || '';
+  const finalDescription = docxHtml || rawCleanLong || rawCleanShort || (mockMatch?.description || '');
 
   return {
     id: String(row.id),
@@ -332,15 +335,29 @@ export async function getSupabaseProductBySlug(slug: string): Promise<Product | 
   const cleanSlug = (slug || '').trim().toLowerCase();
   const altSlug = cleanSlug.replace(/-s\b/g, 's');
   const altSlug2 = cleanSlug.replace(/\b(men|women)s\b/g, '$1-s');
-  return (
-    products.find(
-      (p) =>
-        p.slug === cleanSlug ||
-        p.slug === altSlug ||
-        p.slug === altSlug2 ||
-        p.id === cleanSlug
-    ) || null
+  const found = products.find(
+    (p) =>
+      p.slug === cleanSlug ||
+      p.slug === altSlug ||
+      p.slug === altSlug2 ||
+      p.id === cleanSlug
   );
+
+  if (!found) return null;
+
+  // Lazily fetch and parse the Word .docx ONLY for this specific viewed product
+  if (found.longDescription && (found.longDescription.toLowerCase().includes('.docx') || !found.longDescription.includes('<p>'))) {
+    const parsedHtml = await fetchAndParseDocx(found.longDescription);
+    if (parsedHtml) {
+      return {
+        ...found,
+        longDescription: parsedHtml,
+        description: parsedHtml || found.description,
+      };
+    }
+  }
+
+  return found;
 }
 
 // ==========================================
