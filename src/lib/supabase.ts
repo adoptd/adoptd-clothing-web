@@ -47,10 +47,16 @@ export async function fetchAndParseDocx(rawField?: string): Promise<string> {
   // 2. Candidate Supabase Storage locations
   const filename = docxName || cleanInput;
   if (filename && filename.toLowerCase().endsWith('.docx')) {
-    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/products/${filename}`);
-    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/products/descriptions/${filename}`);
-    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/descriptions/${filename}`);
-    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/documents/${filename}`);
+    // If user entered e.g. "Descriptions/filename.docx"
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/${encodeURI(filename)}`);
+    // Direct in Descriptions bucket (case-insensitive checks)
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/Descriptions/${encodeURI(filename)}`);
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/descriptions/${encodeURI(filename)}`);
+    // In products bucket
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/products/${encodeURI(filename)}`);
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/products/Descriptions/${encodeURI(filename)}`);
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/products/descriptions/${encodeURI(filename)}`);
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/documents/${encodeURI(filename)}`);
   }
 
   for (const url of candidateUrls) {
