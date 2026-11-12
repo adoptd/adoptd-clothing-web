@@ -261,29 +261,29 @@ export default async function HomePage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
           {categories.map((cat) => (
             <div
               key={cat.slug}
-              className="bg-[#efefef] rounded-[20px] p-8 flex flex-col items-center justify-between text-center space-y-6 hover:shadow-md transition-all"
+              className="bg-[#efefef] rounded-[20px] p-6 sm:p-7 flex flex-col items-center justify-between text-center space-y-5 hover:shadow-md transition-all"
             >
-              <div className="relative aspect-square w-32 rounded-lg overflow-hidden bg-white shadow-sm">
+              <div className="relative aspect-square w-28 sm:w-32 rounded-lg overflow-hidden bg-white shadow-sm">
                 <Image
                   src={cat.image}
                   alt={cat.name}
                   fill
                   className="object-cover"
-                  sizes="128px"
+                  sizes="(max-width: 640px) 112px, 128px"
                 />
               </div>
 
-              <h3 className="font-black text-base text-stone-900 tracking-wider">
+              <h3 className="font-black text-sm sm:text-base text-stone-900 tracking-wider">
                 {cat.name}
               </h3>
 
               <Link
                 href={`/shop/${cat.slug}`}
-                className="w-full py-2.5 px-6 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-stone-800 transition text-center"
+                className="w-full py-2.5 px-4 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-stone-800 transition text-center"
               >
                 Shop
               </Link>
