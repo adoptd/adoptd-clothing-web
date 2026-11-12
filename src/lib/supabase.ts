@@ -200,7 +200,7 @@ export async function mapRowToProduct(row: any): Promise<Product> {
         if (primaryFile) {
           const url = primaryFile.startsWith('/') || primaryFile.startsWith('http')
             ? primaryFile
-            : `${supabaseUrl}/storage/v1/object/public/products/${primaryFile}`;
+            : `${supabaseUrl}/storage/v1/object/public/products/${encodeURI(primaryFile)}`;
           colorImages.push(url);
         }
       } else if (localFileMatch) {
@@ -238,7 +238,7 @@ export async function mapRowToProduct(row: any): Promise<Product> {
     const cleanMain = row.main_featured_image.trim();
     featuredImage = cleanMain.startsWith('/') || cleanMain.startsWith('http')
       ? cleanMain
-      : `${supabaseUrl}/storage/v1/object/public/products/${cleanMain}`;
+      : `${supabaseUrl}/storage/v1/object/public/products/${encodeURI(cleanMain)}`;
   } else if (fs.existsSync(path.join(publicProductsDir, `${slug}.webp`))) {
     featuredImage = `/images/products/${slug}.webp`;
   } else if (mockMatch && mockMatch.featuredImage) {
