@@ -22,7 +22,7 @@ export function constructMetadata({
 
   const fullDescription = description || mockSiteSettings.globalMetaDescription;
   const canonicalUrl = `${siteUrl}/${slug.replace(/^\//, '')}`;
-  const ogImage = image || `${siteUrl}/images/hero-banner.webp`;
+  const ogImage = image ? absoluteImageUrl(image) : `${siteUrl}/images/hero-banner.webp`;
 
   return {
     metadataBase: new URL(siteUrl),
@@ -106,6 +106,35 @@ export function generateOrganizationJsonLd(settings?: SiteSettings) {
   };
 }
 
+// Sitewide WebSite schema for Google Sitelinks & AI entity linking.
+export function generateWebSiteJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${siteUrl}/#website`,
+    name: organizationName,
+    url: siteUrl,
+    inLanguage: 'en-GB',
+    publisher: {
+      '@id': `${siteUrl}/#organization`,
+    },
+  };
+}
+
+// BreadcrumbList schema for category, product, and journal pages.
+export function generateBreadcrumbJsonLd(items: { name: string; path: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: `${siteUrl}${item.path.startsWith('/') ? item.path : `/${item.path}`}`,
+    })),
+  };
+}
+
 // Generate JSON-LD Schema for Product and its Offer.
 export function generateProductJsonLd(product: Product) {
   const images = Array.from(
@@ -121,6 +150,8 @@ export function generateProductJsonLd(product: Product) {
     '@type': 'Product',
     '@id': `${siteUrl}/product/${product.slug}#product`,
     name: product.name,
+    url: `${siteUrl}/product/${product.slug}`,
+    category: product.categoryName || 'Christian Clothing',
     description: (product.shortDescription || product.description || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(),
     image: images.length ? images : [`${siteUrl}/images/hero-banner.webp`],
     sku: product.id,
@@ -137,6 +168,40 @@ export function generateProductJsonLd(product: Product) {
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
       itemCondition: 'https://schema.org/NewCondition',
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: product.price >= 40 ? '0.00' : '3.95',
+          currency: 'GBP',
+        },
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'GB',
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 1,
+            maxValue: 3,
+            unitCode: 'DAY',
+          },
+          transitTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 2,
+            maxValue: 4,
+            unitCode: 'DAY',
+          },
+        },
+      },
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'GB',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 30,
+        returnMethod: 'https://schema.org/ReturnByMail',
+      },
       seller: {
         '@type': 'Organization',
         '@id': `${siteUrl}/#organization`,

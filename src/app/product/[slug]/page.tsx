@@ -1,7 +1,7 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { getSupabaseProductBySlug, getSupabaseProducts } from '@/lib/supabase';
-import { constructMetadata, generateProductJsonLd } from '@/lib/seo';
+import { constructMetadata, generateProductJsonLd, generateBreadcrumbJsonLd } from '@/lib/seo';
 import { ProductDetailClient } from '@/components/product/ProductDetailClient';
 import { Metadata } from 'next';
 
@@ -54,8 +54,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
   ).slice(0, 3);
 
   const jsonLd = generateProductJsonLd(product);
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: 'Home', path: '/' },
+    { name: product.categoryName || 'Shop', path: `/shop/${product.category}` },
+    { name: product.name, path: `/product/${product.slug}` },
+  ]);
   // Escape "<" to prevent product data from terminating the JSON-LD script element.
   const jsonLdString = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
+  const breadcrumbJsonLdString = JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c');
 
   return (
     <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 py-12">
@@ -63,6 +69,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdString }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: breadcrumbJsonLdString }}
       />
 
       <ProductDetailClient

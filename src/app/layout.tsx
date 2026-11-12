@@ -4,7 +4,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { getSiteSettings } from "@/lib/airtable";
-import { constructMetadata, generateOrganizationJsonLd } from "@/lib/seo";
+import { constructMetadata, generateOrganizationJsonLd, generateWebSiteJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = constructMetadata({});
 
@@ -19,6 +19,7 @@ export default async function RootLayout({
   const settings = await getSiteSettings();
   // Escape "<" so JSON-LD cannot accidentally terminate its script element.
   const organizationJsonLd = JSON.stringify(generateOrganizationJsonLd(settings)).replace(/</g, '\\u003c');
+  const websiteJsonLd = JSON.stringify(generateWebSiteJsonLd()).replace(/</g, '\\u003c');
 
   return (
     <html lang="en-GB" className="scroll-smooth" suppressHydrationWarning>
@@ -26,6 +27,10 @@ export default async function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: organizationJsonLd }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: websiteJsonLd }}
         />
         <Navbar settings={settings} />
         <main className="flex-1">{children}</main>
