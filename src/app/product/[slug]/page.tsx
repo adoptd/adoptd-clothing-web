@@ -64,7 +64,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const breadcrumbJsonLdString = JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c');
 
   return (
-    <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 py-12">
+    <div className="max-w-[1680px] mx-auto px-3 sm:px-1.5 lg:px-2 py-8 sm:py-12 pb-24 md:pb-12">
       {/* Inject Google Structured Data */}
       <script
         type="application/ld+json"

@@ -120,7 +120,7 @@ export default async function HomePage() {
         </Link>
       </section>
 
-      <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 pt-6 sm:pt-10">
+      <section className="max-w-[1680px] mx-auto px-3 sm:px-1.5 lg:px-2 pt-6 sm:pt-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
           <div className="flex flex-col gap-6 justify-between">
             <div className="bg-[#efefef] rounded-[24px] p-6 sm:p-10 flex flex-col justify-between space-y-6 shadow-sm">
@@ -206,7 +206,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="relative w-full h-full min-h-[420px] sm:min-h-[520px] lg:min-h-full rounded-[24px] overflow-hidden bg-[#efefef] shadow-sm group">
+          <div className="relative w-full h-full min-h-[280px] sm:min-h-[520px] lg:min-h-full rounded-[24px] overflow-hidden bg-[#efefef] shadow-sm group">
             <Image
               src="/images/hero-hoodie.webp"
               alt="Featured Adoptd Christian Hoodie Collection"
@@ -220,8 +220,8 @@ export default async function HomePage() {
 
       <div className="w-full border-t-2 border-black" />
 
-      <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+      <section className="max-w-[1680px] mx-auto px-3 sm:px-1.5 lg:px-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6">
           {featuredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
@@ -254,20 +254,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
-        <div className="text-center mb-10">
+      <section className="max-w-[1680px] mx-auto px-3 sm:px-1.5 lg:px-2">
+        <div className="text-center mb-8 sm:mb-10">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
             Shop By Category
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6">
           {categories.map((cat) => (
             <div
               key={cat.slug}
-              className="bg-[#efefef] rounded-[20px] p-6 sm:p-7 flex flex-col items-center justify-between text-center space-y-5 hover:shadow-md transition-all"
+              className="bg-[#efefef] rounded-[20px] p-4 sm:p-7 flex flex-col items-center justify-between text-center space-y-4 sm:space-y-5 hover:shadow-md transition-all"
             >
-              <div className="relative aspect-square w-28 sm:w-32 rounded-lg overflow-hidden bg-white shadow-sm">
+              <div className="relative aspect-square w-24 sm:w-32 rounded-lg overflow-hidden bg-white shadow-sm">
                 <Image
                   src={cat.image}
                   alt={cat.name}
