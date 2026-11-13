@@ -11,12 +11,24 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const [selectedColorName, setSelectedColorName] = useState<string | null>(null);
   const [imgError, setImgError] = useState(false);
+
+  const selectedColor = selectedColorName
+    ? product.colors.find((c) => c.name === selectedColorName) || null
+    : null;
+
   const fallback = getProductFallbackImage(product.category, product.slug);
-  // Listing cards always use the designated Main Featured Image; colour selection belongs on the product page.
-  const preferredImage = product.featuredImage || fallback;
+  // Start on the Main Featured Image; switch to the selected colour's image when a swatch is clicked.
+  const preferredImage =
+    (selectedColor && selectedColor.images?.[0]) || product.featuredImage || fallback;
   const initialDisplay = resolveProductImage(preferredImage, product.category, product.slug);
   const displayImage = imgError ? fallback : initialDisplay;
+
+  const handleSelectColor = (colorName: string) => {
+    setImgError(false);
+    setSelectedColorName((prev) => (prev === colorName ? null : colorName));
+  };
 
   return (
     <div className="group flex flex-col bg-[#00736a] rounded-xl overflow-hidden border border-[#00736a]/30 hover:border-[#00736a] transition-all duration-300 hover:shadow-md">
@@ -58,20 +70,30 @@ export function ProductCard({ product }: ProductCardProps) {
           </Link>
         </div>
 
-        {/* Color Swatch Previews */}
+        {/* Interactive Color Swatch Previews */}
         {product.colors.length > 1 && (
-          <div className="flex items-center space-x-1.5 pt-1">
-            {product.colors.map((color) => (
-              <span
-                key={color.name}
-                className="w-4 h-4 rounded-full border border-white/50 opacity-80"
-                style={{ backgroundColor: color.hex }}
-                title={color.name}
-                aria-label={color.name}
-              />
-            ))}
-            <span className="text-xs text-white/80 pl-1.5 font-medium">
-              {product.colors.length} colors
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            {product.colors.map((color) => {
+              const isSelected = selectedColorName === color.name;
+              return (
+                <button
+                  key={color.name}
+                  type="button"
+                  onClick={() => handleSelectColor(color.name)}
+                  className={`w-5 h-5 rounded-full border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white ${
+                    isSelected
+                      ? 'border-white ring-2 ring-white ring-offset-1 ring-offset-[#00736a] scale-110 opacity-100'
+                      : 'border-white/60 opacity-85 hover:opacity-100 hover:scale-110'
+                  }`}
+                  style={{ backgroundColor: color.hex }}
+                  title={`Preview ${color.name}`}
+                  aria-label={`Preview ${product.name} in ${color.name}`}
+                  aria-pressed={isSelected}
+                />
+              );
+            })}
+            <span className="text-xs text-white/85 pl-1 font-medium truncate">
+              {selectedColor ? selectedColor.name : `${product.colors.length} colors`}
             </span>
           </div>
         )}
