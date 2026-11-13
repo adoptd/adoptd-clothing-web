@@ -89,6 +89,34 @@ export const useCartStore = create<CartState>()(
     {
       name: 'adoptd-cart-storage',
       skipHydration: true,
+      storage: {
+        getItem: (name) => {
+          if (typeof window === 'undefined') return null;
+          try {
+            const item = localStorage.getItem(name);
+            if (!item || !item.trim()) return null;
+            return JSON.parse(item);
+          } catch (e) {
+            console.warn('[Cart] Corrupted local storage, resetting cart:', e);
+            try {
+              localStorage.removeItem(name);
+            } catch {}
+            return null;
+          }
+        },
+        setItem: (name, value) => {
+          if (typeof window === 'undefined') return;
+          try {
+            localStorage.setItem(name, JSON.stringify(value));
+          } catch {}
+        },
+        removeItem: (name) => {
+          if (typeof window === 'undefined') return;
+          try {
+            localStorage.removeItem(name);
+          } catch {}
+        },
+      },
     }
   )
 );

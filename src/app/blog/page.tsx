@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getBlogPosts } from '@/lib/airtable';
+import { getSupabaseBlogPosts } from '@/lib/supabase';
 import { constructMetadata } from '@/lib/seo';
 import { BookOpen, Clock, ArrowRight } from 'lucide-react';
 
@@ -14,10 +14,10 @@ export const metadata = constructMetadata({
 export const revalidate = 60;
 
 export default async function BlogPage() {
-  const posts = await getBlogPosts();
+  const posts = await getSupabaseBlogPosts();
 
   return (
-    <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 py-12 space-y-12">
+    <div className="max-w-[1680px] mx-auto px-3 sm:px-1.5 lg:px-2 py-12 space-y-12">
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
         <span className="text-xs uppercase tracking-[0.25em] text-stone-500 font-bold">

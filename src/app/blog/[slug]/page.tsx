@@ -2,7 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getBlogPostBySlug, getBlogPosts, getProducts, getPageSeo } from '@/lib/airtable';
+import { getPageSeo } from '@/lib/airtable';
+import { getSupabaseBlogPostBySlug, getSupabaseBlogPosts, getSupabaseProducts } from '@/lib/supabase';
 import { constructMetadata, generateArticleJsonLd } from '@/lib/seo';
 import { ProductCard } from '@/components/product/ProductCard';
 import { BlogComments } from '@/components/blog/BlogComments';
@@ -88,7 +89,7 @@ interface BlogPostPageProps {
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
   const [post, pageSeo] = await Promise.all([
-    getBlogPostBySlug(slug),
+    getSupabaseBlogPostBySlug(slug),
     getPageSeo(`blog/${slug}`),
   ]);
 
@@ -108,13 +109,13 @@ export const revalidate = 60;
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const post = await getBlogPostBySlug(slug);
+  const post = await getSupabaseBlogPostBySlug(slug);
 
   if (!post) {
     notFound();
   }
 
-  const [allProducts, allPosts] = await Promise.all([getProducts(), getBlogPosts()]);
+  const [allProducts, allPosts] = await Promise.all([getSupabaseProducts(), getSupabaseBlogPosts()]);
   const featuredProducts = allProducts.filter((p) =>
     post.featuredProductIds?.includes(p.id)
   ).slice(0, 2);

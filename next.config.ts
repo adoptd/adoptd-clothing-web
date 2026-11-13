@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
+  outputFileTracingRoot: path.join(__dirname),
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
@@ -52,6 +54,14 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days edge caching for optimized images
     remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "twpnniihnevlkxnuysjj.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "**.supabase.co",
+      },
       {
         protocol: "https",
         hostname: "**.airtableusercontent.com",

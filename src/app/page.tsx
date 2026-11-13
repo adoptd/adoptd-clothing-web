@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
-import { getProducts } from '@/lib/airtable';
+import { getSupabaseProducts } from '@/lib/supabase';
 import { ProductCard } from '@/components/product/ProductCard';
 import { constructMetadata } from '@/lib/seo';
 import { TestimonialsCarousel } from '@/components/home/TestimonialsCarousel';
@@ -16,7 +16,7 @@ export const metadata = constructMetadata({
 });
 
 export default async function HomePage() {
-  const products = await getProducts();
+  const products = await getSupabaseProducts();
 
   const categoryOrder = ['tee-shirts', 'christian-hoodies-uk', 'christian-bags', 'christmas', 'gym-sportswear'];
   const featuredProducts: typeof products = [];
@@ -64,9 +64,9 @@ export default async function HomePage() {
     const fallbacks: Record<string, string> = {
       'tee-shirts': '/images/shop-tshirts-bg.webp',
       'christian-hoodies-uk': '/images/shop-hoodies-bg.webp',
-      'christian-bags': '/images/products/amazing-grace-tote.webp',
-      'christmas': '/images/shop-christmas-bg.webp',
-      'gym-sportswear': '/images/gym-sportswear-banner.png',
+      'christian-bags': '/images/products/christian-TOTE_amazing-grace(main).webp',
+      'christmas': '/images/products/christian-CHRISTMAS_o-holy-night(blue).webp',
+      'gym-sportswear': '/images/products/christian-GYM-men-tank_kingdom-athlete(lifestyle).webp',
     };
     return fallbacks[slug] || '/images/shop-tshirts-bg.webp';
   };
@@ -120,7 +120,7 @@ export default async function HomePage() {
         </Link>
       </section>
 
-      <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 pt-6 sm:pt-10">
+      <section className="max-w-[1680px] mx-auto px-3 sm:px-1.5 lg:px-2 pt-6 sm:pt-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
           <div className="flex flex-col gap-6 justify-between">
             <div className="bg-[#efefef] rounded-[24px] p-6 sm:p-10 flex flex-col justify-between space-y-6 shadow-sm">
@@ -206,7 +206,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="relative w-full h-full min-h-[420px] sm:min-h-[520px] lg:min-h-full rounded-[24px] overflow-hidden bg-[#efefef] shadow-sm group">
+          <div className="relative w-full h-full min-h-[280px] sm:min-h-[520px] lg:min-h-full rounded-[24px] overflow-hidden bg-[#efefef] shadow-sm group">
             <Image
               src="/images/hero-hoodie.webp"
               alt="Featured Adoptd Christian Hoodie Collection"
@@ -220,8 +220,8 @@ export default async function HomePage() {
 
       <div className="w-full border-t-2 border-black" />
 
-      <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+      <section className="max-w-[1680px] mx-auto px-3 sm:px-1.5 lg:px-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6">
           {featuredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
@@ -254,36 +254,36 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
-        <div className="text-center mb-10">
+      <section className="max-w-[1680px] mx-auto px-3 sm:px-1.5 lg:px-2">
+        <div className="text-center mb-8 sm:mb-10">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
             Shop By Category
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6">
           {categories.map((cat) => (
             <div
               key={cat.slug}
-              className="bg-[#efefef] rounded-[20px] p-8 flex flex-col items-center justify-between text-center space-y-6 hover:shadow-md transition-all"
+              className="bg-[#efefef] rounded-[20px] p-4 sm:p-7 flex flex-col items-center justify-between text-center space-y-4 sm:space-y-5 hover:shadow-md transition-all"
             >
-              <div className="relative aspect-square w-32 rounded-lg overflow-hidden bg-white shadow-sm">
+              <div className="relative aspect-square w-24 sm:w-32 rounded-lg overflow-hidden bg-white shadow-sm">
                 <Image
                   src={cat.image}
                   alt={cat.name}
                   fill
                   className="object-cover"
-                  sizes="128px"
+                  sizes="(max-width: 640px) 112px, 128px"
                 />
               </div>
 
-              <h3 className="font-black text-base text-stone-900 tracking-wider">
+              <h3 className="font-black text-sm sm:text-base text-stone-900 tracking-wider">
                 {cat.name}
               </h3>
 
               <Link
                 href={`/shop/${cat.slug}`}
-                className="w-full py-2.5 px-6 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-stone-800 transition text-center"
+                className="w-full py-2.5 px-4 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-stone-800 transition text-center"
               >
                 Shop
               </Link>

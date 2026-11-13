@@ -1,0 +1,511 @@
+import { createClient } from '@supabase/supabase-js';
+import { Product, ProductColorVariant, ProductCategory, BlogPost } from '@/types';
+import { mockProducts, mockBlogPosts } from '@/data/mockData';
+import fs from 'fs';
+import path from 'path';
+import { parseDocxBuffer } from './docx-parser';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'https://twpnniihnevlkxnuysjj.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'sb_publishable_JX1R7a8qmTADZzcKlcSVXA_YD7FZtQ7';
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// In-memory cache for parsed Word document descriptions
+const docxHtmlCache = new Map<string, string>();
+
+function extractDocxName(raw?: string): string {
+  if (!raw) return '';
+  const match = raw.match(/([a-zA-Z0-9_\-.]+\.docx)/i);
+  return match ? match[1] : '';
+}
+
+export async function fetchAndParseDocx(rawField?: string): Promise<string> {
+  if (!rawField) return '';
+  const cleanInput = rawField.trim();
+  const docxName = extractDocxName(cleanInput);
+
+  // If already cached, return immediately in 0ms
+  const cacheKey = docxName || cleanInput;
+  if (docxHtmlCache.has(cacheKey)) {
+    return docxHtmlCache.get(cacheKey)!;
+  }
+
+  // If input contains no .docx and is not a URL, it's direct rich text/HTML
+  if (!docxName && !cleanInput.toLowerCase().includes('.docx') && !cleanInput.startsWith('http')) {
+    return cleanInput;
+  }
+
+  const candidateUrls: string[] = [];
+
+  // 1. Direct URL (excluding dead airtable login URLs)
+  if (cleanInput.startsWith('http://') || cleanInput.startsWith('https://')) {
+    if (!cleanInput.includes('airtable.com')) {
+      candidateUrls.push(cleanInput);
+    }
+  }
+
+  // 2. Candidate Supabase Storage locations
+  const filename = docxName || cleanInput;
+  if (filename && filename.toLowerCase().endsWith('.docx')) {
+    // If user entered e.g. "Descriptions/filename.docx"
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/${encodeURI(filename)}`);
+    // Direct in Descriptions bucket (case-insensitive checks)
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/Descriptions/${encodeURI(filename)}`);
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/descriptions/${encodeURI(filename)}`);
+    // Direct in Blog bucket
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/Blog/${encodeURI(filename)}`);
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/blog/${encodeURI(filename)}`);
+    // In products bucket
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/products/${encodeURI(filename)}`);
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/products/Descriptions/${encodeURI(filename)}`);
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/products/descriptions/${encodeURI(filename)}`);
+    candidateUrls.push(`${supabaseUrl}/storage/v1/object/public/documents/${encodeURI(filename)}`);
+  }
+
+  for (const url of candidateUrls) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timer);
+
+      if (res.ok) {
+        const arrayBuf = await res.arrayBuffer();
+        const buf = Buffer.from(arrayBuf);
+        // Verify ZIP / docx header signature (PK.. or 0x50 0x4B)
+        if (buf.length > 4 && buf[0] === 0x50 && buf[1] === 0x4b) {
+          const parsed = await parseDocxBuffer(buf);
+          if (parsed && parsed.html) {
+            docxHtmlCache.set(cacheKey, parsed.html);
+            return parsed.html;
+          }
+        }
+      }
+    } catch {
+      // Safe timeout fallback
+    }
+  }
+
+  return '';
+}
+
+const mockBySlug = new Map<string, Product>();
+mockProducts.forEach((p) => {
+  mockBySlug.set(p.slug.toLowerCase(), p);
+  mockBySlug.set(p.name.toLowerCase(), p);
+});
+
+export function getColorHex(colorName: string): string {
+  const normalized = colorName.toLowerCase().trim();
+  if (normalized.includes('black')) return '#111111';
+  if (normalized.includes('grey') || normalized.includes('gray')) return '#C0C0C0';
+  if (normalized.includes('sand') || normalized.includes('natural')) return '#D8C7B5';
+  if (normalized.includes('sapphire')) return '#0F52BA';
+  if (normalized.includes('navy')) return '#1B2A4A';
+  if (normalized.includes('blue')) return '#2B4C6F';
+  if (normalized.includes('white')) return '#FFFFFF';
+  if (normalized.includes('burgundy') || normalized.includes('maroon')) return '#6A1A24';
+  if (normalized.includes('jade')) return '#00A86B';
+  if (normalized.includes('green') || normalized.includes('forest') || normalized.includes('teal')) return '#2D4A3E';
+  if (normalized.includes('purple')) return '#5B2C6F';
+  if (normalized.includes('lilac')) return '#C8A2C8';
+  return '#444444';
+}
+
+const COLOR_COLUMNS = [
+  { key: 'image_black', name: 'Black', aliases: ['black'] },
+  { key: 'image_grey', name: 'Grey', aliases: ['grey', 'gray'] },
+  { key: 'image_natural', name: 'Natural', aliases: ['natural', 'sand'] },
+  { key: 'image_white', name: 'White', aliases: ['white'] },
+  { key: 'image_jade', name: 'Jade', aliases: ['jade'] },
+  { key: 'image_purple', name: 'Purple', aliases: ['purple'] },
+  { key: 'image_green', name: 'Green', aliases: ['green', 'olive'] },
+  { key: 'image_burgundy', name: 'Burgundy', aliases: ['burgundy', 'maroon'] },
+  { key: 'image_blue', name: 'Blue', aliases: ['blue'] },
+  { key: 'image_lilac', name: 'Lilac', aliases: ['lilac'] },
+  { key: 'image_navy', name: 'Navy', aliases: ['navy'] },
+  { key: 'image_sapphire', name: 'Sapphire', aliases: ['sapphire', 'sapphireblue'] },
+];
+
+export async function mapRowToProduct(row: any): Promise<Product> {
+  const rawName = (row.product_name || 'Untitled Product').trim();
+  const autoSlug = rawName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+
+  const mockMatch = mockBySlug.get(autoSlug) || mockBySlug.get(rawName.toLowerCase());
+  const slug = mockMatch?.slug || autoSlug;
+
+  const rawCat = (row.category || '').toLowerCase();
+  let categorySlug: ProductCategory = 'tee-shirts';
+  let categoryName = row.category || 'T-Shirts';
+
+  if (rawCat.includes('gym') || rawCat.includes('sport')) {
+    categorySlug = 'gym-sportswear';
+    categoryName = 'Gym & Sportswear';
+  } else if (rawCat.includes('christmas')) {
+    categorySlug = 'christmas';
+    categoryName = 'Christmas';
+  } else if (rawCat.includes('bag') || rawCat.includes('tote')) {
+    categorySlug = 'christian-bags';
+    categoryName = 'Tote Bags';
+  } else if (rawCat.includes('hoodie')) {
+    categorySlug = 'christian-hoodies-uk';
+    categoryName = 'Hoodies';
+  } else if (rawCat.includes('sweater')) {
+    categorySlug = 'sweaters';
+    categoryName = 'Sweaters';
+  } else if (rawCat.includes('shirt') || rawCat.includes('tee')) {
+    categorySlug = 'tee-shirts';
+    categoryName = 'T-Shirts';
+  }
+
+  // Parse sizes (e.g. "S, M, L, XL, XXL, 3XL" or "One Size")
+  let availableSizes: string[] = ['One Size'];
+  if (row.sizes) {
+    if (Array.isArray(row.sizes)) {
+      availableSizes = row.sizes;
+    } else if (typeof row.sizes === 'string') {
+      availableSizes = row.sizes.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
+  }
+
+  const publicProductsDir = path.join(process.cwd(), 'public', 'images', 'products');
+
+  // Build colors directly from Supabase database columns!
+  const dbHasColors = COLOR_COLUMNS.some((c) => {
+    const val = row[c.key];
+    return val && typeof val === 'string' && val.trim() && !val.includes('airtable.com');
+  });
+
+  const colors: ProductColorVariant[] = [];
+
+  for (const c of COLOR_COLUMNS) {
+    const dbVal = row[c.key];
+    // A color is available if its image column in Supabase is not null / not empty
+    const hasDbColor = dbVal && typeof dbVal === 'string' && dbVal.trim() && !dbVal.includes('airtable.com');
+
+    // If database explicitly defines which colors exist for this product, follow the database
+    if (dbHasColors && !hasDbColor) continue;
+
+    // Also check if local pre-rendered images exist for this color
+    let localFileMatch = '';
+    for (const alias of c.aliases) {
+      const candidate = `${slug}-${alias}.webp`;
+      if (fs.existsSync(path.join(publicProductsDir, candidate))) {
+        localFileMatch = `/images/products/${candidate}`;
+        break;
+      }
+    }
+
+    if (hasDbColor || localFileMatch) {
+      const colorImages: string[] = [];
+
+      // 1. Prefer database filename in Supabase Storage if present
+      if (hasDbColor) {
+        const filenames = dbVal.split(',').map((f: string) => f.trim()).filter(Boolean);
+        const primaryFile = filenames.find((f: string) => !f.includes('airtable.com'));
+        if (primaryFile) {
+          const url = primaryFile.startsWith('/') || primaryFile.startsWith('http')
+            ? primaryFile
+            : `${supabaseUrl}/storage/v1/object/public/products/${encodeURI(primaryFile)}`;
+          colorImages.push(url);
+        }
+      } else if (localFileMatch) {
+        // 2. Otherwise fall back to local pre-rendered image
+        colorImages.push(localFileMatch);
+      }
+
+      colors.push({
+        name: c.name,
+        hex: getColorHex(c.name),
+        images: colorImages,
+        hasSpecificImage: colorImages.length > 0,
+      });
+    }
+  }
+
+  // Fallback to mock colors if database has zero colors defined
+  if (colors.length === 0 && mockMatch && mockMatch.colors && mockMatch.colors.length > 0) {
+    colors.push(...mockMatch.colors);
+  }
+
+  // Fallback default color
+  if (colors.length === 0) {
+    colors.push({
+      name: 'Default',
+      hex: '#111111',
+      images: [`/images/products/${slug}.webp`],
+      hasSpecificImage: false,
+    });
+  }
+
+  // Featured image
+  let featuredImage = '';
+  if (row.main_featured_image && typeof row.main_featured_image === 'string' && row.main_featured_image.trim() && !row.main_featured_image.includes('airtable.com')) {
+    const cleanMain = row.main_featured_image.trim();
+    featuredImage = cleanMain.startsWith('/') || cleanMain.startsWith('http')
+      ? cleanMain
+      : `${supabaseUrl}/storage/v1/object/public/products/${encodeURI(cleanMain)}`;
+  } else if (fs.existsSync(path.join(publicProductsDir, `${slug}.webp`))) {
+    featuredImage = `/images/products/${slug}.webp`;
+  } else if (mockMatch && mockMatch.featuredImage) {
+    featuredImage = mockMatch.featuredImage;
+  } else if (colors[0]?.images[0]) {
+    featuredImage = colors[0].images[0];
+  } else {
+    featuredImage = '/images/shop-hoodies-bg.webp';
+  }
+
+  // Size guide type
+  let sizeGuideType: 'unisex-hoodie' | 'unisex-tshirt' | 'sweater' | 'tote-bag' = 'unisex-tshirt';
+  if (categorySlug === 'christian-hoodies-uk') sizeGuideType = 'unisex-hoodie';
+  else if (categorySlug === 'sweaters') sizeGuideType = 'sweater';
+  else if (categorySlug === 'christian-bags') sizeGuideType = 'tote-bag';
+
+  // Parse descriptions: on catalog/list views, do not block with 35 parallel docx downloads.
+  // If already in RAM cache, use it immediately in 0ms; otherwise lazy-load on product detail page.
+  let docxHtml = '';
+  const cleanLongDesc = (row.long_description || '').trim();
+  const docxName = extractDocxName(cleanLongDesc);
+  if (docxName && docxHtmlCache.has(docxName)) {
+    docxHtml = docxHtmlCache.get(docxName)!;
+  }
+
+  // Fallback to plain text if not docx/url
+  const isDocxOrUrl = (str?: string) => 
+    Boolean(str && (str.toLowerCase().includes('.docx') || str.includes('http://') || str.includes('https://')));
+
+  const rawCleanLong = isDocxOrUrl(cleanLongDesc) ? '' : cleanLongDesc;
+  const rawCleanShort = isDocxOrUrl(row.short_description) ? '' : (row.short_description || '').trim();
+
+  const finalLongDescription = docxHtml || cleanLongDesc || rawCleanLong || '';
+  const finalDescription = docxHtml || rawCleanLong || rawCleanShort || (mockMatch?.description || '');
+
+  return {
+    id: String(row.id),
+    name: rawName,
+    slug,
+    category: categorySlug,
+    categoryName,
+    price: Number(row.price) || (mockMatch?.price || 19.99),
+    compareAtPrice: row.compare_at_price ? Number(row.compare_at_price) : mockMatch?.compareAtPrice,
+    inStock: row.in_stock !== false,
+    availableSizes: availableSizes.length > 0 ? availableSizes : (mockMatch?.availableSizes || ['M', 'L', 'XL']),
+    colors,
+    description: finalDescription,
+    shortDescription: rawCleanShort || undefined,
+    longDescription: finalLongDescription || undefined,
+    scriptureReference: row.scripture_reference || mockMatch?.scriptureReference || undefined,
+    sizeGuideType: mockMatch?.sizeGuideType || sizeGuideType,
+    featuredImage,
+    categoryOverview: row.category_overview || undefined,
+  };
+}
+
+let cachedProducts: Product[] | null = null;
+let lastFetchTime = 0;
+const CACHE_TTL_MS = 60 * 1000; // 1 minute in-memory cache
+
+export async function getSupabaseProducts(): Promise<Product[]> {
+  if (cachedProducts && Date.now() - lastFetchTime < CACHE_TTL_MS) {
+    return cachedProducts;
+  }
+
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('published', true)
+    .order('id', { ascending: true });
+
+  if (error) {
+    console.error('[Supabase] Error fetching products:', error);
+    return cachedProducts || mockProducts;
+  }
+
+  const products = await Promise.all((data || []).map(mapRowToProduct));
+  cachedProducts = products;
+  lastFetchTime = Date.now();
+  return products;
+}
+
+export async function getSupabaseProductBySlug(slug: string): Promise<Product | null> {
+  const products = await getSupabaseProducts();
+  const cleanSlug = (slug || '').trim().toLowerCase();
+  const altSlug = cleanSlug.replace(/-s\b/g, 's');
+  const altSlug2 = cleanSlug.replace(/\b(men|women)s\b/g, '$1-s');
+  const found = products.find(
+    (p) =>
+      p.slug === cleanSlug ||
+      p.slug === altSlug ||
+      p.slug === altSlug2 ||
+      p.id === cleanSlug
+  );
+
+  if (!found) return null;
+
+  // Lazily fetch and parse the Word .docx ONLY for this specific viewed product
+  if (found.longDescription && (found.longDescription.toLowerCase().includes('.docx') || !found.longDescription.includes('<p>'))) {
+    const parsedHtml = await fetchAndParseDocx(found.longDescription);
+    if (parsedHtml) {
+      return {
+        ...found,
+        longDescription: parsedHtml,
+        description: parsedHtml || found.description,
+      };
+    }
+  }
+
+  return found;
+}
+
+// ==========================================
+// SUPABASE BLOG FUNCTIONS
+// ==========================================
+
+export function resolveBlogCoverImage(raw?: string): string {
+  if (!raw || !raw.trim()) {
+    return 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200';
+  }
+  const clean = raw.trim();
+  if (clean.startsWith('http://') || clean.startsWith('https://')) {
+    return clean;
+  }
+  if (clean.toLowerCase().startsWith('blog/')) {
+    return `${supabaseUrl}/storage/v1/object/public/${encodeURI(clean)}`;
+  }
+  // User entered filename from storage 'Blog' bucket
+  return `${supabaseUrl}/storage/v1/object/public/Blog/${encodeURI(clean)}`;
+}
+
+export async function mapRowToBlogPost(row: any): Promise<BlogPost> {
+  const title = (row.title || 'Faith & Devotion').trim();
+  const autoSlug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+  const slug = (row.slug || autoSlug || String(row.id)).trim();
+
+  const coverImage = resolveBlogCoverImage(row.cover_image || row.image_cover);
+  const category = (row.category || 'Faith & Encouragement').trim();
+
+  let contentHtml = row.content || row.body || '';
+  let rawText = '';
+
+  // Check for Word document attachment in docx / word_document column or inside content/body
+  const docxCandidate =
+    row.docx ||
+    row.word_document ||
+    row.document ||
+    row.file ||
+    row.article ||
+    extractDocxName(row.content) ||
+    extractDocxName(row.body) ||
+    (typeof contentHtml === 'string' && contentHtml.toLowerCase().includes('.docx') ? contentHtml : null);
+
+  if (docxCandidate) {
+    const parsedHtml = await fetchAndParseDocx(docxCandidate);
+    if (parsedHtml) {
+      contentHtml = parsedHtml;
+      rawText = parsedHtml.replace(/<[^>]*>/g, '');
+    }
+  }
+
+  let excerpt = (row.excerpt || row.summary || '').trim();
+  if (!excerpt && rawText) {
+    excerpt = rawText.slice(0, 160).trim() + '...';
+  } else if (!excerpt) {
+    excerpt = 'A biblical reflection and devotional from the ADOPTD journal.';
+  }
+
+  const wordCount = (rawText || contentHtml.replace(/<[^>]*>/g, '')).split(/\s+/).length;
+  const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 200));
+
+  const publishDate =
+    row.publish_date ||
+    (row.created_at ? new Date(row.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+
+  return {
+    id: String(row.id),
+    title,
+    slug,
+    coverImage,
+    category,
+    excerpt,
+    contentHtml,
+    publishDate,
+    author: row.author || 'ADOPTD Team',
+    readingTimeMinutes,
+    seoTitle: row.seo_title || `${title} | ADOPTD Journal`,
+    seoDescription: row.seo_description || excerpt,
+    published: row.published !== false,
+  };
+}
+
+let cachedBlogPosts: BlogPost[] | null = null;
+let lastBlogFetchTime = 0;
+
+export async function getSupabaseBlogPosts(): Promise<BlogPost[]> {
+  if (cachedBlogPosts && Date.now() - lastBlogFetchTime < CACHE_TTL_MS) {
+    return cachedBlogPosts;
+  }
+
+  // Support both "Blog" and "blog" table casing
+  let data: any[] | null = null;
+  let fetchError: any = null;
+
+  const res1 = await supabase
+    .from('Blog')
+    .select('*')
+    .eq('published', true)
+    .order('id', { ascending: false });
+
+  if (!res1.error && res1.data) {
+    data = res1.data;
+  } else {
+    const res2 = await supabase
+      .from('blog')
+      .select('*')
+      .eq('published', true)
+      .order('id', { ascending: false });
+    if (!res2.error && res2.data) {
+      data = res2.data;
+    } else {
+      fetchError = res1.error || res2.error;
+    }
+  }
+
+  if (fetchError || !data || data.length === 0) {
+    if (fetchError) {
+      console.error('[Supabase] Error fetching Blog posts:', fetchError);
+    }
+    // Return mock blog posts if table is empty or error
+    return cachedBlogPosts || mockBlogPosts;
+  }
+
+  const posts = await Promise.all(data.map(mapRowToBlogPost));
+  cachedBlogPosts = posts;
+  lastBlogFetchTime = Date.now();
+  return posts;
+}
+
+export function clearSupabaseCache(): void {
+  cachedProducts = null;
+  lastFetchTime = 0;
+  cachedBlogPosts = null;
+  lastBlogFetchTime = 0;
+  docxHtmlCache.clear();
+}
+
+export async function getSupabaseBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  const posts = await getSupabaseBlogPosts();
+  const cleanSlug = (slug || '').trim().toLowerCase();
+  return (
+    posts.find(
+      (p) =>
+        p.slug.toLowerCase() === cleanSlug ||
+        p.id === cleanSlug
+    ) || null
+  );
+}

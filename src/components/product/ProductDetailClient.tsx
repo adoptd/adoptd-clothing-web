@@ -60,19 +60,20 @@ export function ProductDetailClient({
     });
   }
 
-  // 2. Subsequent positions: Specific photographs for each color variant
+  // 2. Subsequent positions: One specific photograph for each color variant
   product.colors.forEach((color) => {
-    color.images.forEach((imgUrl, i) => {
-      const resolved = resolveProductImage(imgUrl, product.category, product.slug);
+    const primaryImg = color.images[0];
+    if (primaryImg) {
+      const resolved = resolveProductImage(primaryImg, product.category, product.slug);
       if (resolved && !seenUrls.has(resolved)) {
         seenUrls.add(resolved);
         galleryItems.push({
           url: resolved,
           colorName: color.name,
-          label: `${color.name}${i > 0 ? ` (${i + 1})` : ''}`,
+          label: color.name,
         });
       }
-    });
+    }
   });
 
   if (galleryItems.length === 0) {
@@ -412,6 +413,37 @@ export function ProductDetailClient({
           </div>
         </section>
       )}
+
+      {/* Mobile-only Sticky Add to Bag Bar */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-stone-200 px-3 py-2.5 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-stone-900 truncate">{product.name}</p>
+            <p className="text-xs text-stone-500 truncate">
+              {selectedColorName}{selectedSize ? ` • ${selectedSize}` : ''} • £{product.price.toFixed(2)}
+            </p>
+          </div>
+          <button
+            onClick={handleAddToCart}
+            disabled={!product.inStock}
+            className="flex-shrink-0 py-2.5 px-5 bg-stone-950 text-white rounded-lg font-bold text-xs tracking-wider uppercase hover:bg-stone-800 transition flex items-center space-x-1.5 disabled:opacity-40"
+          >
+            {!product.inStock ? (
+              <span>Out of Stock</span>
+            ) : isAddedAnimation ? (
+              <>
+                <Check className="w-4 h-4 text-emerald-400" />
+                <span>Added</span>
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="w-4 h-4" />
+                <span>Add to Bag</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

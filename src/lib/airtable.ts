@@ -4,17 +4,11 @@ import { mockProducts, mockBlogPosts, mockSiteSettings } from '@/data/mockData';
 import { parseDocxBuffer } from './docx-parser';
 import yoastSeoData from '@/data/yoast-seo-data.json';
 import { resolveProductImage, getProductFallbackImage, isAirtableUrlExpired } from './images';
+import { getSupabaseProducts, getSupabaseBlogPosts, getSupabaseBlogPostBySlug } from './supabase';
 
-const apiKey = process.env.AIRTABLE_API_KEY;
-const baseId = process.env.AIRTABLE_BASE_ID;
-
-const base = apiKey && baseId
-  ? new Airtable({
-      apiKey,
-      requestTimeout: 2500,
-      noRetryIfRateLimited: true,
-    }).base(baseId)
-  : null;
+// AIRTABLE PERMANENTLY DISCONNECTED (Migrated 100% to Supabase)
+// Setting base = null ensures zero queries ever reach Airtable, completely eliminating billing errors and timeouts.
+const base: any = null;
 
 // Clean timeout wrapper to prevent any external query from blocking Vercel serverless functions
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
@@ -191,8 +185,22 @@ function getMainFeaturedAttachments(fields: Record<string, any>): any[] {
   return key && isAttachmentArray(fields[key]) ? fields[key] : [];
 }
 
-// Fetch all active products (Cached)
+// Fetch all active products (Powered by Supabase)
 export async function getProducts(): Promise<Product[]> {
+  try {
+    const supabaseProducts = await getSupabaseProducts();
+    if (supabaseProducts && supabaseProducts.length > 0) {
+      cachedProducts = { data: supabaseProducts, timestamp: Date.now() };
+      supabaseProducts.forEach((p) => {
+        cachedProductsBySlug.set(p.slug.toLowerCase(), p);
+        cachedProductsById.set(p.id, p);
+      });
+      return supabaseProducts;
+    }
+  } catch (err) {
+    console.warn('[Supabase] Failed to fetch products, attempting fallback:', err);
+  }
+
   if (cachedProducts && Date.now() - cachedProducts.timestamp < CACHE_TTL_MS) {
     return cachedProducts.data;
   }
@@ -225,12 +233,12 @@ export async function getProducts(): Promise<Product[]> {
 
     const products: Product[] = await Promise.all(
       records
-        .filter((record) => {
+        .filter((record: any) => {
           // Double-check Published status to ensure unpublished items are excluded
           const pub = record.fields['Published'];
           return pub !== false && pub !== 0 && pub !== 'false';
         })
-        .map(async (record) => {
+        .map(async (record: any) => {
           const fields = record.fields;
 
           const rawCatVal = fields['Category'] || fields['category'];
@@ -495,7 +503,7 @@ export async function getAboutPageData(): Promise<{
       return defaultData;
     }
 
-    const record = records.find(r => r.fields['Title'] || r.fields['Content'] || r.fields['content']) || records[0];
+    const record = records.find((r: any) => r.fields['Title'] || r.fields['Content'] || r.fields['content']) || records[0];
     const fields = record.fields;
 
     const title = (fields['Title'] as string) || (fields['title'] as string) || defaultData.title;
@@ -550,7 +558,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
   }
 
   if (!base) {
-    return mockBlogPosts;
+    return getSupabaseBlogPosts();
   }
 
   try {
@@ -578,7 +586,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     const records = await withTimeout(fetchBlog, 2500, []);
 
     if (!records || records.length === 0) {
-      return mockBlogPosts;
+      return getSupabaseBlogPosts();
     }
 
     const posts: BlogPost[] = [];
@@ -673,7 +681,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     return posts;
   } catch (error) {
     console.error('Error fetching blog posts from Airtable:', error);
-    return cachedBlogPosts?.data || mockBlogPosts;
+    return cachedBlogPosts?.data || (await getSupabaseBlogPosts());
   }
 }
 
@@ -684,7 +692,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
     return cachedBlogPostsBySlug.get(cleanSlug)!;
   }
   const posts = await getBlogPosts();
-  return cachedBlogPostsBySlug.get(cleanSlug) || posts.find((p) => p.slug.toLowerCase() === cleanSlug) || null;
+  return cachedBlogPostsBySlug.get(cleanSlug) || posts.find((p) => p.slug.toLowerCase() === cleanSlug) || (await getSupabaseBlogPostBySlug(slug));
 }
 
 // Fetch global site settings (Cached)
@@ -835,12 +843,12 @@ export async function getApprovedBlogComments(slug: string): Promise<BlogComment
       sort: [{ field: 'Submitted At', direction: 'asc' }],
       maxRecords: 100,
     }).all();
-    return records.map((record) => ({
+    return records.map((record: any) => ({
       id: record.id,
       name: String(record.fields['Name'] || 'Reader'),
       comment: String(record.fields['Comment'] || ''),
       submittedAt: String(record.fields['Submitted At'] || record.fields['Created'] || ''),
-    })).filter((item) => item.comment.trim());
+    })).filter((item: any) => item.comment.trim());
   } catch (error) {
     console.error('Error fetching approved blog comments from Airtable:', error);
     return [];

@@ -25,20 +25,20 @@ export function Navbar({ settings }: NavbarProps) {
   return (
     <header className="sticky top-0 z-40 transition-all">
       {/* Top Teal Green Accent Bar (+35% Size, Uppercase) */}
-      <div className="bg-[#00736a] text-white text-sm sm:text-base py-3 sm:py-3.5 px-4 text-center font-black uppercase tracking-wider">
+      <div className="bg-[#00736a] text-white text-xs sm:text-base py-2 sm:py-3.5 px-3 sm:px-4 text-center font-black uppercase tracking-wider">
         <span>{settings?.announcementBanner || "WEAR THE WORD. SHARE THE LIGHT."}</span>
       </div>
 
       {/* Main Black Header Bar */}
       <div className="bg-[#030303] text-white border-b border-stone-800">
-        <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2">
-          <div className="flex items-center justify-between py-5 sm:py-6 lg:py-8">
+        <div className="max-w-[1680px] mx-auto px-3 sm:px-1.5 lg:px-2">
+          <div className="flex items-center justify-between py-2.5 sm:py-6 lg:py-8">
             
             {/* Brand Logo - Scaled +25% in Depth with Preserved Vertical Ratio */}
             <div className="flex-shrink-0 flex items-center">
               <Link
                 href="/"
-                className="block relative h-20 sm:h-24 lg:h-[120px] w-56 sm:w-80 lg:w-[380px] focus:outline-none transition-transform hover:opacity-95"
+                className="block relative h-12 w-40 sm:h-24 sm:w-80 lg:h-[120px] lg:w-[380px] focus:outline-none transition-transform hover:opacity-95"
                 aria-label="Adoptd Christian Clothing Home"
               >
                 <Image
@@ -113,7 +113,8 @@ export function Navbar({ settings }: NavbarProps) {
               >
                 <ShoppingBag className="w-6 h-6 text-white" />
                 <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white">
-                  {hasMounted && totalItems > 0 ? `${totalItems} Items` : '0 Items'}
+                  {hasMounted && totalItems > 0 ? totalItems : 0}
+                  <span className="hidden sm:inline"> Items</span>
                 </span>
               </button>
 

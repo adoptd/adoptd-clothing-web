@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { getProducts, getBlogPosts } from '@/lib/airtable';
+import { getSupabaseProducts, getSupabaseBlogPosts } from '@/lib/supabase';
 import { constructMetadata } from '@/lib/seo';
 import { Map, ShoppingBag, BookOpen, Layers, ShieldCheck, FileCode, ArrowRight } from 'lucide-react';
 
@@ -14,8 +14,8 @@ export const revalidate = 60;
 
 export default async function SitemapPage() {
   const [products, posts] = await Promise.all([
-    getProducts(),
-    getBlogPosts(),
+    getSupabaseProducts(),
+    getSupabaseBlogPosts(),
   ]);
 
   const categories = [
