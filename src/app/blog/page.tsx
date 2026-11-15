@@ -39,13 +39,13 @@ export default async function BlogPage() {
             href={`/blog/${post.slug}`}
             className="group flex flex-col bg-white border border-stone-200 rounded-2xl overflow-hidden hover:border-stone-400 transition-all duration-300 shadow-sm hover:shadow-md"
           >
-            <div className="relative aspect-video w-full bg-stone-100 overflow-hidden">
+            <div className="relative aspect-[16/10] w-full bg-stone-100 overflow-hidden">
               <Image
                 src={post.coverImage}
                 alt={post.title}
                 fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
               />
               <span className="absolute top-3 left-3 bg-stone-900/90 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md backdrop-blur-sm">
                 {post.category}

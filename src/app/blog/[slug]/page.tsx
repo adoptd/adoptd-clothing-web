@@ -170,13 +170,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       </div>
 
       {/* Cover Image */}
-      <div className="max-w-4xl mx-auto relative aspect-video w-full rounded-2xl overflow-hidden shadow-md bg-stone-100 border border-stone-200">
+      <div className="max-w-4xl mx-auto relative aspect-[16/10] w-full rounded-2xl overflow-hidden shadow-md bg-stone-100 border border-stone-200">
         <Image
           src={post.coverImage}
           alt={post.title}
           fill
           priority
-          className="object-cover"
+          className="object-cover object-center"
           sizes="(max-width: 1024px) 100vw, 896px"
         />
       </div>

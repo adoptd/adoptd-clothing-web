@@ -163,7 +163,7 @@ export function ProductDetailClient({
         
         {/* Gallery / Images Column */}
         <div className="space-y-4">
-          <div className="relative aspect-[4/5] sm:aspect-square w-full bg-stone-50 rounded-2xl overflow-hidden border border-stone-200 shadow-sm p-4 sm:p-6 flex items-center justify-center">
+          <div className="relative aspect-[4/5] w-full bg-stone-100 rounded-2xl overflow-hidden border border-stone-200 shadow-sm">
             <Image
               src={currentDisplayImage}
               alt={`${product.name}${selectedColorName ? ` in ${selectedColorName}` : ''} - Christian ${product.categoryName.toLowerCase()} from Adoptd`}
@@ -171,7 +171,7 @@ export function ProductDetailClient({
               priority
               onError={() => setImgErrorMap((prev) => ({ ...prev, [rawDisplayImage]: true }))}
               sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-contain object-center transition-all duration-300"
+              className="object-cover object-center transition-all duration-300"
             />
             {!product.inStock ? (
               <span className="absolute top-4 left-4 bg-stone-900/90 text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-md shadow-sm">
@@ -196,10 +196,10 @@ export function ProductDetailClient({
                     key={`${item.url}-${idx}`}
                     type="button"
                     onClick={() => handleGalleryClick(idx)}
-                    className={`group relative aspect-square w-full rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer focus:outline-none p-1.5 bg-stone-50 ${
+                    className={`group relative aspect-[4/5] w-full rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer focus:outline-none bg-stone-100 ${
                       isSelected
                         ? 'border-[#00736a] ring-2 ring-[#00736a]/30 shadow-md opacity-100'
-                        : 'border-stone-200/90 opacity-70 hover:opacity-100 hover:border-stone-400'
+                        : 'border-stone-200/90 opacity-75 hover:opacity-100 hover:border-stone-400'
                     }`}
                     aria-label={`View ${product.name} ${item.label || ''}`}
                   >
@@ -209,7 +209,7 @@ export function ProductDetailClient({
                       fill
                       onError={() => setImgErrorMap((prev) => ({ ...prev, [item.url]: true }))}
                       sizes="(max-width: 640px) 25vw, (max-width: 1024px) 15vw, 120px"
-                      className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
+                      className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
                     />
                     <span className="absolute bottom-1 right-1 bg-stone-900/80 text-[9px] text-white px-1 py-0.5 rounded font-medium max-w-[90%] truncate">
                       {item.label || (item.colorName ? item.colorName : 'Main')}

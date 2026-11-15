@@ -110,9 +110,9 @@ export default async function HomePage() {
           <img
             src="/images/gym-sportswear-banner.png"
             alt="Built on Faith — shop Adoptd Christian gym and sportswear"
-            width={2048}
-            height={533}
-            className="block h-auto w-full"
+            width={2400}
+            height={625}
+            className="block h-auto w-full object-cover object-center"
             loading="eager"
             fetchPriority="high"
             decoding="async"
@@ -147,7 +147,7 @@ export default async function HomePage() {
                 </nav>
               </div>
 
-              <div className="relative aspect-[16/8] sm:aspect-[16/7] w-full rounded-[18px] overflow-hidden bg-white shadow-sm">
+              <div className="relative aspect-[16/7] w-full rounded-[18px] overflow-hidden bg-stone-100 shadow-sm">
                 <Image
                   src="/images/hero-banner.webp"
                   alt="Adoptd Christian Clothing Collection"
@@ -206,12 +206,12 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="relative w-full h-full min-h-[280px] sm:min-h-[520px] lg:min-h-full rounded-[24px] overflow-hidden bg-[#efefef] shadow-sm group">
+          <div className="relative w-full aspect-[4/5] lg:aspect-auto lg:h-full lg:min-h-full rounded-[24px] overflow-hidden bg-[#efefef] shadow-sm group">
             <Image
               src="/images/hero-hoodie.webp"
               alt="Featured Adoptd Christian Hoodie Collection"
               fill
-              className="object-cover object-center group-hover:scale-102 transition-transform duration-500"
+              className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
           </div>
@@ -265,17 +265,20 @@ export default async function HomePage() {
           {categories.map((cat) => (
             <div
               key={cat.slug}
-              className="bg-[#efefef] rounded-[20px] p-4 sm:p-7 flex flex-col items-center justify-between text-center space-y-4 sm:space-y-5 hover:shadow-md transition-all"
+              className="group bg-[#efefef] rounded-[20px] p-4 sm:p-5 flex flex-col items-center justify-between text-center space-y-4 hover:shadow-md transition-all"
             >
-              <div className="relative aspect-square w-24 sm:w-32 rounded-lg overflow-hidden bg-white shadow-sm">
+              <Link
+                href={`/shop/${cat.slug}`}
+                className="relative aspect-[4/5] w-full rounded-xl overflow-hidden bg-stone-100 shadow-sm block"
+              >
                 <Image
                   src={cat.image}
                   alt={cat.name}
                   fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 112px, 128px"
+                  className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                 />
-              </div>
+              </Link>
 
               <h3 className="font-black text-sm sm:text-base text-stone-900 tracking-wider">
                 {cat.name}

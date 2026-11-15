@@ -80,13 +80,13 @@ export function CartDrawer() {
 
                 return (
                   <div key={item.id} className="flex space-x-4 pb-6 border-b border-stone-100">
-                    <div className="w-20 h-24 relative rounded-md overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200">
+                    <div className="w-20 aspect-[4/5] relative rounded-md overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200">
                       <Image
                         src={displayImg}
                         alt={item.name}
                         fill
                         onError={() => setImgErrors((prev) => ({ ...prev, [item.id]: true }))}
-                        className="object-cover"
+                        className="object-cover object-center"
                         sizes="80px"
                       />
                     </div>

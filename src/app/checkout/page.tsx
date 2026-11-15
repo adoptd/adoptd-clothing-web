@@ -63,13 +63,13 @@ export default function CheckoutPage() {
 
                   return (
                     <div key={item.id} className="pt-3 first:pt-0 flex space-x-3 items-center">
-                      <div className="relative w-16 h-18 rounded-md overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200">
+                      <div className="relative w-16 aspect-[4/5] rounded-md overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200">
                         <Image
                           src={displayImg}
                           alt={item.name}
                           fill
                           onError={() => setImgErrors((prev) => ({ ...prev, [item.id]: true }))}
-                          className="object-cover"
+                          className="object-cover object-center"
                           sizes="64px"
                         />
                       </div>

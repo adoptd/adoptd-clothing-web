@@ -63,7 +63,7 @@ body {
 
 /* Inline Images from Word Documents */
 .prose-article img, .article-inline-image {
-  @apply rounded-2xl max-w-full my-8 shadow-md mx-auto block object-cover border border-stone-100;
+  @apply rounded-2xl w-full max-w-full h-auto my-8 shadow-md mx-auto block object-cover object-center border border-stone-100;
 }
 
 .prose-article strong {

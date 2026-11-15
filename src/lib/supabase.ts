@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Product, ProductColorVariant, ProductCategory, BlogPost } from '@/types';
 import { mockProducts, mockBlogPosts } from '@/data/mockData';
+import { getProductFallbackImage } from '@/lib/images';
 import fs from 'fs';
 import path from 'path';
 import { parseDocxBuffer } from './docx-parser';
@@ -115,7 +116,8 @@ export function getColorHex(colorName: string): string {
 const COLOR_COLUMNS = [
   { key: 'image_black', name: 'Black', aliases: ['black'] },
   { key: 'image_grey', name: 'Grey', aliases: ['grey', 'gray'] },
-  { key: 'image_natural', name: 'Natural', aliases: ['natural', 'sand'] },
+  { key: 'image_natural', name: 'Natural', aliases: ['natural'] },
+  { key: 'image_sand', name: 'Sand', aliases: ['sand'] },
   { key: 'image_white', name: 'White', aliases: ['white'] },
   { key: 'image_jade', name: 'Jade', aliases: ['jade'] },
   { key: 'image_purple', name: 'Purple', aliases: ['purple'] },
@@ -202,13 +204,15 @@ export async function mapRowToProduct(row: any): Promise<Product> {
     if (hasDbColor || localFileMatch) {
       const colorImages: string[] = [];
 
-      // 1. Prefer database filename in Supabase Storage if present
+      // 1. Prefer database filename in Supabase Storage if present (or local public/images/products if bundled)
       if (hasDbColor) {
         const filenames = dbVal.split(',').map((f: string) => f.trim()).filter(Boolean);
         const primaryFile = filenames.find((f: string) => !f.includes('airtable.com'));
         if (primaryFile) {
           const url = primaryFile.startsWith('/') || primaryFile.startsWith('http')
             ? primaryFile
+            : fs.existsSync(path.join(publicProductsDir, primaryFile))
+            ? `/images/products/${primaryFile}`
             : `${supabaseUrl}/storage/v1/object/public/products/${encodeURI(primaryFile)}`;
           colorImages.push(url);
         }
@@ -226,17 +230,12 @@ export async function mapRowToProduct(row: any): Promise<Product> {
     }
   }
 
-  // Fallback to mock colors if database has zero colors defined
-  if (colors.length === 0 && mockMatch && mockMatch.colors && mockMatch.colors.length > 0) {
-    colors.push(...mockMatch.colors);
-  }
-
   // Fallback default color
   if (colors.length === 0) {
     colors.push({
       name: 'Default',
       hex: '#111111',
-      images: [`/images/products/${slug}.webp`],
+      images: [getProductFallbackImage(categorySlug, slug)],
       hasSpecificImage: false,
     });
   }
@@ -247,15 +246,13 @@ export async function mapRowToProduct(row: any): Promise<Product> {
     const cleanMain = row.main_featured_image.trim();
     featuredImage = cleanMain.startsWith('/') || cleanMain.startsWith('http')
       ? cleanMain
+      : fs.existsSync(path.join(publicProductsDir, cleanMain))
+      ? `/images/products/${cleanMain}`
       : `${supabaseUrl}/storage/v1/object/public/products/${encodeURI(cleanMain)}`;
-  } else if (fs.existsSync(path.join(publicProductsDir, `${slug}.webp`))) {
-    featuredImage = `/images/products/${slug}.webp`;
-  } else if (mockMatch && mockMatch.featuredImage) {
-    featuredImage = mockMatch.featuredImage;
   } else if (colors[0]?.images[0]) {
     featuredImage = colors[0].images[0];
   } else {
-    featuredImage = '/images/shop-hoodies-bg.webp';
+    featuredImage = getProductFallbackImage(categorySlug, slug);
   }
 
   // Size guide type
