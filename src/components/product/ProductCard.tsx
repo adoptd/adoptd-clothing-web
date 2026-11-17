@@ -36,7 +36,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <Link href={`/product/${product.slug}`} className="relative aspect-[4/5] w-full bg-stone-100 overflow-hidden block">
         <Image
           src={displayImage}
-          alt={product.name}
+          alt={`${product.name}${selectedColor ? ` in ${selectedColor.name}` : ''} — Adoptd Christian Clothing UK`}
           fill
           onError={() => setImgError(true)}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

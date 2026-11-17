@@ -239,3 +239,82 @@ export function generateArticleJsonLd(post: BlogPost) {
     },
   };
 }
+
+// Generate CollectionPage + ItemList JSON-LD Schema for Category Pages.
+export function generateCollectionPageJsonLd({
+  title,
+  description,
+  slug,
+  products,
+}: {
+  title: string;
+  description: string;
+  slug: string;
+  products: Product[];
+}) {
+  const cleanSlug = slug.replace(/^\//, '');
+  const url = `${siteUrl}/${cleanSlug}`;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': `${url}#collection`,
+    name: title,
+    description,
+    url,
+    inLanguage: 'en-GB',
+    isPartOf: {
+      '@id': `${siteUrl}/#website`,
+    },
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: products.length,
+      itemListElement: products.map((product, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: `${siteUrl}/product/${product.slug}`,
+        name: product.name,
+      })),
+    },
+  };
+}
+
+// Generate Service JSON-LD Schema for Church & Ministry Print Services.
+export function generateServiceJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    '@id': `${siteUrl}/church-print-services#service`,
+    name: 'Church & Ministry Custom Apparel Printing UK',
+    serviceType: 'Custom Screen Printing and Embroidery for Churches & Ministries',
+    description:
+      'Custom organic cotton t-shirts, heavyweight hoodies, sweaters, and tote bags printed for UK churches, youth ministries, worship teams, and Christian conferences.',
+    provider: {
+      '@type': 'Organization',
+      '@id': `${siteUrl}/#organization`,
+      name: organizationName,
+    },
+    areaServed: {
+      '@type': 'Country',
+      name: 'United Kingdom',
+    },
+    url: `${siteUrl}/church-print-services`,
+  };
+}
+
+// Generate FAQPage JSON-LD Schema for Google Rich Results & AI Overviews.
+export function generateFaqJsonLd(faqs: { question: string; answer: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+}
+

@@ -108,7 +108,7 @@ export default async function HomePage() {
           className="group block w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00736a]"
         >
           <img
-            src="/images/gym-sportswear-banner.png"
+            src="/images/gym-sportswear-banner.webp"
             alt="Built on Faith — shop Adoptd Christian gym and sportswear"
             width={2400}
             height={625}
@@ -127,6 +127,9 @@ export default async function HomePage() {
               <div className="space-y-4">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tight text-stone-950 leading-tight">
                   SMALL BUSINESS. BIG FAITH.
+                  <span className="block text-xs sm:text-sm font-bold tracking-[0.18em] text-[#00736a] mt-1.5">
+                    Christian Clothing &amp; Faith-Inspired Apparel UK
+                  </span>
                 </h1>
                 <p className="text-stone-800 text-sm sm:text-base leading-relaxed font-normal">
                   ADOPTD is an independent Christian clothing brand, created with a simple purpose — to make clothing that carries a message of faith, hope and identity. Every purchase helps a small independent business and supports a bigger mission: to point people toward Jesus through everyday style.

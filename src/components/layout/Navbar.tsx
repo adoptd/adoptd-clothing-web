@@ -32,13 +32,13 @@ export function Navbar({ settings }: NavbarProps) {
       {/* Main Black Header Bar */}
       <div className="bg-[#030303] text-white border-b border-stone-800">
         <div className="max-w-[1680px] mx-auto px-3 sm:px-1.5 lg:px-2">
-          <div className="flex items-center justify-between py-2.5 sm:py-6 lg:py-8">
+          <div className="flex items-center justify-between py-2.5 sm:py-5 lg:py-4">
             
             {/* Brand Logo - Scaled +25% in Depth with Preserved Vertical Ratio */}
             <div className="flex-shrink-0 flex items-center">
               <Link
                 href="/"
-                className="block relative h-12 w-40 sm:h-24 sm:w-80 lg:h-[120px] lg:w-[380px] focus:outline-none transition-transform hover:opacity-95"
+                className="block relative h-12 w-40 sm:h-20 sm:w-72 lg:h-24 lg:w-[320px] focus:outline-none transition-transform hover:opacity-95"
                 aria-label="Adoptd Christian Clothing Home"
               >
                 <Image

@@ -1,17 +1,62 @@
 import React from 'react';
-import Image from 'next/image';
-import { Church, CheckCircle, ShieldCheck, Mail, Sparkles, Send } from 'lucide-react';
-import { constructMetadata } from '@/lib/seo';
+import { Church, CheckCircle, Send } from 'lucide-react';
+import {
+  constructMetadata,
+  generateBreadcrumbJsonLd,
+  generateFaqJsonLd,
+  generateServiceJsonLd,
+} from '@/lib/seo';
 
 export const metadata = constructMetadata({
   title: 'Church & Ministry Print Services | Custom Christian Apparel',
-  description: 'Custom screen printing and embroidery for UK churches, youth ministries, worship teams, and Christian conferences.',
+  description:
+    'Custom screen printing and embroidery for UK churches, youth ministries, worship teams, and Christian conferences.',
   slug: 'church-print-services',
 });
 
+const churchPrintFaqs = [
+  {
+    question: 'What is the minimum order quantity for custom church apparel?',
+    answer:
+      'Our standard tiered ministry pricing starts at 25 garments (which can be a mix of sizes across t-shirts, hoodies, or tote bags), making it ideal for small church teams as well as large conferences.',
+  },
+  {
+    question: 'Can you help with our church logo or youth camp artwork?',
+    answer:
+      'Yes! Every ministry order includes free digital mockups and artwork proofing before printing, and our team can help refine your church logo, scripture typography, and garment colour combinations.',
+  },
+  {
+    question: 'How long does custom church printing and UK delivery take?',
+    answer:
+      'Once your digital mockup is approved, most UK church and ministry print orders are produced and delivered via tracked courier within 7–14 working days.',
+  },
+];
+
 export default function ChurchPrintServicesPage() {
+  const serviceJsonLd = JSON.stringify(generateServiceJsonLd()).replace(/</g, '\\u003c');
+  const faqJsonLd = JSON.stringify(generateFaqJsonLd(churchPrintFaqs)).replace(/</g, '\\u003c');
+  const breadcrumbJsonLd = JSON.stringify(
+    generateBreadcrumbJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'Church & Ministry Print Services', path: '/church-print-services' },
+    ])
+  ).replace(/</g, '\\u003c');
+
   return (
-    <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 py-16 space-y-16">
+    <div className="max-w-[1680px] mx-auto px-3 sm:px-1.5 lg:px-2 py-16 space-y-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serviceJsonLd }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: faqJsonLd }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }}
+      />
+
       {/* Header */}
       <div className="text-center max-w-5xl lg:max-w-6xl mx-auto space-y-4">
         <div className="inline-flex items-center space-x-2 bg-stone-100 text-stone-800 px-4 py-1.5 rounded-full text-xs font-semibold">
@@ -19,21 +64,21 @@ export default function ChurchPrintServicesPage() {
           <span>Custom Ministry Solutions</span>
         </div>
         <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-stone-950 whitespace-normal sm:whitespace-nowrap">
-          Church & Ministry Print Services
+          Church &amp; Ministry Print Services
         </h1>
         <p className="text-stone-700 text-base sm:text-lg leading-relaxed font-normal max-w-3xl mx-auto">
           Premium, ethically sourced custom t-shirts, hoodies, and tote bags for your church staff, youth camps, worship ministries, and outreach events.
         </p>
       </div>
 
-      {/* Benefits Grid */}
+      {/* Benefits Grid (Uses H2 for valid H1 -> H2 heading hierarchy) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="bg-[#00736a] text-white rounded-2xl p-8 sm:p-10 space-y-5 shadow-sm flex flex-col justify-between">
           <div className="space-y-4">
             <div className="w-14 h-14 bg-white text-[#00736a] rounded-xl flex items-center justify-center font-black text-xl shadow-sm">
               1
             </div>
-            <h3 className="font-serif text-2xl font-bold text-white">Heavyweight Quality</h3>
+            <h2 className="font-serif text-2xl font-bold text-white">Heavyweight Quality</h2>
             <p className="text-base sm:text-lg text-white/95 leading-relaxed font-normal">
               We supply high-grade organic ringspun cotton and cozy heavyweight fleece that your congregation will genuinely love wearing weekly.
             </p>
@@ -45,7 +90,7 @@ export default function ChurchPrintServicesPage() {
             <div className="w-14 h-14 bg-white text-[#00736a] rounded-xl flex items-center justify-center font-black text-xl shadow-sm">
               2
             </div>
-            <h3 className="font-serif text-2xl font-bold text-white">Bulk Ministry Pricing</h3>
+            <h2 className="font-serif text-2xl font-bold text-white">Bulk Ministry Pricing</h2>
             <p className="text-base sm:text-lg text-white/95 leading-relaxed font-normal">
               Tiered volume discounts designed for church budgets, youth groups, and conference merchandise without compromising quality.
             </p>
@@ -57,7 +102,7 @@ export default function ChurchPrintServicesPage() {
             <div className="w-14 h-14 bg-white text-[#00736a] rounded-xl flex items-center justify-center font-black text-xl shadow-sm">
               3
             </div>
-            <h3 className="font-serif text-2xl font-bold text-white">Custom Design Support</h3>
+            <h2 className="font-serif text-2xl font-bold text-white">Custom Design Support</h2>
             <p className="text-base sm:text-lg text-white/95 leading-relaxed font-normal">
               Need help polishing your church logo, event theme typography, or choosing color combinations? We help guide you from concept to delivery.
             </p>
@@ -68,7 +113,6 @@ export default function ChurchPrintServicesPage() {
       {/* Inquiry Form Section - Full Width Spread */}
       <div className="w-full bg-[#efefef] rounded-[28px] p-6 sm:p-10 lg:p-14 border border-stone-200/80 shadow-sm">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
-          
           {/* Left Column: Context & Guarantees */}
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-3">
@@ -87,11 +131,11 @@ export default function ChurchPrintServicesPage() {
             <div className="space-y-3.5 pt-2 border-t border-stone-300/80">
               <div className="flex items-start space-x-3 text-stone-800 text-sm sm:text-base font-medium">
                 <CheckCircle className="w-5 h-5 text-[#00736a] flex-shrink-0 mt-0.5" />
-                <span>Free digital mockups & artwork proofing before printing</span>
+                <span>Free digital mockups &amp; artwork proofing before printing</span>
               </div>
               <div className="flex items-start space-x-3 text-stone-800 text-sm sm:text-base font-medium">
                 <CheckCircle className="w-5 h-5 text-[#00736a] flex-shrink-0 mt-0.5" />
-                <span>Premium organic ringspun cottons & cozy heavyweight fleece</span>
+                <span>Premium organic ringspun cottons &amp; cozy heavyweight fleece</span>
               </div>
               <div className="flex items-start space-x-3 text-stone-800 text-sm sm:text-base font-medium">
                 <CheckCircle className="w-5 h-5 text-[#00736a] flex-shrink-0 mt-0.5" />
@@ -99,7 +143,7 @@ export default function ChurchPrintServicesPage() {
               </div>
               <div className="flex items-start space-x-3 text-stone-800 text-sm sm:text-base font-medium">
                 <CheckCircle className="w-5 h-5 text-[#00736a] flex-shrink-0 mt-0.5" />
-                <span>Tracked Royal Mail & courier delivery direct to your church</span>
+                <span>Tracked Royal Mail &amp; courier delivery direct to your church</span>
               </div>
             </div>
 
@@ -194,7 +238,7 @@ export default function ChurchPrintServicesPage() {
 
               <div>
                 <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-stone-800 mb-1.5">
-                  Project Details, Event Date & Design Notes
+                  Project Details, Event Date &amp; Design Notes
                 </label>
                 <textarea
                   rows={4}
@@ -212,9 +256,28 @@ export default function ChurchPrintServicesPage() {
               </button>
             </form>
           </div>
-
         </div>
       </div>
+
+      {/* Church Print Services FAQ Section */}
+      <section className="space-y-6 pt-4 border-t border-stone-200" aria-labelledby="church-faq-heading">
+        <div className="text-center max-w-3xl mx-auto space-y-2">
+          <span className="text-xs uppercase tracking-[0.25em] text-[#00736a] font-bold">
+            Ministry Printing FAQs
+          </span>
+          <h2 id="church-faq-heading" className="font-serif text-2xl sm:text-3xl font-bold text-stone-950">
+            Frequently Asked Questions
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {churchPrintFaqs.map((faq) => (
+            <div key={faq.question} className="rounded-2xl bg-stone-50 border border-stone-200 p-6 space-y-2">
+              <h3 className="font-serif text-lg font-bold text-stone-950">{faq.question}</h3>
+              <p className="text-sm text-stone-600 leading-relaxed">{faq.answer}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
