@@ -6,6 +6,7 @@ import {
   Elements,
   PaymentElement,
   AddressElement,
+  LinkAuthenticationElement,
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
@@ -19,6 +20,7 @@ function CheckoutForm({ clientSecret }: { clientSecret: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [customerEmail, setCustomerEmail] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const clearCart = useCartStore((state) => state.clearCart);
 
@@ -36,6 +38,9 @@ function CheckoutForm({ clientSecret }: { clientSecret: string }) {
       elements,
       confirmParams: {
         return_url: `${window.location.origin}/checkout/success`,
+        ...(customerEmail && customerEmail.includes('@')
+          ? { receipt_email: customerEmail.trim() }
+          : {}),
       },
     });
 
@@ -54,9 +59,19 @@ function CheckoutForm({ clientSecret }: { clientSecret: string }) {
         <h3 className="font-serif text-base font-bold text-stone-900 border-b border-stone-100 pb-3">
           1. Delivery Address
         </h3>
+        <LinkAuthenticationElement
+          onChange={(event) => {
+            if (event.value?.email) {
+              setCustomerEmail(event.value.email);
+            }
+          }}
+        />
         <AddressElement
           options={{
             mode: 'shipping',
+            fields: {
+              phone: 'always',
+            },
             allowedCountries: ['GB', 'US', 'CA', 'IE', 'AU', 'NZ', 'FR', 'DE'],
             defaultValues: {
               address: {
@@ -126,9 +141,15 @@ export function StripeEmbeddedCheckout() {
           body: JSON.stringify({
             items: items.map((i) => ({
               id: i.productId,
+              name: i.name,
+              slug: i.slug,
               size: i.size,
               color: i.color,
               quantity: i.quantity,
+              design: i.design,
+              variant: i.variant,
+              personalisedText: i.personalisedText,
+              uploadedArtworkUrl: i.uploadedArtworkUrl,
             })),
           }),
         });

@@ -1,100 +1,83 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { insertOrderPostgres } from '@/lib/vercel-postgres';
-
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+import { processConfirmedPaymentIntent } from '@/lib/orders';
 
 export async function POST(req: NextRequest) {
   const payload = await req.text();
   const sig = req.headers.get('stripe-signature');
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-  let event;
+  let event: any;
 
   try {
-    if (webhookSecret && sig) {
+    if (webhookSecret) {
+      if (!sig) {
+        return NextResponse.json(
+          { error: 'Missing stripe-signature header' },
+          { status: 400 }
+        );
+      }
       event = stripe.webhooks.constructEvent(payload, sig, webhookSecret);
+    } else if (process.env.NODE_ENV === 'production') {
+      console.error('⚠️ STRIPE_WEBHOOK_SECRET is not configured in production.');
+      return NextResponse.json(
+        { error: 'Webhook secret not configured' },
+        { status: 400 }
+      );
     } else {
-      // In development / initial testing without webhook secret
+      // Development / local test mode fallback when STRIPE_WEBHOOK_SECRET is not set
       event = JSON.parse(payload);
     }
   } catch (err: any) {
     console.error(`⚠️ Webhook signature verification failed:`, err.message);
-    return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Webhook signature verification failed' },
+      { status: 400 }
+    );
   }
 
-  // Handle successful payments
-  if (event.type === 'payment_intent.succeeded') {
-    const paymentIntent = event.data.object as any;
-    const orderNumber = `ORD-${Date.now().toString().slice(-6)}`;
-    const customerEmail = paymentIntent.receipt_email || paymentIntent.customer_details?.email || 'customer@example.com';
-    const customerName = paymentIntent.shipping?.name || paymentIntent.customer_details?.name || 'Customer';
-    const totalAmount = paymentIntent.amount / 100;
-    const shippingAddress = paymentIntent.shipping?.address || {};
+  try {
+    // Only trigger on confirmed payment events; ignore order updates or non-succeeded events
+    if (event.type === 'payment_intent.succeeded') {
+      let paymentIntent = event.data.object as any;
 
-    // Order successfully verified via Stripe
-    console.log(`[Order Received] ${orderNumber} - Customer: ${customerName} (${customerEmail}) - Total: £${totalAmount.toFixed(2)}`);
-
-    // 2. SECONDARY: Mirror order into Vercel Postgres
-    if (process.env.POSTGRES_URL) {
-      try {
-        await insertOrderPostgres({
-          orderNumber,
-          customerName,
-          customerEmail,
-          totalAmount,
-          items: [{ metadata: paymentIntent.metadata }],
-          shippingAddress,
-          stripePaymentId: paymentIntent.id,
-        });
-        console.log(`[Vercel Postgres] Successfully mirrored order: ${orderNumber}`);
-      } catch (pgErr) {
-        console.error('[Vercel Postgres] Error mirroring order:', pgErr);
+      // Expand payment_method and latest_charge from Stripe API if real key is configured
+      if (
+        paymentIntent?.id &&
+        process.env.STRIPE_SECRET_KEY &&
+        !process.env.STRIPE_SECRET_KEY.includes('mock_dummy_key') &&
+        !paymentIntent.latest_charge?.payment_method_details
+      ) {
+        try {
+          paymentIntent = await stripe.paymentIntents.retrieve(paymentIntent.id, {
+            expand: ['payment_method', 'latest_charge'],
+          });
+        } catch {
+          // Proceed with webhook payload object if retrieve fails
+        }
       }
+
+      const result = await processConfirmedPaymentIntent(paymentIntent);
+
+      console.log(
+        `[Stripe Webhook] Order #${result.order.orderNumber} processed (emailSent=${result.emailSent}, alreadyProcessed=${result.alreadyProcessed}, savedToSupabase=${result.savedToSupabase})`
+      );
+
+      return NextResponse.json({
+        received: true,
+        orderNumber: result.order.orderNumber,
+        emailSent: result.emailSent,
+        alreadyProcessed: result.alreadyProcessed,
+        savedToSupabase: result.savedToSupabase,
+      });
     }
 
-    // 3. Dispatch new order email alert to store owner (adoptdclothing@gmail.com)
-    const resendApiKey = process.env.RESEND_API_KEY;
-    if (resendApiKey) {
-      try {
-        const itemsDesc = paymentIntent.metadata?.itemsDescription || `${paymentIntent.metadata?.itemCount || 1} item(s)`;
-        const fullAddress = [
-          shippingAddress.line1,
-          shippingAddress.line2,
-          shippingAddress.city,
-          shippingAddress.postal_code,
-          shippingAddress.country,
-        ].filter(Boolean).join(', ');
-
-        await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${resendApiKey}`,
-          },
-          body: JSON.stringify({
-            from: process.env.RESEND_FROM_EMAIL || 'ADOPTD Orders <onboarding@resend.dev>',
-            to: ['adoptdclothing@gmail.com'],
-            subject: `🎉 New Order Received: ${orderNumber} (£${totalAmount.toFixed(2)})`,
-            html: `
-              <div style="font-family: sans-serif; font-size: 16px; color: #1c1917; max-width: 600px; line-height: 1.6;">
-                <h2 style="color: #00736a; margin-bottom: 8px;">🎉 New Order Received: ${orderNumber}</h2>
-                <p><strong>Customer:</strong> ${customerName} (<a href="mailto:${customerEmail}">${customerEmail}</a>)</p>
-                <p><strong>Total Paid:</strong> £${totalAmount.toFixed(2)}</p>
-                <p><strong>Items:</strong> ${itemsDesc}</p>
-                <p><strong>Delivery Address:</strong> ${fullAddress || 'N/A'}</p>
-                <p><strong>Stripe Payment ID:</strong> ${paymentIntent.id}</p>
-                <hr style="border: 0; border-top: 1px solid #e7e5e4; margin: 20px 0;" />
-                <p style="font-size: 13px; color: #78716c;">Recorded automatically in Airtable Orders.</p>
-              </div>
-            `,
-          }),
-        });
-        console.log(`[Email Alert] Dispatched order notification to adoptdclothing@gmail.com for ${orderNumber}`);
-      } catch (emailErr) {
-        console.error('[Email Alert] Error dispatching order email:', emailErr);
-      }
-    }
+    return NextResponse.json({ received: true, ignoredEventType: event.type });
+  } catch (error: any) {
+    console.error('[Stripe Webhook] Error processing confirmed order:', error);
+    return NextResponse.json(
+      { error: error.message || 'Webhook processing error' },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json({ received: true });
 }

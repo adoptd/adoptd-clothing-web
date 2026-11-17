@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { CheckCircle2, ShoppingBag, ArrowRight, Heart, Mail } from 'lucide-react';
 import { constructMetadata } from '@/lib/seo';
+import { OrderSuccessConfirmation } from '@/components/checkout/OrderSuccessConfirmation';
 
 export const metadata = constructMetadata({
   title: 'Order Confirmed | Adoptd Christian Clothing',
@@ -11,6 +12,9 @@ export const metadata = constructMetadata({
 export default function CheckoutSuccessPage() {
   return (
     <div className="max-w-[1680px] mx-auto px-1 sm:px-1.5 lg:px-2 py-20 text-center space-y-8">
+      <Suspense fallback={null}>
+        <OrderSuccessConfirmation />
+      </Suspense>
       <div className="max-w-3xl mx-auto space-y-8">
         <div className="w-24 h-24 bg-[#00736a]/15 text-[#00736a] rounded-full flex items-center justify-center mx-auto shadow-inner">
           <CheckCircle2 className="w-12 h-12" />

@@ -50,6 +50,51 @@ export interface CartItem {
   color: string;
   image: string;
   quantity: number;
+  design?: string;
+  variant?: string;
+  personalisedText?: string;
+  uploadedArtworkUrl?: string;
+}
+
+export interface OrderItemDetails {
+  productId: string;
+  productName: string;
+  design: string;
+  variant: string;
+  size: string;
+  color: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+  image?: string;
+  personalisedText?: string;
+  uploadedArtworkUrl?: string;
+}
+
+export interface OrderDeliveryAddress {
+  line1: string;
+  line2?: string;
+  city: string;
+  county: string;
+  postcode: string;
+  country: string;
+}
+
+export interface OrderRecord {
+  orderNumber: string;
+  orderDate: string;
+  paymentStatus: string;
+  paymentMethod: string;
+  subtotal: number;
+  shippingCost: number;
+  totalAmount: number;
+  currency: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  deliveryAddress: OrderDeliveryAddress;
+  items: OrderItemDetails[];
+  stripePaymentId: string;
 }
 
 export interface BlogPost {

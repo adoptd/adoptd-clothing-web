@@ -140,6 +140,10 @@ export function ProductDetailClient({
     }
 
     const effectiveColor = selectedColorName || product.colors[0]?.name || 'Default';
+    const designLabel = product.scriptureReference
+      ? `${product.name} (${product.scriptureReference})`
+      : product.name;
+    const variantLabel = `${product.categoryName} — ${effectiveColor} / Size ${selectedSize}`;
 
     addItem({
       productId: product.id,
@@ -150,6 +154,8 @@ export function ProductDetailClient({
       color: effectiveColor,
       image: currentDisplayImage,
       quantity: 1,
+      design: designLabel,
+      variant: variantLabel,
     });
 
     setIsAddedAnimation(true);
